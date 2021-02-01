@@ -1,0 +1,643 @@
+---
+openapi: 3.0.1
+info:
+  title: Mitigation Reporting API
+  description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
+  contact:
+    email: g.dorchies@resilienx.com
+  version: 0.0.7
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/mitigation/v0
+
+tags:
+- name: Mitigation
+  description: Mitigation information
+
+- name: Mitigation Subscription
+  description: Subscribe to one, multiple, or all mitigation updates
+
+- name: Mitigation Subscriber
+  description: Endpoint(s) opened up by clients who can execute or care about mitigation actions
+
+  
+paths:
+  /mitigation:
+    get:
+      tags:
+      - Mitigation
+      summary: Requests the current list of all mitigation actions 
+      description: This call requests the list of all mitigation actions that have been issued since the start of the system. This is likely not going to be a commonly used call, see /mitigation/{status} below.
+      operationId: getMitigations
+      responses:
+        200:
+          description: Returned list of mitigation actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationList'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
+    post:
+      tags:
+      - Mitigation
+      summary: Posts a mitigation action for one or more faults
+      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST
+      operationId: postMitigation
+      requestBody:
+        description: JSON description of the mitigation action
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mitigation'
+      responses:
+        201:
+          description: Successfully posted new mitigation action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationManage: [mitigation.manage]
+  
+  /mitigation/{uuid}:
+    get:
+      tags:
+      - Mitigation
+      summary: Requests a specific mitigation action
+      description: This call requests a mitigation action tied to its UUID
+      operationId: getMitigationByUuid
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the mitigation action to be returned
+      responses:
+        200:
+          description: Returned list of mitigation actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationDetails'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
+  
+    put:
+      tags:
+      - Mitigation
+      summary: Updates a mitigation action entry's state
+      description: This call updates the state of an existing mitigation
+      operationId: updateMitigationState
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the mitigation action to be updated
+      requestBody:
+        description: JSON description of the mitigation action
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StateAndTime'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload or parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationManage:
+        - fraihmwork.mitigation.manage
+
+  /subscription/mitigation:
+    post:
+      tags:
+      - Mitigation Subscription
+      summary: Subscribe to one, more, or all mitigation updates 
+      description: This call adds a system to a list of subscribers for one, multiple, or all mitigation updates
+      operationId: subscribeToMitigation
+      requestBody:
+        description: JSON description of the subscription requested
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MitigationSubscription'
+      responses:
+        201:
+          description: Successfully subscribed to mitigation information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
+    
+  /subscription/mitigation/{subscriptionUuid}:
+    get:
+      tags:
+      - Mitigation Subscription
+      summary: Get mitigation subscription information 
+      description: Retrieves a specific mitigation subscription
+      operationId: getMitigationSubscriptionInformation
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the subscription to retrieve information on
+      responses:
+        200:
+          description: Successfully retrieved subscription information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationSubscription'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
+    
+    put:
+      tags:
+      - Mitigation Subscription
+      summary: Update subscription for mitigation information
+      description: This call adds a system to a list of subscribers for mitigation updates
+      operationId: updateMitigationSubscription
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the subscription to retrieve information on
+      requestBody:
+        description: JSON description of the subscription requested
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MitigationSubscription'
+      responses:
+        200:
+          description: Successfully updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationSubscription'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read       
+    delete:
+      tags:
+      - Mitigation Subscription
+      summary: Cancels a subscription
+      description: This unsubscribes a system from receiving future mitigation updates
+      operationId: unsubscribeFromMitigation
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the subscription to remove
+      responses:
+        200:
+          description: Successfully unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
+  
+  /subscriber/mitigation/update:
+    post:
+      tags:
+      - Mitigation Subscriber
+      summary: Posts a mitigation update to an executor
+      description: This call POSTs the latest updatet on a mitigation to an endpoint that is marked as an executor for it
+      operationId: postMitigationUpdate
+      requestBody:
+        description: JSON description of the mitigation action
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mitigationId:
+                  type: string
+                  format: uuid
+                  description: The id of the mitigation that is being pushed
+                payload:
+                  $ref: '#/components/schemas/Mitigation'
+      responses:
+        201:
+          description: Successfully pushed update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationManage:
+        - fraihmwork.mitigation.manage
+
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The message provided back to the client
+      required:
+        - message
+    
+    StateAndTime:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The timestamp that this state change was issued. If not provided, assumed to be the time of receipt of latest message. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required:
+        - state
+        
+    MitigationState:
+      type: string
+      description: "
+        This is a description of the current state of the action being taken. If this field is not provided, it is assumed to be 'RECOMMENDED'
+        RECOMMENDED describes a mitigation action that was recommended to an end user, but is waiting for further instruction. Generally, from here the state can only change to 'ACCEPTED', 'REVOKED' or 'DENIED'
+        ACCEPTED describes an action that has been accepted by a user or system, but has not yet been executed. From here, the state should only change to 'STARTED', 'REVOKED', or 'FAILED'
+        STARTED describes an action that has been started and is still in progress. From herer, the state should only change to 'COMPLETE' or 'FAILED'
+        COMPLETE describes an action that has been full resolved. This is an end state for the action
+        FAILED describes an action that was unsuccessful in completing its task or its completion resulted in an unsatisfactory mitigation. This is an end state for the action
+        REVOKED describes an action that the issuing system can no longer take or no longer desires to take. It effectively cancels the action, and is an end state.
+        DENIED describes an action where a system or user has declined to allow the action to take place. It is an end state for the action
+        "
+      enum:
+      - RECOMMENDED
+      - ACCEPTED
+      - STARTED
+      - COMPLETE
+      - FAILED
+      - REVOKED
+      - DENIED
+      default: RECOMMENDED
+      
+    MitigationList:
+      description: List of mitigation actions
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationDetails'
+          
+    MitigationDetails:
+      description: Mitigation action
+      type: object
+      properties:
+        mitigationId:
+          type: string
+          format: uuid
+        mitigation:
+          $ref: '#/components/schemas/Mitigation'
+      required:
+        - mitigationId
+        - mitigation
+            
+    Mitigation:
+      description: A message used to describe an mitigation to be taken against a fault.
+      type: object
+      properties:
+        issuerId:
+          type: string
+          format: uuid
+          description: The source component that issued this mitigation
+        executorId:
+          type: string
+          format: uuid
+          description: The component ID of the system that will execute this mitigation
+        executorCallback:
+          type: string
+          format: url
+          description: The base URL callback that is used to inform the executor that the action has been accepted or denied, or of any other status changes. When the state changes, a POST call will be made to the URL defined here, and will contain the same body provided in the /subscriber/mitigation/update endpoint.
+        faultIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: One or more ids of faults that are being addressed by this mitigation
+        description:
+          type: string
+          description: Description of the mitigation that the system will take or has taken
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeIssued:
+          type: string
+          format: date-time
+          description: The timestamp that this component instantiated this action. Timestamp format is as specified by RFC 3339 section 5.6. 
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this action was accurate. If not provided, assumed to be the time of receipt of latest message Timestamp format is as specified by RFC 3339 section 5.6. 
+      required: 
+        - issuerId
+        - executorId
+        - description
+        - timeIssued
+   
+    MitigationSubscription:
+      type: object
+      properties:
+        baseUrl:
+          type: string
+          format: url
+          description: The base url that the mitigation manager will send updates to. This should not include any specific endpoint information that is already included in this API description, as it will be appended automatically
+        interestedUuids:
+          description: List of specific mitigations to subscribe to. If not specified, it is assumed that all mitigation updates are desired
+          type: array
+          items:
+            type: string
+            format: uuid
+        stopTime: 
+          type: string
+          format: date-time
+          description: The requested time for the subscription to expire. If not specified, will expire only when the mitigation reaches an 'end state'. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required: 
+        - baseUrl
+          
+  securitySchemes:
+    MitigationManage:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          scopes:
+            fraihmwork.mitigation.manage: Client can update the list of mitigation actions
+      type: oauth2
+      
+    MitigationRead:
+      flows:
+       clientCredentials:
+         tokenUrl: https://well-known/oauth-authorization-server/token
+         scopes:
+           fraihmwork.mitigation.read: Client can read the mitigation actions list
+      type: oauth2 
+            
