@@ -1,3 +1,6 @@
+Version 0.0.8:
+- Introduced new endpoint with /state to fetch mitigations by their MitigationState
+
 Version 0.0.7:
 - Fixed the servers.url tag to correctly include the /api part of the path and adding .com to the path as well.
 

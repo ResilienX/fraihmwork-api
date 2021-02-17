@@ -5,7 +5,7 @@ info:
   description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.7
+  version: 0.0.8
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -230,6 +230,60 @@ paths:
       security:
       - MitigationManage:
         - fraihmwork.mitigation.manage
+        
+  /mitigation/state/{state}:
+    get:
+      tags:
+      - Mitigation
+      summary: Requests all mitigations with specific state
+      description: This call requests all mitigations having a specific state
+      operationId: getMitigationByState
+      parameters:
+        - in: path
+          name: state
+          required: true
+          schema:
+            $ref: '#/components/schemas/MitigationState'
+      responses:
+        200:
+          description: Returned list of mitigations belonging to the same Mitigation State
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationList'
+        400:
+          description: Invalid State action
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Mitigations not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MitigationRead:
+        - fraihmwork.mitigation.read
 
   /subscription/mitigation:
     post:
