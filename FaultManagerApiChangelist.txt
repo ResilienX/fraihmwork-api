@@ -1,2 +1,5 @@
+Version 0.0.2:
+Fixing fault endpoint path (https://github.com/ResilienX/fraihmwork-api/issues/7)
+
 Version 0.0.1: 
 Initial external release
