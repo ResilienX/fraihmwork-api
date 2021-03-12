@@ -17,7 +17,7 @@ paths:
   /faults:
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findAllFaults
       operationId: findAllFaults
       responses:
@@ -54,7 +54,7 @@ paths:
   /faults/search/findFaultsBySourceAndCode:
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findFaultsBySourceAndCode
       operationId: findFaultsBySourceAndCode
       parameters:
@@ -104,7 +104,7 @@ paths:
   '/faults/{uuid}':
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findFaultByUuid
       operationId: findFaultByUuid
       parameters:
