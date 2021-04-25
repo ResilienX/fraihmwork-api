@@ -4,12 +4,12 @@ info:
   description: 'API to retrieve the latest processed fault data from FRAIHMWORK'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.1
+  version: 0.0.2
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io  
 servers:
-- url: https://<server>.fraihmwork.resilienx.com/api/faults/v0/
+- url: https://<server>.fraihmwork.resilienx.com/api/active/faults/v0/
 tags:
 - name: Fault Data Retrieval
   description: Functions for getting all faults, faults by source & code, by source, code & severity, and by ID.
@@ -17,7 +17,7 @@ paths:
   /faults:
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findAllFaults
       operationId: findAllFaults
       responses:
@@ -54,7 +54,7 @@ paths:
   /faults/search/findFaultsBySourceAndCode:
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findFaultsBySourceAndCode
       operationId: findFaultsBySourceAndCode
       parameters:
@@ -104,7 +104,7 @@ paths:
   '/faults/{uuid}':
     get:
       tags:
-        - Fault Entity
+        - Fault Data Retrieval
       summary: findFaultByUuid
       operationId: findFaultByUuid
       parameters:
