@@ -353,7 +353,7 @@ paths:
       - FaultWrite:
         - fraihmwork.fault.write
 
-  fault/{uuid}/refresh:
+  /fault/{uuid}/refresh:
     post:
       tags:
       - Fault
