@@ -173,6 +173,50 @@ paths:
       security:
       - SystemWrite:
         - fraihmwork.system.write
+   
+  /system/{uuid}/refresh:
+    post:
+      tags:
+      - System
+      summary: Refresh existing system properties
+      description: This allows to refresh an existing system with the same properties. 
+      operationId: refreshSystemInformation
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system property being refreshed
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
       
   /fault:
     post:
