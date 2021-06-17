@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.8
+  version: 0.0.9
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -160,6 +160,50 @@ paths:
                 $ref: '#/components/schemas/Response'
         406:
           description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
+   
+  /system/{uuid}/refresh:
+    post:
+      tags:
+      - System
+      summary: Refresh existing system properties
+      description: Permits an already registered system to be refreshed without changing any properties
+      operationId: refreshSystemInformation
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system property being refreshed
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
           content: 
             application/json:
               schema:
@@ -333,6 +377,62 @@ paths:
                 $ref: '#/components/schemas/Response'
         404:
           description: Unregistered UUID, or fault doesn't exist
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - FaultWrite:
+        - fraihmwork.fault.write
+        
+  /fault/{uuid}/refresh:
+    post:
+      tags:
+      - Fault
+      summary: Refresh a fault that is affecting a system
+      description: Allows a system to refresh a fault currently affecting the system without changing any properties
+      operationId: refreshFault
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the fault being refreshed
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - this service cannot post fault information
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: The referenced fault UUID cannot be found
           content: 
             application/json:
               schema:
