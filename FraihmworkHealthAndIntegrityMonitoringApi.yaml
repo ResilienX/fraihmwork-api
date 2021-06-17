@@ -179,7 +179,7 @@ paths:
       tags:
       - System
       summary: Refresh existing system properties
-      description: This allows to refresh an existing system with the same properties. 
+      description: Permits an already registered system to be refreshed without changing any properties. 
       operationId: refreshSystemInformation
       parameters:
         - in: path
