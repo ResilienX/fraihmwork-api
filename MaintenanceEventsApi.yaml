@@ -1,0 +1,396 @@
+---
+openapi: 3.0.1
+info:
+  title: FRAIHMWORK Maintenance API
+  description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, events with components and duration information must be modelled in the system. The purpose of this API is to create, read, update, and delete these data. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
+  contact:
+    email: matt.synborski@resilienx.com
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/maintenance/v0
+tags:
+- name: Event
+  description: Event data model manipulation endpoints
+paths:
+  /events:
+    get:
+      tags:
+        - Event
+      summary: Retrieves all event information
+      description: Returns all scheduled events and associated information
+      operationId: retrieveEvents
+      parameters:
+        - in: query
+          name: componentUuid
+          schema:
+            type: string
+            format: uuid
+          required: false
+          description: Uuid of the component's events being requested
+        - in: query
+          name: state
+          schema:
+            type: string
+            format: EventState
+          required: false
+          description: EventState of the events being requested
+        - in: query
+          name: before
+          schema:
+            type: string
+            format: date-time
+          required: false
+          description: The start times of the events being requested are before this date-time (ISO 8601)
+        - in: query
+          name: after
+          schema:
+            type: string
+            format: date-time
+          required: false
+          description: The start times of the events being requested are after this date-time (ISO 8601)
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceEventDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceEventDefinitionAuth:
+        - fraihmwork.maintenance.read
+        - fraihmwork.maintenance.write
+    post:
+      tags:
+        - Event
+      summary: Add a new Maintenance Event to the FRAIHMWORK model
+      description: Adds a new event to the system
+      operationId: registerEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceEventDefinition'
+      responses:
+        201:
+          description: Created new event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already registered event. This will be the response if there is a match in the backend of the exact same event. If the event UUID is specified, then a match with an existing event uuid would also generate this response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed start or end time, or referenced components or users do not exist in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceEventDefinitionAuth:
+        - fraihmwork.maintenance.write       
+  /events/{uuid}:
+    get:
+      tags:
+        - Event
+      summary: Retrieves specific event
+      description: Returns a single event by UUID
+      operationId: retrieveEvent
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the event being requested
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceEventDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target event uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceEventDefinitionAuth:
+        - fraihmwork.maintenance.read
+        - fraihmwork.maintenance.write
+    put:
+      tags:
+        - Event
+      summary: Updates a specific maintenance event
+      description: Updates a specific maintenance event by UUID
+      operationId: updateEvent
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the event being updated. 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceEventDefinition'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed start or end time, or referenced components or users do not exist in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target event uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceEventDefinitionAuth:
+        - fraihmwork.maintenance.write
+    delete:
+      tags:
+        - Event
+      summary: Removes a specific maintenance event model from the system
+      description: Deletes a specific maintenance event by UUID
+      operationId: deleteEvent
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the event being deleted
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target event uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceEventDefinitionAuth:
+        - fraihmwork.maintenance.write
+                
+
+components:
+  schemas:
+    Response:
+      type: object
+      description: A default uuid / message combination to convey simple success / error messages to the client
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The success message provided back to the client
+      required:
+        - message
+    EventState:
+      type: string
+      enum:
+        - SCHEDULED
+        - CANCELED
+        - STARTED
+        - COMPLETED        
+    MaintenanceEventDefinition:
+      type: object
+      properties:
+        eventUuid:
+          type: string
+          format: uuid
+          description: The internal uuid of the maintenance event definition
+        name:
+          type: string
+          description: The name of the maintenance event          
+        description:
+          type: string
+          description: The description of the maintenance event
+        userContactUuid:
+          type: string
+          format: uuid
+          description: The User Contact uuid for who is responsible for performing the maintenance event
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of maintenance event via ISO 8601 date-time format
+          example: "2021-01-30T08:30:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: End time of maintenance event via ISO 8601 date-time format
+          example: "2021-01-30T08:30:00Z"
+        componentUuid:
+          type: string
+          format: uuid
+          description: The uuid of the component scheduled for maintenance
+        eventState:
+          type: EventState
+          description: The state of the event
+      required: 
+        - name
+        - componentUuids
+        - startTime
+        - endTime
+  securitySchemes:
+    MaintenanceEventDefinitionAuth:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.maintenance.write: Client can add, delete, or modify maintenance events
+            fraihmwork.maintenance.read: Client can view maintenance events
+      type: oauth2
