@@ -340,6 +340,7 @@ components:
         - message
     EventState:
       type: string
+      description: The state of the event
       enum:
         - SCHEDULED
         - CANCELED
@@ -377,8 +378,7 @@ components:
           format: uuid
           description: The uuid of the component scheduled for maintenance
         eventState:
-          type: EventState
-          description: The state of the event
+          $ref: '#/components/schemas/EventState'
       required: 
         - name
         - componentUuids
