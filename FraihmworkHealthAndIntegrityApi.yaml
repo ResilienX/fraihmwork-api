@@ -759,10 +759,8 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the reporter of this system, if provided.
-        additionalProperties:
-          type: object
-          description: An open space for providing additional objects or properties for consumption
-          
+
+      additionalProperties: true    
       required: 
         - name
         - state
@@ -865,10 +863,7 @@ components:
           format: uuid
           description: The unique identifier of the reporter of this fault, if provided.
           
-        additionalProperties:
-          description: An open space for providing additional objects or properties for consumption
-          type: object
-          
+      additionalProperties: true
       required:
         - name
         - code
