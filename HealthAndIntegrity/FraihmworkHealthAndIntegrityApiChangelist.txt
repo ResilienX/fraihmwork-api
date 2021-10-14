@@ -1,3 +1,8 @@
+Version 1.0.0:
+- Merged registration API elements into this api spec for simplicity and to remove redundant items
+- Updated additional properties to just be a free-form object, rather than use 'extra property' definitions
+- Split between v0 and v1 versions of the API
+
 Version 0.0.9:
 - Added api path to refresh component and fault properties
 
