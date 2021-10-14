@@ -2,10 +2,10 @@
 openapi: 3.0.1
 info:
   title: Registration APIs
-  description: APIs for Registration requests
+  description: APIs for Registration requests. THIS API IS DEPRECATED!
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.11
+  version: 0.0.12
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -24,6 +24,7 @@ tags:
 paths:
   /system:
     post:
+      deprecated: true
       tags:
       - Registration
       summary: Register a unique ID that the system is already using within the ecosystem
@@ -87,6 +88,7 @@ paths:
       - SystemWrite:
         - fraihmwork.system.write
     get:
+      deprecated: true
       tags:
       - Registration
       summary: Request existing registrations for information about the system
@@ -130,6 +132,7 @@ paths:
 
   /system/{uuid}:
     get:
+      deprecated: true
       tags:
       - Registration
       summary: Request existing registration for specific system
@@ -185,6 +188,7 @@ paths:
         - fraihmwork.system.read
 
     delete:
+      deprecated: true
       tags:
       - Registration
       summary: Request a registration for specific system is removed so that it is no longer serviced
@@ -241,6 +245,7 @@ paths:
   
   /fault:
     post:
+      deprecated: true
       tags:
       - Faults
       summary: Register a unique ID for a fault that is being produced by the ecosystem
@@ -304,6 +309,7 @@ paths:
       - FaultWrite:
         - fraihmwork.fault.write
     get:
+      deprecated: true
       tags:
       - Faults
       summary: Request existing faults for information
@@ -347,6 +353,7 @@ paths:
 
   /fault/{uuid}:
     get:
+      deprecated: true
       tags:
       - Faults
       summary: Request existing fault info for specific fault
@@ -402,6 +409,7 @@ paths:
         - fraihmwork.fault.read
 
     delete:
+      deprecated: true
       tags:
       - Faults
       summary: Request a registration for specific fault is removed so that it is no longer in the system
@@ -458,6 +466,7 @@ paths:
 
   /requestId:
     get:
+      deprecated: true
       tags:
       - ID Control
       summary: Request a unique ID to use in future API posts

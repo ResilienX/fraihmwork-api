@@ -1,3 +1,6 @@
+Version 0.0.12:
+- API IS NOW DEPRECATED, USE THE FraihmworkHealthAndIntegrityMonitoringApi.yaml from now on!
+
 Version 0.0.11:
 - Changed "Code" Type from String to Integer.
 
