@@ -1,2 +1,0 @@
-The eventual futurer of these APIs are to all be combined into a single, comprehensive document for all component and fault registration, status, and modification. 
-Also note that the RegistrationApi is DEPRECATED
