@@ -759,8 +759,11 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the reporter of this system, if provided.
+        extensions:
+          description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
+          type: object
+          additionalProperties: true
 
-      additionalProperties: true    
       required: 
         - name
         - state
@@ -863,7 +866,10 @@ components:
           format: uuid
           description: The unique identifier of the reporter of this fault, if provided.
           
-      additionalProperties: true
+        extensions:
+          description: Optional parameter to provide any extensions to the default fault object type
+          type: object
+          additionalProperties: true
       required:
         - name
         - code
