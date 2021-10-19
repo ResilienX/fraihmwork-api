@@ -84,7 +84,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/System'
+                  $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
         401:
           description: Not authenticated
           content:
@@ -134,7 +134,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/System'
+                $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
         401:
           description: Not authenticated
           content:
@@ -392,7 +392,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/Fault'
+                  $ref: '#/components/schemas/FaultRegistrationInformation'
         401:
           description: Not authenticated
           content:
@@ -442,7 +442,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Fault'
+                $ref: '#/components/schemas/FaultRegistrationInformation'
         401:
           description: Not authenticated
           content:
@@ -785,6 +785,35 @@ components:
           type: string
           description: The version of the system's configuration, if applicable
 
+    SystemRegistrationDetailedInformation:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: The name of the system / component registering the unique identifier
+        description:
+          type: string
+          description: A brief description of the system
+        physicalLocation:
+          type: string
+          description: A physical location describing where the device is
+        networkAddress:
+          type: string
+          description: A network location describing where the device is
+        systemTimeout:
+          type: integer
+          minimum: 1
+          description: Seconds within which a system update is expected from the client. If no update is received, the system will be considered lifeless.
+        timeOfRegistration:
+          type: string
+          format: date-time
+          description: The time that the system was first registered
+      required:
+        - uuid
+        - name
     State:
       type: object
       properties:
@@ -808,7 +837,7 @@ components:
             the system state with no additional qualifications.
       required:
         - state
-
+        
     Fault:
       type: object
       description: A fault describes a specific condition that is adversely affecting the reporting system or subsystem. FRAIHMWORK uses this information to alert maintainers of problems, or to integrate various faults to identify larger system of system problems. Faults are identified by FRAIHMWORK by their name, code and source. Therefore there are assumptions to how faults are reported that should be abided by. Namely - each unique fault should have the same name and code information. Updates to the same fault should be reusing these keys, but can allow for other properties to change over time. If a fault is no longer active, it is expected that the system provides an update notifying FRAIHMWORK that the fault has been cleared. Otherwise, the fault will automatically clear after a default time interval if there have been no updates. 
@@ -875,6 +904,31 @@ components:
         - code
         - severity
 
+    FaultRegistrationInformation:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: The name or summary of the fault
+        source:
+          type: string
+          format: uuid
+        code:
+          type: integer
+          description: The code of the fault. Usually represented as an integer
+        timeOfDetection:
+          type: string
+          format: date-time
+          description: The time that the fault was first reported
+        faultTimeout: 
+          type: integer
+          minimum: 1
+          example: 100
+          description: Seconds within which a fault update is expected from the client. If no update is received, the fault is assumed to be resolved.
+          
   securitySchemes:
     SystemWrite:      
       flows:
