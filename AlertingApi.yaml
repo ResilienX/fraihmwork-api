@@ -1,0 +1,363 @@
+---
+openapi: 3.0.1
+info:
+  title: FRAIHMWORK Alerting API
+  description: 'FRAIHMWORK allows for notifications via text or email about faults that are affecting components. To enable this, users with phone / email information must be modelled in the system, as well as notification policies that associate users to the notifications they want to receive. The purpose of this API is to add, delete, get or modify these data. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
+  contact:
+    email: g.dorchies@resilienx.com
+  version: 0.1.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/notifications/v0
+
+tags:
+- name: User
+  description: User data model manipulation endpoints
+- name: Notification Policy
+  description: Notification policy endpoints
+
+paths:
+  /user:
+    get:
+      tags:
+        - User
+      summary: Retrieves all users and contact information
+      description: Returns all registered users and their contact information
+      operationId: retrieveUsers
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - AlertingUserDefinitionsAuth:
+        - fraihmwork.notifications.user.read   
+        - fraihmwork.notifications.user.write     
+    post:
+      tags:
+        - User
+      summary: Add a new user definition to the FRAIHMWORK model
+      description: Adds a new user to the system that can be associated with notification policies
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDefinition'
+      responses:
+        201:
+          description: Created new user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already registered user. This will be the response if there is a match in the backend of the exact same name and at least one notification mechanism. If the user UUID is specified, then a match with an existing user uuid would also generate this response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed email or phone number. Could also happen if neither email nor phone number is filled out, or if the 'preferredContact' field is set to an invalid value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - AlertingUserDefinitionsAuth:
+        - fraihmwork.notifications.user.write
+
+  /user/{uuid}:
+    get:
+      tags:
+        - User
+      summary: Retrieves specific user
+      description: Returns a single user by UUID
+      operationId: retrieveUser
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the user being requested
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target user uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - AlertingUserDefinitionsAuth:
+        - fraihmwork.notifications.user.read    
+        - fraihmwork.notifications.user.write
+
+    put:
+      tags:
+        - User
+      summary: Updates a specific user
+      description: Updates a specific user by UUID
+      operationId: updateUser
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the user being updated. 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDefinition'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed email or phone number. Could also happen if neither email nor phone number is filled out, or if the 'preferredContact' field is set to an invalid value.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target user uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - AlertingUserDefinitionsAuth:
+        - fraihmwork.notifications.user.write
+
+    delete:
+      tags:
+        - User
+      summary: Removes a specific user model from the system
+      description: Deletes a specific user by UUID
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the user being deleted
+      responses:
+        200:
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target user uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - AlertingUserDefinitionsAuth:
+        - fraihmwork.notifications.user.write
+
+components:
+  schemas:
+    Response:
+      type: object
+      description: A default uuid / message combination to convey simple success / error messages to the client
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The success message provided back to the client
+      required:
+        - message
+        
+    UserDefinition:
+      type: object
+      description: A definition of the users that will be matched to notification policies. Note that although only the name is required, it is expected that there is at least one of 'email' and 'phoneNumber' filled out. Similarly, 'receiveEmailAlerts' and 'receiveSmsAlerts' can be filled out with an appropriate boolean, and is only required if either mechanism is filled out.
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: The internal uuid of the user definition
+
+        username:
+          type: string
+          description: The username of the user
+
+        email:
+          type: string
+          format: email
+          description: The email address of the user to use for email notifications. On updating an existing user definition, if the email field is not provided, the existing field will not get updated, whereas if the email field is an empty string "", the existing email field is cleared. At any given time, atleast email or phoneNumber must be provided. 
+
+        phoneNumber:
+          type: string
+          description: The mobile phone number of the user to use for text notifications. On updating an existing user definition, if the phoneNumber field is not provided, the existing field will not get updated, whereas if the phoneNumber field is an empty string "", the existing phoneNumber field is cleared. At any given time, atleast email or phoneNumber must be provided. 
+
+        receiveEmailAlerts:
+          type: boolean
+          description: Whether a not the user wants to subscribe to email alerts. By default, the value will be considered as false.
+          
+        receiveSmsAlerts:
+          type: boolean
+          description: Whether a not the user wants to subscribe to SMS alerts. By default, the value will be considered as false.
+      required: 
+        - username
+
+  securitySchemes:
+    AlertingUserDefinitionsAuth:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.notifications.user.read: Client can read user definitions
+            fraihmwork.notifications.user.write: Client can add, delete, or modify user definitions
+      type: oauth2
