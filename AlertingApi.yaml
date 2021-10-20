@@ -16,8 +16,6 @@ servers:
 tags:
 - name: User
   description: User data model manipulation endpoints
-- name: Notification Policy
-  description: Notification policy endpoints
 
 paths:
   /user:
