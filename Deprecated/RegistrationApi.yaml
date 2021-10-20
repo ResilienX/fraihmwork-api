@@ -1,0 +1,643 @@
+---
+openapi: 3.0.1
+info:
+  title: Registration APIs
+  description: APIs for Registration requests. THIS API IS DEPRECATED!
+  contact:
+    email: g.dorchies@resilienx.com
+  version: 0.0.12
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/registration/v0
+
+tags:
+- name: Registration
+  description: System Registration
+- name: Faults
+  description: Registration for faults
+- name: ID Control
+  description: Generation of UUIDS
+  
+paths:
+  /system:
+    post:
+      deprecated: true
+      tags:
+      - Registration
+      summary: Register a unique ID that the system is already using within the ecosystem
+      description: This API suite allows for systems to use their own UUIDs for Health and Integrity tracking so long as they are properly registered with FRAIHMWORK. If they do not have their own UUID, they are expected to use the requestId endpoint to get one for future use.
+      operationId: registerId
+      requestBody:
+        description: JSON description of the current system state
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemRegistrationInformation'
+      responses:
+        201:
+          description: Created new registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: UUID Already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
+    get:
+      deprecated: true
+      tags:
+      - Registration
+      summary: Request existing registrations for information about the system
+      description: This endpoint allows requesting services to find information about registered instaces that FRAIHMWORK is currently aware of
+      operationId: getRegistrations
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+
+  /system/{uuid}:
+    get:
+      deprecated: true
+      tags:
+      - Registration
+      summary: Request existing registration for specific system
+      description: This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of
+      operationId: getRegistration
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system properties being updated
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+
+    delete:
+      deprecated: true
+      tags:
+      - Registration
+      summary: Request a registration for specific system is removed so that it is no longer serviced
+      description: This endpoint allows callers to remove a registration from FRAIHMWORK so that it is no longer active
+      operationId: deleteRegistration
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system properties being updated
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write  
+  
+  /fault:
+    post:
+      deprecated: true
+      tags:
+      - Faults
+      summary: Register a unique ID for a fault that is being produced by the ecosystem
+      description: This API suite allows for systems to use their own UUIDs for fault tracking so long as they are properly registered with FRAIHMWORK. If they do not have their own UUID, they are expected to use the requestId endpoint to get one for future use.
+      operationId: registerFault
+      requestBody:
+        description: JSON description of the current system state
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaultRegistrationInformation'
+      responses:
+        201:
+          description: Created new fault registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: UUID Already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - FaultWrite:
+        - fraihmwork.fault.write
+    get:
+      deprecated: true
+      tags:
+      - Faults
+      summary: Request existing faults for information
+      description: This endpoint allows requesting fault info to see what faults are currently being tracked by FRAIHMWORK
+      operationId: getFaultRegistrations
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/FaultRegistrationInformation'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - FaultRead:
+        - fraihmwork.fault.read
+
+  /fault/{uuid}:
+    get:
+      deprecated: true
+      tags:
+      - Faults
+      summary: Request existing fault info for specific fault
+      description: This endpoint allows requesting fault info by UUID
+      operationId: getFaultRegistration
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the faults being updated
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaultRegistrationInformation'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Fault registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - FaultRead:
+        - fraihmwork.fault.read
+
+    delete:
+      deprecated: true
+      tags:
+      - Faults
+      summary: Request a registration for specific fault is removed so that it is no longer in the system
+      description: This removes a fault from the system because it is no longer being reported by the monitored system
+      operationId: deleteFaultRegistration
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system properties being updated
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - FaultWrite:
+        - fraihmwork.fault.write
+
+  /requestId:
+    get:
+      deprecated: true
+      tags:
+      - ID Control
+      summary: Request a unique ID to use in future API posts
+      description: If the system does not already provide a UUID as part of its software suite, it will need to request a UUID from the FRAIHMWORK system to uniquely identify the source. Note that this operation does not guarantee any registration of the UUID - it merely generates one. The next call should be to register the UUID created
+      operationId: requestId
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        500:
+          description: Internal server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+        
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        itemId: 
+          type: string
+          format: uuid
+          description: The returned UUID
+        message:
+          type: string
+          description: The message provided back to the client
+      required:
+        - message
+                
+    SystemRegistrationInformation:
+      type: object
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          description: The name of the system / component registering the unique identifier
+        description:
+          type: string
+          description: A brief description of the system
+        physicalLocation:
+          type: string
+          description: A physical location describing where the device is
+        networkAddress:
+          type: string
+          description: A network location describing where the device is
+        systemTimeout:
+          type: integer
+          minimum: 1
+          example: 100
+          description: Seconds within which a system update is expected from the client. If no update is received, the system will be considered lifeless.
+      required:
+        - uuid
+        - name
+        
+    SystemRegistrationDetailedInformation:
+      type: object
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          description: The name of the system / component registering the unique identifier
+        description:
+          type: string
+          description: A brief description of the system
+        physicalLocation:
+          type: string
+          description: A physical location describing where the device is
+        networkAddress:
+          type: string
+          description: A network location describing where the device is
+        systemTimeout:
+          type: integer
+          minimum: 1
+          description: Seconds within which a system update is expected from the client. If no update is received, the system will be considered lifeless.
+        timeOfRegistration:
+          type: string
+          format: date-time
+          description: The time that the system was first registered
+      required:
+        - uuid
+        - name
+        
+        
+    UUID:
+      type: string
+      description: An identifier for that is guaranteed to be unique across the entire UTM ecosystem
+      format: uuid
+      
+    FaultRegistrationInformation:
+      type: object
+      properties:
+        uuid:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          description: The name or summary of the fault
+        source:
+          $ref: '#/components/schemas/UUID'
+        code:
+          type: integer
+          description: The code of the fault. Usually represented as an integer
+        timeOfDetection:
+          type: string
+          format: date-time
+          description: The time that the fault was first reported
+        faultTimeout: 
+          type: integer
+          minimum: 1
+          example: 100
+          description: Seconds within which a fault update is expected from the client. If no update is received, the fault is assumed to be resolved.
+  securitySchemes:
+    SystemWrite:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.system.write: Client may write any system, version or state data 
+      type: oauth2
+    SystemRead:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.system.read: Client may query for any system, version or state data that the service can provide
+      type: oauth2
+    FaultWrite:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.fault.write: Client may write any detailed fault information to the service 
+      type: oauth2
+    FaultRead:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.fault.read: Client may query for any detailed fault information that the service can provide
+      type: oauth2
