@@ -47,7 +47,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
+      deprecated: true
       security:
       - SystemRead:
         - fraihmwork.system.read
@@ -97,7 +97,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
+      deprecated: true
       security:
       - SystemRead:
         - fraihmwork.system.read
@@ -140,7 +140,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false      
+      deprecated: true      
       security:
       - SystemRead:
         - fraihmwork.system.read
