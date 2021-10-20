@@ -422,7 +422,7 @@ components:
           type: string
           format: date-time
         extensions:
-          description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
+          description: The addition for any fault extensions that are optionally included to provide stereotyped information for a particular fault. 
           type: object
           additionalProperties: true
   securitySchemes:
