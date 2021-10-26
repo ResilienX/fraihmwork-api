@@ -2,7 +2,7 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Health And Integrity API
-  description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
+  description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
   version: 1.0.0
@@ -15,8 +15,18 @@ servers:
 
 tags:
 - name: System
-  description: High level system and service information
-- name: Fault
+  description: High level system and service information. These are deprecated and replaced by the component endpoints to avoid confusion about ResilienX FRAIHMWORK terminology.
+  
+- name: Components
+  description: All component related api endpoints
+  
+- name: Faults
+  description: All fault related api endpoints
+  
+- name: Component Updates
+  description: High level component  information
+
+- name: Fault Updates
   description: Fault information
 
 - name: UUID Control
@@ -25,6 +35,7 @@ tags:
 paths:
   /system:
     post:
+      deprecated: true
       tags:
       - System
       summary: Post an update on all current system properties
@@ -36,7 +47,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/System'
+              $ref: '#/components/schemas/MonitoredComponent'
       responses:
         201:
           description: Successfully posted new service information
@@ -72,6 +83,7 @@ paths:
       - SystemWrite: [system.write]
 
     get:
+      deprecated: true
       tags:
       - System
       summary: Request existing registration details for information about a system
@@ -84,7 +96,7 @@ paths:
             application/json:
               schema:
                 items:
-                  $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
+                  $ref: '#/components/schemas/ComponentRegistrationInformation'
         401:
           description: Not authenticated
           content:
@@ -112,9 +124,10 @@ paths:
       security:
       - SystemRead:
         - fraihmwork.system.read
-        
+
   /system/{uuid}:
     get:
+      deprecated: true
       tags:
       - System
       summary: Request existing registration for specific system
@@ -134,7 +147,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SystemRegistrationDetailedInformation'
+                $ref: '#/components/schemas/ComponentRegistrationInformation'
         401:
           description: Not authenticated
           content:
@@ -170,6 +183,7 @@ paths:
         - fraihmwork.system.read
 
     put:
+      deprecated: true
       tags:
       - System
       summary: Update existing properties about a system
@@ -189,7 +203,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/System'
+              $ref: '#/components/schemas/MonitoredComponent'
       responses:
         200:
           description: Successful operation
@@ -226,6 +240,7 @@ paths:
         - fraihmwork.system.write
 
     delete:  
+      deprecated: true
       tags:
       - System
       summary: Deletes an active entry
@@ -273,9 +288,10 @@ paths:
       security:
       - SystemWrite:
         - fraihmwork.system.write
-   
+
   /system/{uuid}/refresh:
     post:
+      deprecated: true
       tags:
       - System
       summary: Refresh existing system properties
@@ -317,11 +333,323 @@ paths:
       security:
       - SystemWrite:
         - fraihmwork.system.write
-      
+
+  /component:
+    post:
+      tags:
+      - Components
+      - Component Updates
+      summary: Post an update on all component properties
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response
+      operationId: postComponentInformation
+      requestBody:
+        description: JSON description of the current component state
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitoredComponent'
+      responses:
+        201:
+          description: Successfully posted new component information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite: [system.write]
+
+    get:
+      tags:
+      - Components
+      summary: Retrieve all of the components in the FRAIHMWORK system, filtered by any optional criteria provided.
+      operationId: findAllComponents
+      parameters:
+      - name: state
+        in: query
+        description: Filter results by the state of the components. Can leave null to not filter
+        schema:
+          type: string         
+          enum:
+          - UNAVAILABLE
+          - STARTING_UP
+          - ONLINE
+          - FAULTED
+      - name: parent
+        in: query
+        description: Filter results to only return components with a specific parent component. Can leave null to not filter
+        schema:
+          type: string         
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActiveComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+
+  /component/{uuid}:
+    get:
+      tags:
+      - Components
+      summary: findComponentByUuid
+      operationId: findComponentByUuid
+      parameters:
+      - name: uuid
+        in: path
+        description: uuid
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ActiveComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+
+    put:
+      tags:
+      - Components
+      - Component Updates
+      summary: Update existing properties about a component
+      description: This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. 
+      operationId: updateComponentInformation
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component properties being updated
+      requestBody:
+        description: JSON description of the current component state
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitoredComponent'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
+
+    delete:  
+      tags:
+      - Components
+      - Component Updates
+      summary: Deletes an active entry
+      description: This operation removes a components's basic information from FRAIHMWORK, thus rendering itself inactive.
+      operationId: deleteComponentInformation
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component properties being deleted
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
+
+  /component/{uuid}/refresh:
+    post:
+      tags:
+      - Components
+      - Component Updates
+      summary: Refresh existing component properties
+      description: Permits an already registered component to be refreshed without changing any properties
+      operationId: refreshComponentInformation
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component property being refreshed
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - SystemWrite:
+        - fraihmwork.system.write
+
   /fault:
     post:
       tags:
-      - Fault
+      - Fault Updates
+      - Faults
       summary: Posts a new fault that is affecting a system
       description: Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response).
       operationId: postNewFault
@@ -381,71 +709,50 @@ paths:
 
     get:
       tags:
-      - Fault
-      summary: Request existing faults for information
-      description: This endpoint allows requesting fault info to see what faults are currently being tracked by FRAIHMWORK
-      operationId: getFaultRegistrations
-      responses:
-        200:
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/FaultRegistrationInformation'
-        401:
-          description: Not authenticated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        403:
-          description: Forbidden
-          content: 
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        406:
-          description: Not acceptable - only responds in application/json format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        500:
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-      security:
-      - FaultRead:
-        - fraihmwork.fault.read
-
-  /fault/{uuid}:
-    get:
-      tags:
-      - Fault
-      summary: Request existing fault info for specific fault
-      description: This endpoint allows requesting fault info by UUID
-      operationId: getFaultRegistration
+        - Faults
+      summary: Find all faults provided certain optional querying parameters
+      operationId: findAllFaults
       parameters:
-        - in: path
-          name: uuid
-          required: true
-          schema:
-            type: string
-            format: uuid
-          description: Uuid of the faults being updated
+      - name: source
+        in: query
+        description: Filter results by source component's UUID. Can leave null to not filter
+        schema:
+          type: string
+          format: uuid
+      - name: reporter
+        in: query
+        description: Filter results by the reporter. Can leave null to not filter
+        schema:
+          type: string
+          format: uuid
+      - name: code
+        in: query
+        description: Filter results by fault code. Can leave null to not filter
+        schema:
+          type: integer
+          format: int32
+      - name: severity
+        in: query
+        description: Filter results by fault severity. Can leave null to not filter
+        schema:
+          type: string
+          enum:
+          - LOW
+          - MEDIUM
+          - HIGH
+          - UNKNOWN  
       responses:
         200:
-          description: Successful operation
+          description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FaultRegistrationInformation'
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActiveFault'
         401:
-          description: Not authenticated
-          content:
+          description: Unauthorized
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -456,30 +763,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: Fault registration not found
-          content:
+          description: Not Found
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-        406:
-          description: Not acceptable - only responds in application/json format
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        500:
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
+      deprecated: false
       security:
-      - FaultRead:
-        - fraihmwork.fault.read
-    
+      - SystemRead:
+        - fraihmwork.system.read
+
+  /fault/{uuid}:
+    get:
+      tags:
+        - Faults
+      summary: findFaultByUuid
+      operationId: findFaultByUuid
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ActiveFault'
+        401:
+          description: Unauthorized
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false      
+      security:
+      - SystemRead:
+        - fraihmwork.system.read
+
     put:
       tags:
-      - Fault
+      - Faults
+      - Fault Updates
       summary: Updates a fault that is affecting a system
       description: Allows a system to report one or more faults currently affecting the system
       operationId: updateFault
@@ -541,7 +882,8 @@ paths:
         
     delete:
       tags:
-      - Fault
+      - Faults
+      - Fault Updates
       summary: Clears a new fault that is no longer affecting a system
       description: Allows a system to clear a fault no longer affecting it
       operationId: deleteFault
@@ -593,11 +935,12 @@ paths:
       security:
       - FaultWrite:
         - fraihmwork.fault.write
-        
+
   /fault/{uuid}/refresh:
     post:
       tags:
-      - Fault
+      - Faults
+      - Fault Updates
       summary: Refresh a fault that is affecting a system
       description: Allows a system to refresh a fault currently affecting the system without changing any properties
       operationId: refreshFault
@@ -694,7 +1037,7 @@ paths:
       security:
       - SystemRead:
         - fraihmwork.system.read
-        
+
 components:
   schemas:
     Response:
@@ -709,7 +1052,7 @@ components:
       required:
         - message
 
-    System:
+    MonitoredComponent:
       type: object
       properties:
         uuid:
@@ -750,15 +1093,15 @@ components:
           type: string
           format: date-time
           description: The last timestamp when this message's information was guaranteed to be accurate. If this field is not provided, it is assumed that the time of receipt of this message is the time of validity
-        systemTimeout:
+        timeout:
           type: integer
           minimum: 1
           example: 100
-          description: Seconds within which a system update is expected from the client. If no update is received, the system will be considered lifeless.
+          description: Seconds within which a component update is expected from the client. If no update is received, the system will consider the component lifeless.
         reporter:
           type: string
           format: uuid
-          description: The unique identifier of the reporter of this system, if provided.
+          description: The unique identifier of the reporter of this component, if provided.
         extensions:
           description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
           type: object
@@ -770,22 +1113,22 @@ components:
 
     Version:
       type: object
-      description: The version of the system For maximum flexibility, this is provided as string values to allow for different versioning schemes.
+      description: The version of the component. For maximum flexibility, this is provided as string values to allow for different versioning schemes.
       properties:
         hardware:
           type: string
-          description: The version of the system's hardware package, if applicable
+          description: The version of the component's hardware package, if applicable
         software:
           type: string
-          description: The version of the system's software package, if applicable
+          description: The version of the component's software package, if applicable
         firmware:
           type: string
-          description: The version of the system's firmware package, if applicable
+          description: The version of the component's firmware package, if applicable
         configuration:
           type: string
-          description: The version of the system's configuration, if applicable
+          description: The version of the component's configuration, if applicable
 
-    SystemRegistrationDetailedInformation:
+    ComponentRegistrationInformation:
       type: object
       properties:
         uuid:
@@ -793,38 +1136,39 @@ components:
           format: uuid
         name:
           type: string
-          description: The name of the system / component registering the unique identifier
+          description: The name of the component registering the unique identifier
         description:
           type: string
-          description: A brief description of the system
+          description: A brief description of the component
         physicalLocation:
           type: string
-          description: A physical location describing where the device is
+          description: A physical location describing where the component is
         networkAddress:
           type: string
-          description: A network location describing where the device is
+          description: A network location describing where the component is
         systemTimeout:
           type: integer
           minimum: 1
-          description: Seconds within which a system update is expected from the client. If no update is received, the system will be considered lifeless.
+          description: Seconds within which a component update is expected from the client. If no update is received, the FRAIHMWORK system will consider the component lifeless.
         timeOfRegistration:
           type: string
           format: date-time
-          description: The time that the system was first registered
+          description: The time that the component was first registered
       required:
         - uuid
         - name
+
     State:
       type: object
       properties:
         state:
           type: string
           description: "
-          This is a high level description of the system or subsystem state. 
-          UNAVAILABLE describes a system that cannot provide its normal services, but not due to a fault with the system. This could be because the service cannot access its host system, the system is being restarted, or any other similar reason
-          STARTING_UP is for services being powered on - services may not be available yet but they will be soon
-          ONLINE describes a system with services provided
-          FAULTED describes a system that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this system is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
+          This is a high level description of the component or subsystem state. <br> <br>
+          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
+          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
+          ONLINE describes a component with services provided  <br> <br>
+          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
           enum:
           - UNAVAILABLE
           - STARTING_UP
@@ -832,15 +1176,88 @@ components:
           - FAULTED
         description:
           type: string
-          description: An optional detailed description of the system state in order to provide
+          description: An optional detailed description of the component state in order to provide
             more context. This field can be left blank if the enum fully describes
-            the system state with no additional qualifications.
+            the component state with no additional qualifications.
       required:
         - state
+
+    ComponentStatistics:
+      type: object
+      properties:
+        timeOfRegistration:
+          description: Time of first registration in the FRAIHMWORK system. The moment that we are first aware of the component. 
+          type: string
+          format: date-time
+          
+        timeOfPerformance:
+          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time 
+          type: string
+          format: date-time
+          
+        timeOfReplacement:
+          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Tracks the last time that a component was repaired, replaced, or any other maintenance has been performed, thus requiring a reset in the lifetime statistics below / MTBF time.  
+          type: string
+          format: date-time
+          
+        sessionRunningTimeSeconds:
+          description: If ONLINE, this is the amount of time (ms) passed between when the component started being ONLINE to the present. Otherwise 0. Function of (NOW - Component Startup)
+          type: integer
+          format: int64
+        
+        totalRunningTimeSeconds:
+          description: This is the amount of time that the component has been ONLINE since it has been registered with FRAIHMWORK. Could be seen as the sum of all SESSION RUNNING TIMEs since the TIME OF REGISTRATION. Used for tracking time used to measure MTBF 
+          type: integer
+          format: int64
+          
+        registrationLifetimeSeconds:
+          description: Total time passed since TIME OF REGISTRATION. Total amount of time that the FRAIHMWORK CORE has been aware of this component. Function is (NOW - TIME OF REGISTRATION)
+          type: integer
+          format: int64
+
+        totalUptime:
+          description: A percentage which is a function of TOTAL RUNNING TIME / REGISTRATION LIFETIME
+          type: number
+          format: double
+          
+        totalPerformanceRunningTimeSeconds:
+          description: This is the amount of time that the component has been ONLINE since the TIME OF PERFORMANCE. Could be seen as a sum of all SESSION LIFETIMEs since the TIME OF PERFORMANCE. Used for tracking data over a specific period of time.
+          type: integer
+          format: int64
+
+        performanceLifetimeSeconds:
+          description: Total time passed since TIME OF PERFORMANCE . Total amount of time that the FRAIHMWORK CORE has been aware of this component since a manual reset. Function is (NOW - TIME OF PERFORMANCE)
+          type: integer
+          format: int64
+
+        performanceUptime:
+          description: A percentage which is a function of (TOTAL PERFORMANCE RUNNING TIME) / (PERFORMANCE LIFETIME).
+          type: number
+          format: double
+          
+        totalReplacementRunningTimeSeconds:
+          description: This is the amount of time that the component has been ONLINE since the TIME OF REPLACEMENT. Could be seen as a sum of all SESSION LIFETIMEs since the TIME OF REPLACEMENT. Used for tracking data over a specific period of time.
+          type: integer
+          format: int64
+
+        replacementLifetimeSeconds:
+          description: Total time passed since TIME OF REPLACEMENT. Total amount of time that the FRAIHMWORK system has been aware of this component since a replacement. Function is (NOW - TIME OF REPLACEMENT)
+          type: integer
+          format: int64
+
+        replacementUptime:
+          description: A percentage which is a function of (TOTAL REPLACEMENT RUNNING TIME) / (REPLACEMENT LIFETIME).
+          type: number
+          format: double
+
+        availability:
+          description: Same as TOTAL UPTIME % for now. Will update definition as we gain ability to inject modules for handling different types of components (like using additional properties defined for radars)
+          type: number
+          format: double
         
     Fault:
       type: object
-      description: A fault describes a specific condition that is adversely affecting the reporting system or subsystem. FRAIHMWORK uses this information to alert maintainers of problems, or to integrate various faults to identify larger system of system problems. Faults are identified by FRAIHMWORK by their name, code and source. Therefore there are assumptions to how faults are reported that should be abided by. Namely - each unique fault should have the same name and code information. Updates to the same fault should be reusing these keys, but can allow for other properties to change over time. If a fault is no longer active, it is expected that the system provides an update notifying FRAIHMWORK that the fault has been cleared. Otherwise, the fault will automatically clear after a default time interval if there have been no updates. 
+      description: A fault describes a specific condition that is adversely affecting the reporting component or subsystem. FRAIHMWORK uses this information to alert maintainers of problems, or to integrate various faults to identify larger system of system problems. Faults are identified by FRAIHMWORK by their name, code and source. Therefore there are assumptions to how faults are reported that should be abided by. Namely - each unique fault should have the same name and code information. Updates to the same fault should be reusing these keys, but can allow for other properties to change over time. If a fault is no longer active, it is expected that the component provides an update notifying FRAIHMWORK that the fault has been cleared. Otherwise, the fault will automatically clear after a default time interval if there have been no updates. 
       properties:
         uuid:
           type: string
@@ -856,18 +1273,18 @@ components:
         source:
           type: string
           format: uuid
-          description: The source UUID of the component that is causing the fault. Used when the client can detect failures with other systems or subsystems. When not included, it is assumed that the source is the UUID of this reporting client
+          description: The source UUID of the component that is causing the fault. Used when the client can detect failures with other components or subsystems. When not included, it is assumed that the source is the UUID of this reporting client
         code:
           type: integer
-          description: An integer representation of the fault code. This must be a value that always corresponds to a specific type of fault given a specific version of the system. Implementers are encouraged to give meaningful numbers to faults - for example, faults relating to firmware issues may all fall in the range of 500-599. 
+          description: An integer representation of the fault code. This must be a value that always corresponds to a specific type of fault given a specific version of the component. Implementers are encouraged to give meaningful numbers to faults - for example, faults relating to firmware issues may all fall in the range of 500-599. 
         severity:
           type: string
           description: |
-            This is a high level description of a fault affecting the service or system
-            LOW is meant for faults that have no effect on the system. These are minor oddities that the software keeps track of but do not affect service quality in any way.
-            MEDIUM level faults are meant for faults that affect the system's operational performance but do not affect the quality of information provided by a service. If a service is providing trustworthy information at a suboptimal rate, or if only non-critical functions are impeded, then a service is experiencing a MEDIUM level fault
-            HIGH level faults affect service quality in some way because of a malfunction of the underlying software or hardware. These faults may resolve themselves over time, but should be associated with a FAULTED state. Services experiencing a HIGH level fault are operating below their performance specifications and are likely putting out bad data that cannot be trusted
-            UNKNOWN is a level reserved for when the system cannot determine the source of a fault. This should not be used generally, as other services should treat UNKNOWN faults with the same level of caution as HIGH level faults
+            This is a high level description of a fault affecting the service or component <br> <br>
+            LOW is meant for faults that have no effect on the component. These are minor oddities that the software keeps track of but do not affect service quality in any way. <br> <br>
+            MEDIUM level faults are meant for faults that affect the component's operational performance but do not affect the quality of information provided by a service. If a service is providing trustworthy information at a suboptimal rate, or if only non-critical functions are impeded, then a service is experiencing a MEDIUM level fault <br> <br>
+            HIGH level faults affect service quality in some way because of a malfunction of the underlying software or hardware. These faults may resolve themselves over time, but should be associated with a FAULTED state. Services experiencing a HIGH level fault are operating below their performance specifications and are likely putting out bad data that cannot be trusted <br> <br>
+            UNKNOWN is a level reserved for when the component cannot determine the source of a fault. This should not be used generally, as other services should treat UNKNOWN faults with the same level of caution as HIGH level faults
           enum:
           - LOW
           - MEDIUM
@@ -877,18 +1294,18 @@ components:
         timeOfDetection:
           type: string
           format: date-time
-          description: The timestamp when this fault was first detected. Timestamp format is as specified by RFC 3339 section 5.6. If this field is not provided, it is assumed that the time of receipt of this fault is the time of detection (if it does not match any existing faults from the same system)
+          description: The timestamp when this fault was first detected. Timestamp format is as specified by RFC 3339 section 5.6. If this field is not provided, it is assumed that the time of receipt of this fault is the time of detection (if it does not match any existing faults from the same component)
           
         timeOfValidity:
           type: string
           format: date-time
           description: The last timestamp when this fault was confirmed to still be active. Timestamp format is as specified by RFC 3339 section 5.6. If this field is not provided, it is assumed that the time of receipt of this fault message is the time of validity (and will try to match to any existing faults being tracked)
           
-        faultTimeout: 
+        timeout: 
           type: integer
           minimum: 1
           example: 100
-          description: Seconds within which a fault update is expected from the client. If no update is received, the fault is assumed to be resolved.
+          description: Seconds within which a fault update is expected from the reporting client. If no update is received, the fault is assumed to be resolved.
         
         reporter:
           type: string
@@ -904,61 +1321,57 @@ components:
         - code
         - severity
 
-    FaultRegistrationInformation:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        name:
-          type: string
-          description: The name or summary of the fault
-        source:
-          type: string
-          format: uuid
-        code:
-          type: integer
-          description: The code of the fault. Usually represented as an integer
-        timeOfDetection:
-          type: string
-          format: date-time
-          description: The time that the fault was first reported
-        faultTimeout: 
-          type: integer
-          minimum: 1
-          example: 100
-          description: Seconds within which a fault update is expected from the client. If no update is received, the fault is assumed to be resolved.
-          
+    ActiveComponent:
+      description: The final component data that are used for external consumption by displays and other services. These data may be altered between initial receipt and this value. 
+      allOf:
+        - $ref: '#/components/schemas/MonitoredComponent'
+        - type: object
+          properties:
+            selfReportedState:
+              description: The original self-reported state of the component. Useful for when an override is performed due to a fault or other special circumstance. 
+              $ref: '#/components/schemas/State'
+              
+            componentLibraryName:
+              type: string
+
+            performanceStatistics:
+              $ref: '#/components/schemas/ComponentStatistics'
+
+    ActiveFault:
+      description: The final 'fault' that is used for external consumption by displays and other services
+      allOf:
+        - $ref: '#/components/schemas/Fault'
+
   securitySchemes:
-    SystemWrite:      
+    SystemWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.system.write: Client may write any system, version or state data 
+            fraihmwork.system.write: Client may write any component, version or state data 
       type: oauth2
-    SystemRead:      
+    SystemRead:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.system.read: Client may query for any system, version or state data that the service can provide
+            fraihmwork.system.read: Client may query for any component, version or state data that the service can provide
       type: oauth2
-    FaultWrite:      
+    FaultWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.write: Client may write any detailed fault information to the service 
+            fraihmwork.fault.write: Client may write any detailed fault information to the FRAIHMWORK system 
       type: oauth2
-    FaultRead:      
+    FaultRead:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.read: Client may query for any detailed fault information that the service can provide
+            fraihmwork.fault.read: Client may query for any detailed fault information that the FRAIHMWORK system can provide
       type: oauth2
