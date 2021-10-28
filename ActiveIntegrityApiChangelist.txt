@@ -1,2 +1,0 @@
-Version 0.0.2: 
-Initial external release / combination from previous active api entries
