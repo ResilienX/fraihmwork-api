@@ -15,7 +15,7 @@ servers:
 
 tags:
 - name: System
-  description: High level system and service information. These are deprecated and replaced by the component endpoints to avoid confusion about ResilienX FRAIHMWORK terminology.
+  description: High level component and service information. These are deprecated and replaced by the component endpoints to avoid confusion about ResilienX FRAIHMWORK terminology.
   
 - name: Components
   description: All component related api endpoints
@@ -23,12 +23,6 @@ tags:
 - name: Faults
   description: All fault related api endpoints
   
-- name: Component Updates
-  description: High level component  information
-
-- name: Fault Updates
-  description: Fault information
-
 - name: UUID Control
   description: Functions for helping manage UUIDs for components and faults
 
@@ -38,11 +32,11 @@ paths:
       deprecated: true
       tags:
       - System
-      summary: Post an update on all current system properties
-      description: This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the system needs to be registered (under the hood), so a UUID will be created and assigned in the response
+      summary: Post an update on all current component properties
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response
       operationId: postSystemInformation
       requestBody:
-        description: JSON description of the current system state
+        description: JSON description of the current component state
         required: true
         content:
           application/json:
@@ -50,7 +44,7 @@ paths:
               $ref: '#/components/schemas/MonitoredComponent'
       responses:
         201:
-          description: Successfully posted new service information
+          description: Successfully posted new component information
           content:
             application/json:
               schema:
@@ -86,7 +80,7 @@ paths:
       deprecated: true
       tags:
       - System
-      summary: Request existing registration details for information about a system
+      summary: Request existing registration details for information about a component
       description: This endpoint allows requesting services to find information about registered instaces that FRAIHMWORK is currently aware of
       operationId: getRegistrations
       responses:
@@ -130,7 +124,7 @@ paths:
       deprecated: true
       tags:
       - System
-      summary: Request existing registration for specific system
+      summary: Request existing registration for specific component
       description: This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of
       operationId: getRegistration
       parameters:
@@ -140,7 +134,7 @@ paths:
           schema:
             type: string
             format: uuid
-          description: Uuid of the system properties being updated
+          description: Uuid of the component properties being updated
       responses:
         200:
           description: Successful operation
@@ -186,8 +180,8 @@ paths:
       deprecated: true
       tags:
       - System
-      summary: Update existing properties about a system
-      description: This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. 
+      summary: Update existing properties about a component
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. 
       operationId: updateSystemInformation
       parameters:
         - in: path
@@ -196,9 +190,9 @@ paths:
           schema:
             type: string
             format: uuid
-          description: Uuid of the system properties being updated
+          description: Uuid of the component properties being updated
       requestBody:
-        description: JSON description of the current system state
+        description: JSON description of the current component state
         required: true
         content:
           application/json:
@@ -244,7 +238,7 @@ paths:
       tags:
       - System
       summary: Deletes an active entry
-      description: This operation removes a system's basic information from FRAIHMWORK, thus rendering itself inactive.
+      description: This operation removes a component's basic information from FRAIHMWORK, thus rendering itself inactive.
       operationId: deleteSystemInformation
       parameters:
         - in: path
@@ -253,7 +247,7 @@ paths:
           schema:
             type: string
             format: uuid
-          description: Uuid of the system properties being deleted
+          description: Uuid of the component properties being deleted
       responses:
         200:
           description: Successful operation
@@ -294,8 +288,8 @@ paths:
       deprecated: true
       tags:
       - System
-      summary: Refresh existing system properties
-      description: Permits an already registered system to be refreshed without changing any properties
+      summary: Refresh existing component properties
+      description: Permits an already registered component to be refreshed without changing any properties
       operationId: refreshSystemInformation
       parameters:
         - in: path
@@ -304,7 +298,7 @@ paths:
           schema:
             type: string
             format: uuid
-          description: Uuid of the system property being refreshed
+          description: Uuid of the component property being refreshed
       responses:
         200:
           description: Successful operation
@@ -338,7 +332,6 @@ paths:
     post:
       tags:
       - Components
-      - Component Updates
       summary: Post an update on all component properties
       description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response
       operationId: postComponentInformation
@@ -386,7 +379,7 @@ paths:
     get:
       tags:
       - Components
-      summary: Retrieve all of the components in the FRAIHMWORK system, filtered by any optional criteria provided.
+      summary: Retrieve all of the components in FRAIHMWORK, filtered by any optional criteria provided.
       operationId: findAllComponents
       parameters:
       - name: state
@@ -496,9 +489,8 @@ paths:
     put:
       tags:
       - Components
-      - Component Updates
       summary: Update existing properties about a component
-      description: This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. 
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. 
       operationId: updateComponentInformation
       parameters:
         - in: path
@@ -553,7 +545,6 @@ paths:
     delete:  
       tags:
       - Components
-      - Component Updates
       summary: Deletes an active entry
       description: This operation removes a components's basic information from FRAIHMWORK, thus rendering itself inactive.
       operationId: deleteComponentInformation
@@ -604,7 +595,6 @@ paths:
     post:
       tags:
       - Components
-      - Component Updates
       summary: Refresh existing component properties
       description: Permits an already registered component to be refreshed without changing any properties
       operationId: refreshComponentInformation
@@ -648,10 +638,9 @@ paths:
   /fault:
     post:
       tags:
-      - Fault Updates
       - Faults
-      summary: Posts a new fault that is affecting a system
-      description: Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response).
+      summary: Posts a new fault that is affecting a component
+      description: Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response).
       operationId: postNewFault
       requestBody:
         description: JSON description of a new, updated, or cleared fault
@@ -820,9 +809,8 @@ paths:
     put:
       tags:
       - Faults
-      - Fault Updates
-      summary: Updates a fault that is affecting a system
-      description: Allows a system to report one or more faults currently affecting the system
+      summary: Updates a fault that is affecting a component
+      description: Allows a component to report one or more faults currently affecting the component
       operationId: updateFault
       parameters:
         - in: path
@@ -883,9 +871,8 @@ paths:
     delete:
       tags:
       - Faults
-      - Fault Updates
-      summary: Clears a new fault that is no longer affecting a system
-      description: Allows a system to clear a fault no longer affecting it
+      summary: Clears a new fault that is no longer affecting a component
+      description: Allows a component to clear a fault no longer affecting it
       operationId: deleteFault
       parameters:
         - in: path
@@ -940,9 +927,8 @@ paths:
     post:
       tags:
       - Faults
-      - Fault Updates
-      summary: Refresh a fault that is affecting a system
-      description: Allows a system to refresh a fault currently affecting the system without changing any properties
+      summary: Refresh a fault that is affecting a component
+      description: Allows a component to refresh a fault currently affecting the component without changing any properties
       operationId: refreshFault
       parameters:
         - in: path
@@ -998,7 +984,7 @@ paths:
       tags:
       - UUID Control
       summary: Request a unique ID to use in future API posts
-      description: If the system does not already provide a UUID as part of its software suite, it will need to request a UUID from the FRAIHMWORK system to uniquely identify the source. Note that this operation does not guarantee any registration of the UUID - it merely generates one. The next call should be to register the UUID created
+      description: If the component does not already provide a UUID as part of its software suite, it will need to request a UUID from FRAIHMWORK to uniquely identify the source. Note that this operation does not guarantee any registration of the UUID - it merely generates one. The next call should be to register the UUID created
       operationId: requestId
       responses:
         200:
@@ -1058,13 +1044,13 @@ components:
         uuid:
           type: string
           format: uuid
-          description: The unique identifier of this system, if provided by the client. If left blank, it is assumed that the UUID is being handled by the FRAIHMWORK server.
+          description: The unique identifier of this component, if provided by the client. If left blank, it is assumed that the UUID is being handled by the FRAIHMWORK server.
         name:
           type: string
-          description: The name of the system
+          description: The name of the component
         description:
           type: string
-          description: Summary of services provided by this system
+          description: Summary of services provided by this component
         componentLibraryName:
           type: string
           description: An optional reference to a pre-configured component library entity
@@ -1074,24 +1060,24 @@ components:
           $ref: '#/components/schemas/Version'
         physicalLocation:
           type: string
-          description: General description of where the system or component actually is (to differentiate it from other, redundant systems)
+          description: General description of where the component or component actually is (to differentiate it from other, redundant components)
         networkAddress:
           type: string
-          description: An IPv4, IPv6, DNS or other URI that can be used to reach back to this system. This is for documentation purposes and will not currently be validated
+          description: An IPv4, IPv6, DNS or other URI that can be used to reach back to this component. This is for documentation purposes and will not currently be validated
         manufacturer:
           type: string
-          description: Company or entity providing the service or system
+          description: Company or entity providing the service or component
         model:
           type: string
-          description: The exact model string or number that describes this system
+          description: The exact model string or number that describes this component
         startupTime:
           type: string
           format: date-time
-          description: The time that this system last reached an operational state. If not provided, FRAIHMWORK will assume that the start time is last time it received a message with state = OPERATIONAL from this system. Follows format as specified by RFC 3339 section 5.6, which is a specific implementation of ISO 8601
+          description: The time that this component last reached an operational state. If not provided, FRAIHMWORK will assume that the start time is last time it received a message with state = OPERATIONAL from this component. Follows format as specified by RFC 3339 section 5.6, which is a specific implementation of ISO 8601
         parent:
           type: string
           format: uuid
-          description: This is an optional field that can be used to denote that this is a subsystem of a different system. If left blank, it is assumed that there is no parent for this system, otherwise, it is expected that the UUID provided corresponds to an already existing and registered system.
+          description: This is an optional field that can be used to denote that this is a subsystem of a different component. If left blank, it is assumed that there is no parent for this component, otherwise, it is expected that the UUID provided corresponds to an already existing and registered component.
         timeOfValidity:
           type: string
           format: date-time
@@ -1100,7 +1086,7 @@ components:
           type: integer
           minimum: 1
           example: 100
-          description: Seconds within which a component update is expected from the client. If no update is received, the system will consider the component lifeless.
+          description: Seconds within which a component update is expected from the client. If no update is received, the component will consider the component lifeless.
         reporter:
           type: string
           format: uuid
@@ -1152,11 +1138,11 @@ components:
         systemTimeout:
           type: integer
           minimum: 1
-          description: Seconds within which a component update is expected from the client. If no update is received, the FRAIHMWORK system will consider the component lifeless.
+          description: Seconds within which a component update is expected from the client. If no update is received, FRAIHMWORK will consider the component lifeless.
         timeOfRegistration:
           type: string
           format: date-time
-          description: The time that the component was first registered
+          description: The time that the component was first registered. Formatted according to RFC 3339 section 5.6.
       required:
         - uuid
         - name
@@ -1189,17 +1175,17 @@ components:
       type: object
       properties:
         timeOfRegistration:
-          description: Time of first registration in the FRAIHMWORK system. The moment that we are first aware of the component. 
+          description: Time of first registration in FRAIHMWORK. The moment that we are first aware of the component. Formatted according to RFC 3339 section 5.6.
           type: string
           format: date-time
           
         timeOfPerformance:
-          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time 
+          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Formatted according to RFC 3339 section 5.6.
           type: string
           format: date-time
           
         timeOfReplacement:
-          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Tracks the last time that a component was repaired, replaced, or any other maintenance has been performed, thus requiring a reset in the lifetime statistics below / MTBF time.  
+          description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Tracks the last time that a component was repaired, replaced, or any other maintenance has been performed, thus requiring a reset in the lifetime statistics below / MTBF time. Formatted according to RFC 3339 section 5.6.
           type: string
           format: date-time
           
@@ -1239,12 +1225,12 @@ components:
           format: double
           
         totalReplacementRunningTimeSeconds:
-          description: This is the amount of time that the component has been ONLINE since the TIME OF REPLACEMENT. Could be seen as a sum of all SESSION LIFETIMEs since the TIME OF REPLACEMENT. Used for tracking data over a specific period of time.
+          description: This is the amount of time in seconds that the component has been ONLINE since the TIME OF REPLACEMENT. Could be seen as a sum of all SESSION LIFETIMEs since the TIME OF REPLACEMENT. Used for tracking data over a specific period of time.
           type: integer
           format: int64
 
         replacementLifetimeSeconds:
-          description: Total time passed since TIME OF REPLACEMENT. Total amount of time that the FRAIHMWORK system has been aware of this component since a replacement. Function is (NOW - TIME OF REPLACEMENT)
+          description: Total time in seconds that have passed since TIME OF REPLACEMENT. Total amount of time that FRAIHMWORK  has been aware of this component since a replacement. Function is (NOW - TIME OF REPLACEMENT)
           type: integer
           format: int64
 
@@ -1316,7 +1302,7 @@ components:
           description: The unique identifier of the reporter of this fault, if provided.
           
         extensions:
-          description: Optional parameter to provide any extensions to the default fault object type
+          description: Optional parameter to provide any extensions to the default fault object type. These are expected to be collections of <String, String> pairs that are all gathered under a single String for a collection name. For example, a 'maintenance' extension would be one entry under 'extensions', and could itself contain five key / value mappings, the keys and values both bein
           type: object
           additionalProperties: true
       required:
@@ -1338,7 +1324,7 @@ components:
               $ref: '#/components/schemas/ComponentStatistics'
 
     ActiveFault:
-      description: The final 'fault' that is used for external consumption by displays and other services
+      description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
       allOf:
         - $ref: '#/components/schemas/Fault'
 
@@ -1365,7 +1351,7 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.write: Client may write any detailed fault information to the FRAIHMWORK system 
+            fraihmwork.fault.write: Client may write any detailed fault information to FRAIHMWORK 
       type: oauth2
     FaultRead:
       flows:
@@ -1373,5 +1359,5 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.read: Client may query for any detailed fault information that the FRAIHMWORK system can provide
+            fraihmwork.fault.read: Client may query for any detailed fault information that the FRAIHMWORK can provide
       type: oauth2
