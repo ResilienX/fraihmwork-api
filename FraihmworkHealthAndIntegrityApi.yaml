@@ -1090,7 +1090,7 @@ components:
         reporter:
           type: string
           format: uuid
-          description: The unique identifier of the reporter of this component, if provided.
+          description: The unique identifier of the reporter of this component, if applicable. This assumes that the reporting entity is also a component with a UUID already assigned. This is to allow for components to report status on other components' (such as child entities) behalf.
         extensions:
           description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
           type: object
@@ -1165,9 +1165,7 @@ components:
           - FAULTED
         description:
           type: string
-          description: An optional detailed description of the component state in order to provide
-            more context. This field can be left blank if the enum fully describes
-            the component state with no additional qualifications.
+          description: An optional detailed description of the component state in order to provide more context for future queries or for the display. This field can be left blank if the enum fully describes the component state with no additional qualifications. This is provided by the client, and there are currently no restrictions on what this field can be used for. 
       required:
         - state
 
