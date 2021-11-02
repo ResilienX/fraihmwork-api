@@ -74,7 +74,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite: [system.write]
+      - ComponentWrite: [system.write]
 
     get:
       deprecated: true
@@ -116,8 +116,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - ComponentRead:
+        - fraihmwork.component.read
 
   /system/{uuid}:
     get:
@@ -173,8 +173,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - ComponentRead:
+        - fraihmwork.component.read
 
     put:
       deprecated: true
@@ -230,8 +230,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
     delete:  
       deprecated: true
@@ -280,8 +280,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
   /system/{uuid}/refresh:
     post:
@@ -325,8 +325,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
   /component:
     post:
@@ -374,7 +374,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite: [system.write]
+      - ComponentWrite: [system.write]
 
     get:
       tags:
@@ -433,8 +433,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - ComponentRead:
+        - fraihmwork.component.read
 
   /component/{uuid}:
     get:
@@ -483,8 +483,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - ComponentRead:
+        - fraihmwork.component.read
 
     put:
       tags:
@@ -539,8 +539,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
     delete:  
       tags:
@@ -588,8 +588,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
   /component/{uuid}/refresh:
     post:
@@ -632,8 +632,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemWrite:
-        - fraihmwork.system.write
+      - ComponentWrite:
+        - fraihmwork.component.write
 
   /fault:
     post:
@@ -759,8 +759,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - FaultRead:
+        - fraihmwork.fault.read
 
   /fault/{uuid}:
     get:
@@ -803,8 +803,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false      
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - FaultRead:
+        - fraihmwork.fault.read
 
     put:
       tags:
@@ -1021,8 +1021,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - SystemRead:
-        - fraihmwork.system.read
+      - ComponentRead:
+        - fraihmwork.component.read
 
 components:
   schemas:
@@ -1327,21 +1327,21 @@ components:
         - $ref: '#/components/schemas/Fault'
 
   securitySchemes:
-    SystemWrite:
+    ComponentWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.system.write: Client may write any component, version or state data 
+            fraihmwork.component.write: Client may write any component, version or state data 
       type: oauth2
-    SystemRead:
+    ComponentRead:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.system.read: Client may query for any component, version or state data that the service can provide
+            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
       type: oauth2
     FaultWrite:
       flows:
@@ -1357,5 +1357,5 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.read: Client may query for any detailed fault information that the FRAIHMWORK can provide
+            fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
       type: oauth2
