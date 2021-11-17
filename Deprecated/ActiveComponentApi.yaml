@@ -17,6 +17,7 @@ tags:
 paths:
   /components:
     get:
+      deprecated: true
       tags:
       - Component Entity
       summary: findAllComponents
@@ -54,12 +55,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - SystemRead:
         - fraihmwork.system.read
   /components/{uuid}:
     get:
+      deprecated: true
       tags:
       - Component Entity
       summary: findComponentByUuid
@@ -103,7 +104,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - SystemRead:
         - fraihmwork.system.read
