@@ -1,0 +1,2038 @@
+{
+	"info": {
+		"_postman_id": "f0c81e37-424c-419e-bd60-4d27b7f6af37",
+		"name": "FRAIHMWORK Integrator Starter Kit Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Get OAuthToken and initialize vars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"access_token\", \"null\");\r",
+									"var jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"access_token\", jsonData.access_token);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"String\", \"ExampleString\");\r",
+									"pm.collectionVariables.set(\"Number\", 1234);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "{{clientId}}",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "{{clientSecret}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/realms/dev/protocol/openid-connect/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"realms",
+								"dev",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Components",
+			"item": [
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "Post Component with all fields",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"UUIDComponentResponse\", pm.response.json().itemId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Component Name\",\n    \"state\": {\n        \"state\": \"STARTING_UP\",\n        \"description\": \"State description for the component\"\n    },\n    \"uuid\": \"{{$randomUUID}}\",\n    \"description\": \"Description for the component\",\n    \"version\": {\n        \"hardware\": \"1.0.0\",\n        \"software\": \"1.0.0\",\n        \"firmware\": \"1.0.0\",\n        \"configuration\": \"\"\n    },\n    \"physicalLocation\": \"Installed in a building\",\n    \"networkAddress\": \"127.0.0.1\",\n    \"manufacturer\": \"ResilienX Inc.\",\n    \"model\": \"Model 1001\",\n    \"startupTime\": \"2020-08-05T17:28:22.681Z\",\n    \"timeOfValidity\": \"2020-08-05T17:28:22.681Z\",\n    \"timeout\": 100,\n    \"extensions\": {\n        \"property\": {\n            \"name\": \"{{String}}\",\n            \"value\": \"{{Number}}\",\n            \"type\": \"INTEGER\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/component",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"component"
+									]
+								},
+								"description": "This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET all Components",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/component",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"component"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/{uuid}",
+					"item": [
+						{
+							"name": "GET",
+							"item": [
+								{
+									"name": "GET By UUID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"var jsonData = pm.response.json();"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/component/?:uuid={{UUIDComponentResponse}}",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"component",
+												""
+											],
+											"query": [
+												{
+													"key": ":uuid",
+													"value": "{{UUIDComponentResponse}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "PUT",
+							"item": [
+								{
+									"name": "Update existing properties about a Component Copy",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Component Name\",\n    \"state\": {\n        \"state\": \"ONLINE\",\n        \"description\": \"State description for the component\"\n    },\n    \"uuid\": \"{{UUIDComponentResponse}}\",\n    \"description\": \"Description for the component\",\n    \"version\": {\n        \"hardware\": \"1.0.0\",\n        \"software\": \"1.0.0\",\n        \"firmware\": \"1.0.0\",\n        \"configuration\": \"\"\n    },\n    \"physicalLocation\": \"Installed in a building\",\n    \"networkAddress\": \"127.0.0.1\",\n    \"manufacturer\": \"ResilienX Inc.\",\n    \"model\": \"Model 1001\",\n    \"startupTime\": \"2020-08-05T17:28:22.681Z\",\n    \"timeOfValidity\": \"2020-08-05T17:28:22.681Z\",\n    \"timeout\": 10,\n    \"extensions\": {\n        \"property\": {\n            \"name\": \"{{String}}\",\n            \"value\": \"{{Number}}\",\n            \"type\": \"INTEGER\"\n        }\n    }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/component/:uuid",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"component",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDComponentResponse}}",
+													"description": "(Required) Uuid of the component properties being updated"
+												}
+											]
+										},
+										"description": "This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "DELETE",
+							"item": [
+								{
+									"name": "DELETE Component",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/component/:uuid",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"component",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDComponentResponse}}",
+													"description": "(Required) Uuid of the component properties being deleted"
+												}
+											]
+										},
+										"description": "This operation removes a component's basic information from FRAIHMWORK, thus rendering itself inactive."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/refresh",
+							"item": [
+								{
+									"name": "Refresh component Copy",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/component/:uuid/refresh",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"component",
+												":uuid",
+												"refresh"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDComponentResponse}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Faults",
+			"item": [
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "Posts a new fault that is affecting a component",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", \"null\")\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", jsonData.itemId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Fault of a component\",\n    \"code\": 0,\n    \"severity\": \"LOW\",\n    \"uuid\": \"{{$randomUUID}}\",\n    \"description\": \"Description of a fault\",\n    \"source\": \"{{UUIDComponentResponse}}\",\n    \"timeOfDetection\": \"2020-08-05T21:57:44.823Z\",\n    \"timeOfValidity\": \"2020-08-05T21:57:44.823Z\",\n    \"timeout\": 100,\n    \"extensions\": {\n        \"property\" :        {\n            \"name\": \"{{String}}\",\n            \"value\": \"{{String}}\",\n            \"type\": \"INTEGER\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/fault",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"fault"
+									]
+								},
+								"description": "Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+							},
+							"response": []
+						},
+						{
+							"name": "Posts a new fault without fault uuid that is affecting a component",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", \"null\")\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", jsonData.itemId);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Fault of a component\",\n    \"code\": 0,\n    \"severity\": \"LOW\",\n    \"description\": \"Description of a fault\",\n    \"source\": \"{{UUIDComponentResponse}}\",\n    \"timeOfDetection\": \"2020-08-05T21:57:44.823Z\",\n    \"timeOfValidity\": \"2020-08-05T21:57:44.823Z\",\n    \"timeout\": 100,\n    \"extensions\": {\n        \"property\" :        {\n            \"name\": \"{{String}}\",\n            \"value\": \"{{String}}\",\n            \"type\": \"INTEGER\"\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/fault",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"fault"
+									]
+								},
+								"description": "Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+							},
+							"response": []
+						},
+						{
+							"name": "Posts a new fault with undefined optional field (description)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", \"null\")\r",
+											"var jsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"UUIDFaultResponse\", jsonData.itemId);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"Fault of a component\",\r\n    \"code\": 0,\r\n    \"severity\": \"LOW\",\r\n    \"uuid\": \"{{$randomUUID}}\",\r\n    \"source\": \"{{UUIDComponentResponse}}\",\r\n    \"timeout\": 100\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/fault",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"fault"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "GET all Faults",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{Monitoring}}/fault",
+									"host": [
+										"{{baseUrl}}{{Monitoring}}"
+									],
+									"path": [
+										"fault"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/{uuid}",
+					"item": [
+						{
+							"name": "GET",
+							"item": [
+								{
+									"name": "GET By UUID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/fault/{{UUIDFaultResponse}}",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"fault",
+												"{{UUIDFaultResponse}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "PUT",
+							"item": [
+								{
+									"name": "Updates a fault that is affecting a component",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Fault of a component\",\n    \"code\": 0,\n    \"severity\": \"MEDIUM\",\n    \"uuid\": \"{{UUIDFaultResponse}}\",\n    \"description\": \"Description of a fault\",\n    \"source\": \"{{UUIDComponentResponse}}\",\n    \"timeOfDetection\": \"2020-08-05T21:57:44.823Z\",\n    \"timeOfValidity\": \"2020-08-05T21:57:44.823Z\",\n    \"timeout\": 100,\n    \"extensions\": {\n        \"property\" :        {\n            \"name\": \"{{String}}\",\n            \"value\": \"{{String}}\",\n            \"type\": \"INTEGER\"\n        }\n    }\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/fault/:uuid",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"fault",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDFaultResponse}}",
+													"description": "(Required) Uuid of the fault being updated"
+												}
+											]
+										},
+										"description": "Allows a component to report one or more faults currently affecting the component"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "DELETE",
+							"item": [
+								{
+									"name": "Remove fault",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/fault/:uuid/",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"fault",
+												":uuid",
+												""
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDFaultResponse}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/refresh",
+							"item": [
+								{
+									"name": "Refresh fault",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Monitoring}}/fault/:uuid/refresh",
+											"host": [
+												"{{baseUrl}}{{Monitoring}}"
+											],
+											"path": [
+												"fault",
+												":uuid",
+												"refresh"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDFaultResponse}}"
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "This api refreshes the component uuid as if a PUT was made to the /component/{uuid} endpoint with a body that matches all of the parameters that were previously sent. \r\nRefresh command is sent with an empty body."
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Mitigations",
+			"item": [
+				{
+					"name": "POST",
+					"item": [
+						{
+							"name": "Post Mitigation with all fields",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"UUIDMitigationResponse\", null);\r",
+											"var mitigatorJsonData = pm.response.json();\r",
+											"pm.collectionVariables.set(\"UUIDMitigationResponse\", mitigatorJsonData.itemId);\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"issuerId\": \"{{UUIDComponentResponse}}\",\n    \"executorId\": \"{{UUIDComponentResponse}}\",\n    \"description\": \"Mitigation Description\",\n    \"timeIssued\": \"2020-08-07T19:01:07.208Z\",\n    \"executorCallback\": \"Callback\",\n    \"faultIds\": [\n        \"{{UUIDFaultResponse}}\"\n    ],\n    \"state\": \"RECOMMENDED\",\n    \"timeOfValidity\": \"2020-08-07T19:01:07.208Z\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}{{Mitigation}}/mitigation",
+									"host": [
+										"{{baseUrl}}{{Mitigation}}"
+									],
+									"path": [
+										"mitigation"
+									]
+								},
+								"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the system needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET",
+					"item": [
+						{
+							"name": "Retrieve all mitigations",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Successful GET with UUID\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}{{Mitigation}}/mitigation/",
+									"host": [
+										"{{baseUrl}}{{Mitigation}}"
+									],
+									"path": [
+										"mitigation",
+										""
+									]
+								},
+								"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "/{uuid}",
+					"item": [
+						{
+							"name": "GET",
+							"item": [
+								{
+									"name": "Retrieve posted mitigation",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDMitigationResponse}}",
+													"description": "(Required) Uuid of the mitigation posted"
+												}
+											]
+										},
+										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "PUT",
+							"item": [
+								{
+									"name": "Update mitigation to COMPLETED",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"mitigation.state\", \"COMPLETE\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"state\": \"{{mitigation.state}}\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDMitigationResponse}}"
+												}
+											]
+										},
+										"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
+									},
+									"response": []
+								},
+								{
+									"name": "Update mitigation to ACCEPTED",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"mitigation.state\", \"ACCEPTED\");\r",
+													"pm.collectionVariables.set(\"mitigation.time\", \"2021-10-27T05:52:05.506Z\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"state\": \"{{mitigation.state}}\",\n  \"timeOfValidity\": \"{{mitigation.time}}\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDMitigationResponse}}"
+												}
+											]
+										},
+										"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "/state/{state}",
+					"item": [
+						{
+							"name": "GET",
+							"item": [
+								{
+									"name": "Retrieve posted mitigations with only RECOMMENDED state",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/state/RECOMMENDED",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												"state",
+												"RECOMMENDED"
+											]
+										},
+										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+									},
+									"response": []
+								},
+								{
+									"name": "Retrieve posted mitigations with only ACCEPTED state",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/state/ACCEPTED",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												"state",
+												"ACCEPTED"
+											]
+										},
+										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "/subscription/mitigation",
+					"item": [
+						{
+							"name": "POST",
+							"item": [
+								{
+									"name": "Subscribe to mitigation",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"expirationTime\",\"null\");\r",
+													"var now = new Date();\r",
+													"var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);\r",
+													"utc.setMinutes(utc.getMinutes() + 30 );\r",
+													"pm.collectionVariables.set(\"expirationTime\", utc);"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"UUIDmitigationSubscription\", \"null\");\r",
+													"var mitigatorJsonData = pm.response.json();\r",
+													"pm.collectionVariables.set(\"UUIDmitigationSubscription\", mitigatorJsonData.itemId);\r",
+													"\r",
+													"pm.test(\"Successful Mitigator Subscription POST\", function () {\r",
+													"    pm.response.to.have.status(201);\r",
+													"});\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"baseUrl\": \"{{$randomUrl}}\",\n    \"interestedUuids\": [\n        \"{{UUIDMitigationResponse}}\"\n    ],\n    \"stopTime\": \"{{expirationTime}}\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"subscription",
+												"mitigation"
+											]
+										},
+										"description": "Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "/{uuid}",
+							"item": [
+								{
+									"name": "GET",
+									"item": [
+										{
+											"name": "Retrieve subscription details",
+											"event": [
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"var jsonData = pm.response.json();\r",
+															"\r",
+															"pm.test(\"Returned Expected Value\", function () {\r",
+															"    pm.expect(jsonData.interestedUuids[0]).to.eq(pm.collectionVariables.get(\"UUIDMitigationResponse\"));\r",
+															"});\r",
+															"\r",
+															"pm.test(\"Returned Expected Value\", function () {\r",
+															"    pm.expect(new Date(jsonData.stopTime).valueOf()).to.eq(new Date(pm.collectionVariables.get(\"expirationTime\")).valueOf());\r",
+															"});\r",
+															"\r",
+															"pm.test(\"Successful GET with UUID\", function () {\r",
+															"    pm.response.to.have.status(200);\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation/:uuid",
+													"host": [
+														"{{baseUrl}}{{Mitigation}}"
+													],
+													"path": [
+														"subscription",
+														"mitigation",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "{{UUIDmitigationSubscription}}"
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "PUT",
+									"item": [
+										{
+											"name": "setup",
+											"item": [
+												{
+													"name": "Subscribe to mitigation",
+													"event": [
+														{
+															"listen": "prerequest",
+															"script": {
+																"exec": [
+																	"pm.collectionVariables.set(\"expirationTime\",\"null\");\r",
+																	"var now = new Date();\r",
+																	"var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);\r",
+																	"utc.setMinutes(utc.getMinutes() + 30 );\r",
+																	"pm.collectionVariables.set(\"expirationTime\", utc);"
+																],
+																"type": "text/javascript"
+															}
+														},
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"var mitigatorJsonData = pm.response.json();\r",
+																	"pm.collectionVariables.set(\"UUIDmitigationSubscription\", mitigatorJsonData.itemId);\r",
+																	"\r",
+																	"pm.test(\"Successful Mitigator Subscription POST\", function () {\r",
+																	"    pm.response.to.have.status(201);\r",
+																	"});\r",
+																	""
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"baseUrl\": \"{{$randomUrl}}\",\n    \"interestedUuids\": [\n        \"{{UUIDMitigationResponse}}\"\n    ],\n    \"stopTime\": \"{{expirationTime}}\"\n}"
+														},
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"subscription",
+																"mitigation"
+															]
+														},
+														"description": "Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+													},
+													"response": []
+												},
+												{
+													"name": "Post second fault",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.collectionVariables.set(\"UUIDFaultResponse2\", \"null\")\r",
+																	"var jsonData = pm.response.json();\r",
+																	"pm.collectionVariables.set(\"UUIDFaultResponse2\", jsonData.itemId);\r",
+																	"pm.test(\"Successful POST to FHAIS Fault\", function () {\r",
+																	"    pm.response.to.have.status(201);\r",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [],
+														"body": {
+															"mode": "raw",
+															"raw": "{\r\n    \"name\": \"{{String}}{{String}}\",\r\n    \"code\": 10,\r\n    \"severity\": \"LOW\",\r\n    \"uuid\": \"{{$randomUUID}}\",\r\n    \"description\": \"{{String}}\",\r\n    \"source\": \"{{UUIDComponentResponse}}\",\r\n    \"timeOfDetection\": \"2020-08-05T21:57:44.823Z\",\r\n    \"timeOfValidity\": \"2020-08-05T21:57:44.823Z\",\r\n    \"timeout\": 100\r\n}",
+															"options": {
+																"raw": {
+																	"language": "json"
+																}
+															}
+														},
+														"url": {
+															"raw": "{{baseUrl}}{{Monitoring}}/fault",
+															"host": [
+																"{{baseUrl}}{{Monitoring}}"
+															],
+															"path": [
+																"fault"
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Post new mitigation for Original Fault and Second Fault",
+													"event": [
+														{
+															"listen": "prerequest",
+															"script": {
+																"exec": [
+																	""
+																],
+																"type": "text/javascript"
+															}
+														},
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"var mitigatorJsonData = pm.response.json();\r",
+																	"pm.collectionVariables.set(\"UUIDMitigationResponse2\", mitigatorJsonData.itemId);\r",
+																	"\r",
+																	"pm.test(\"Successful Mitigator POST\", function () {\r",
+																	"    pm.response.to.have.status(201);\r",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "POST",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"issuerId\": \"{{UUIDComponentResponse}}\",\n    \"executorId\": \"{{UUIDComponentResponse}}\",\n    \"description\": \"{{String}}\",\n    \"timeIssued\": \"2020-08-07T19:01:07.208Z\",\n    \"executorCallback\": \"{{String}}\",\n    \"faultIds\": [\n        \"{{UUIDFaultResponse}}\", \"{{UUIDFaultResponse2}}\"\n    ],\n    \"state\": \"RECOMMENDED\",\n    \"timeOfValidity\": \"2020-08-07T19:01:07.208Z\"\n}"
+														},
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/mitigation",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"mitigation"
+															]
+														},
+														"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the system needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+													},
+													"response": []
+												}
+											]
+										},
+										{
+											"name": "update subscription via PUT",
+											"item": [
+												{
+													"name": "Update subscription (add another mitgiation)",
+													"event": [
+														{
+															"listen": "prerequest",
+															"script": {
+																"exec": [
+																	"pm.collectionVariables.set(\"expirationTime\",\"null\");\r",
+																	"var now = new Date();\r",
+																	"var utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);\r",
+																	"utc.setMinutes(utc.getMinutes() + 30 );\r",
+																	"pm.collectionVariables.set(\"expirationTime\", utc);"
+																],
+																"type": "text/javascript"
+															}
+														},
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.collectionVariables.set(\"UUIDmitigationSubscription\", \"null\");\r",
+																	"var mitigatorJsonData = pm.response.json();\r",
+																	"pm.collectionVariables.set(\"UUIDmitigationSubscription\", mitigatorJsonData.itemId);\r",
+																	"\r",
+																	"pm.test(\"Successful PUT to Mitigator Subscription\", function () {\r",
+																	"    pm.response.to.have.status(200);\r",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n    \"baseUrl\": \"{{$randomUrl}}\",\n    \"interestedUuids\": [\n        \"{{UUIDMitigationResponse}}\", \"{{UUIDMitigationResponse2}}\"\n    ],\n    \"stopTime\": \"{{expirationTime}}\"\n}"
+														},
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation/:uuid",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"subscription",
+																"mitigation",
+																":uuid"
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "{{UUIDmitigationSubscription}}"
+																}
+															]
+														},
+														"description": "Allows a system to report one or more faults currently affecting the system"
+													},
+													"response": []
+												},
+												{
+													"name": "Validate subscription details",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"var jsonData = pm.response.json();\r",
+																	"\r",
+																	"pm.test(\"Returned Expected Value\", function () {\r",
+																	"    pm.expect(jsonData.interestedUuids[0]).to.eq(pm.collectionVariables.get(\"UUIDMitigationResponse\"));\r",
+																	"    pm.expect(jsonData.interestedUuids[1]).to.eq(pm.collectionVariables.get(\"UUIDMitigationResponse2\"));\r",
+																	"    pm.expect(new Date(jsonData.stopTime).valueOf()).to.eq(new Date(pm.collectionVariables.get(\"expirationTime\")).valueOf());\r",
+																	"});\r",
+																	"\r",
+																	"pm.test(\"Successful GET with UUID\", function () {\r",
+																	"    pm.response.to.have.status(200);\r",
+																	"});"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "GET",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation/:uuid",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"subscription",
+																"mitigation",
+																":uuid"
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "{{UUIDmitigationSubscription}}"
+																}
+															]
+														}
+													},
+													"response": []
+												}
+											]
+										},
+										{
+											"name": "Cleanup",
+											"item": [
+												{
+													"name": "Update new mitigation to terminal state",
+													"event": [
+														{
+															"listen": "prerequest",
+															"script": {
+																"exec": [
+																	"pm.collectionVariables.set(\"mitigation.state\", \"DENIED\");"
+																],
+																"type": "text/javascript"
+															}
+														},
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Successful PUT to Mitigator\", function () {\r",
+																	"    pm.response.to.have.status(202);\r",
+																	"});\r",
+																	"\r",
+																	"pm.collectionVariables.unset(\"UUIDMitigationResponse2\");"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "PUT",
+														"header": [
+															{
+																"key": "Content-Type",
+																"value": "application/json"
+															}
+														],
+														"body": {
+															"mode": "raw",
+															"raw": "{\n  \"state\": \"{{mitigation.state}}\"\n}"
+														},
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"mitigation",
+																":uuid"
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "{{UUIDMitigationResponse2}}"
+																}
+															]
+														},
+														"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
+													},
+													"response": []
+												},
+												{
+													"name": "Delete Subscription",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Successful DELETE with UUID\", function () {\r",
+																	"    pm.response.to.have.status(200);\r",
+																	"});\r",
+																	"\r",
+																	"pm.collectionVariables.unset(\"UUIDmitigationSubscription\");\r",
+																	"pm.collectionVariables.unset(\"expirationTime\");"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation/:uuid",
+															"host": [
+																"{{baseUrl}}{{Mitigation}}"
+															],
+															"path": [
+																"subscription",
+																"mitigation",
+																":uuid"
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "{{UUIDmitigationSubscription}}"
+																}
+															]
+														}
+													},
+													"response": []
+												},
+												{
+													"name": "Delete fault2",
+													"event": [
+														{
+															"listen": "test",
+															"script": {
+																"exec": [
+																	"pm.test(\"Successful DELETE FROM FHAIS\", function () {\r",
+																	"    pm.response.to.have.status(200);\r",
+																	"});\r",
+																	"pm.collectionVariables.unset(\"UUIDFaultResponse2\");"
+																],
+																"type": "text/javascript"
+															}
+														}
+													],
+													"request": {
+														"auth": {
+															"type": "bearer",
+															"bearer": [
+																{
+																	"key": "token",
+																	"value": "{{access_token}}",
+																	"type": "string"
+																}
+															]
+														},
+														"method": "DELETE",
+														"header": [],
+														"url": {
+															"raw": "{{baseUrl}}{{Monitoring}}/fault/:uuid",
+															"host": [
+																"{{baseUrl}}{{Monitoring}}"
+															],
+															"path": [
+																"fault",
+																":uuid"
+															],
+															"variable": [
+																{
+																	"key": "uuid",
+																	"value": "{{UUIDFaultResponse2}}"
+																}
+															]
+														}
+													},
+													"response": []
+												}
+											]
+										}
+									]
+								},
+								{
+									"name": "DELETE",
+									"item": [
+										{
+											"name": "Delete subscription",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															""
+														],
+														"type": "text/javascript"
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Successful DELETE to Mitigation Subscription\", function () {\r",
+															"    pm.response.to.have.status(200);\r",
+															"});"
+														],
+														"type": "text/javascript"
+													}
+												}
+											],
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "{{access_token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Content-Type",
+														"value": "application/json"
+													}
+												],
+												"url": {
+													"raw": "{{baseUrl}}{{Mitigation}}/subscription/mitigation/:uuid",
+													"host": [
+														"{{baseUrl}}{{Mitigation}}"
+													],
+													"path": [
+														"subscription",
+														"mitigation",
+														":uuid"
+													],
+													"variable": [
+														{
+															"key": "uuid",
+															"value": "{{UUIDmitigationSubscription}}"
+														}
+													]
+												},
+												"description": "Allows a system to report one or more faults currently affecting the system"
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "clientId",
+			"value": "<Request from ResilienX Inc.>"
+		},
+		{
+			"key": "clientSecret",
+			"value": "<Request from ResilienX Inc.>"
+		},
+		{
+			"key": "baseUrl",
+			"value": "https://<example>.fraihmwork.resilienx.com"
+		},
+		{
+			"key": "Mitigation",
+			"value": "/api/mitigation/v0"
+		},
+		{
+			"key": "Monitoring",
+			"value": "/api/monitor/v1"
+		}
+	]
+}
