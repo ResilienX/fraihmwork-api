@@ -371,7 +371,7 @@ components:
         endTime:
           type: string
           format: date-time
-          description: End time of maintenance maintenance appointment via ISO 8601 date-time format
+          description: End time of maintenance appointment via ISO 8601 date-time format
           example: "2021-01-30T08:30:00Z"
         componentUuid:
           type: string
