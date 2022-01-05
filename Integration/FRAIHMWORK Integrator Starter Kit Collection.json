@@ -1,7 +1,8 @@
 {
 	"info": {
-		"_postman_id": "f0c81e37-424c-419e-bd60-4d27b7f6af37",
+		"_postman_id": "c6b25ed4-475d-4939-96f4-64f09614e9e0",
 		"name": "FRAIHMWORK Integrator Starter Kit Collection",
+		"description": "Expected usage of this collection is to run individual requests, rather than folder-wise execution of the collection. This collection allows the publishing and receipt of API requests and responses to a FRAIHMWORK deployment, demonstrating how exchanges with FRAIHMWORK are done via the provided APIs and endpoints.\n\nBefore using, there is requirement for configuring the collection's variables with authentication information.\n\nIn the \"Variables\" section of this portion of the collection, enter the following configuration items:\n\n*   clientId\n*   clientSecret\n*   baseUrl\n    \n\nThese items should be requested from ResilienX Inc.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -78,7 +79,8 @@
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "The OAuth request in this folder is a prerequisite for any of the other requests in the collection. Please run this request first."
 		},
 		{
 			"name": "Components",
@@ -139,7 +141,7 @@
 										"component"
 									]
 								},
-								"description": "This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+								"description": "This operation creates a component instance within FRAIHMWORK. Subsequent requests in the Components folder rely on this being done successfully as a precondition for each example operation."
 							},
 							"response": []
 						}
@@ -171,7 +173,8 @@
 									"path": [
 										"component"
 									]
-								}
+								},
+								"description": "This operation retrieves all components from FRAIHMWORK."
 							},
 							"response": []
 						}
@@ -190,7 +193,7 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"var jsonData = pm.response.json();"
+													""
 												],
 												"type": "text/javascript"
 											}
@@ -210,21 +213,23 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{baseUrl}}{{Monitoring}}/component/?:uuid={{UUIDComponentResponse}}",
+											"raw": "{{baseUrl}}{{Monitoring}}/component/:uuid",
 											"host": [
 												"{{baseUrl}}{{Monitoring}}"
 											],
 											"path": [
 												"component",
-												""
+												":uuid"
 											],
-											"query": [
+											"variable": [
 												{
-													"key": ":uuid",
-													"value": "{{UUIDComponentResponse}}"
+													"key": "uuid",
+													"value": "{{UUIDComponentResponse}}",
+													"description": "(Required) Uuid of the component properties being queried."
 												}
 											]
-										}
+										},
+										"description": "This operation retrieves a component from FRAIHMWORK. The uuid of the component to be read is supposed to be established as a result of running the initial POST of the component."
 									},
 									"response": []
 								}
@@ -294,7 +299,7 @@
 												}
 											]
 										},
-										"description": "This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first."
+										"description": "This operation updates a component in FRAIHMWORK. The uuid of the component to be operated upon is supposed to be established as a result of running the initial POST of the component."
 									},
 									"response": []
 								}
@@ -357,7 +362,7 @@
 												}
 											]
 										},
-										"description": "This operation removes a component's basic information from FRAIHMWORK, thus rendering itself inactive."
+										"description": "This operation removes a component from FRAIHMWORK. The uuid of the component to be operated upon is supposed to be established as a result of running the initial POST of the component."
 									},
 									"response": []
 								}
@@ -416,7 +421,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The requests found within this folder are for creating, reading, updating and deleting instances of Components within FRAIHMWORK."
 		},
 		{
 			"name": "Faults",
@@ -479,7 +485,7 @@
 										"fault"
 									]
 								},
-								"description": "Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+								"description": "Allows a fault to be posted to FRAIHMWORK that is currently affecting a component (source). In this example, the UUID of the fault is being provided by the user of the endpoint making the request."
 							},
 							"response": []
 						},
@@ -539,7 +545,7 @@
 										"fault"
 									]
 								},
-								"description": "Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+								"description": "Allows a fault to be posted to FRAIHMWORK that is currently affecting a component (source). In this example, the UUID of the fault is being generated by FRAIHMWORK."
 							},
 							"response": []
 						},
@@ -589,7 +595,8 @@
 									"path": [
 										"fault"
 									]
-								}
+								},
+								"description": "Allows a fault to be posted to FRAIHMWORK that is currently affecting a component (source). In this example, most of the optional fields in the Fault API data type are stripped away."
 							},
 							"response": []
 						}
@@ -621,7 +628,8 @@
 									"path": [
 										"fault"
 									]
-								}
+								},
+								"description": "This operation retrieves all faults from FRAIHMWORK."
 							},
 							"response": []
 						}
@@ -668,7 +676,8 @@
 												"fault",
 												"{{UUIDFaultResponse}}"
 											]
-										}
+										},
+										"description": "This operation retrieves a fault from FRAIHMWORK. The uuid of the fault to be read is supposed to be established as a result of running the initial POST of the fault."
 									},
 									"response": []
 								}
@@ -738,7 +747,7 @@
 												}
 											]
 										},
-										"description": "Allows a component to report one or more faults currently affecting the component"
+										"description": "This operation updates a fault within FRAIHMWORK. The uuid of the fault to be updated is supposed to be established as a result of running the initial POST of the fault.\n\nThis operation prevents the fault from disappearing due to timeout elapsing."
 									},
 									"response": []
 								}
@@ -778,7 +787,8 @@
 													"value": "{{UUIDFaultResponse}}"
 												}
 											]
-										}
+										},
+										"description": "This operation deletes a fault from FRAIHMWORK. The uuid of the fault to be deleted is supposed to be established as a result of running the initial POST of the fault."
 									},
 									"response": []
 								}
@@ -829,7 +839,8 @@
 													"value": "{{UUIDFaultResponse}}"
 												}
 											]
-										}
+										},
+										"description": "Refreshes the fault within FRAIHMWORK. This operation prevents the fault from disappearing due to timeout elapsing."
 									},
 									"response": []
 								}
@@ -838,7 +849,8 @@
 						}
 					]
 				}
-			]
+			],
+			"description": "The requests found within this folder are for creating, reading, updating and deleting instances of Faults within FRAIHMWORK.\n\nIn general, Faults are in regard to a single Component instance within FRAIHMWORK. Faults have specific information that can be found within the FRAIHMWORK Health and Integrity API specification.\n\nFaults will disappear from FRAIHMWORK if the specified timeout value elapses after the last create, refresh or update operation done on it."
 		},
 		{
 			"name": "Mitigations",
@@ -902,7 +914,7 @@
 										"mitigation"
 									]
 								},
-								"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the system needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+								"description": "Allows a mitigation to be posted to FRAIHMWORK that is supposed to resolve or remedy a fault instance."
 							},
 							"response": []
 						}
@@ -958,7 +970,7 @@
 										""
 									]
 								},
-								"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+								"description": "This operation retrieves all mitigations from FRAIHMWORK."
 							},
 							"response": []
 						}
@@ -1022,7 +1034,7 @@
 												}
 											]
 										},
-										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+										"description": "This operation retrieves a mitigation from FRAIHMWORK. The uuid of the mitigation to be read is supposed to be established as a result of running the initial POST of the mitigation."
 									},
 									"response": []
 								}
@@ -1032,7 +1044,71 @@
 							"name": "PUT",
 							"item": [
 								{
-									"name": "Update mitigation to COMPLETED",
+									"name": "Update mitigation to ACCEPTED",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"mitigation.state\", \"ACCEPTED\");"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "{{access_token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"state\": \"{{mitigation.state}}\"\n}"
+										},
+										"url": {
+											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
+											"host": [
+												"{{baseUrl}}{{Mitigation}}"
+											],
+											"path": [
+												"mitigation",
+												":uuid"
+											],
+											"variable": [
+												{
+													"key": "uuid",
+													"value": "{{UUIDMitigationResponse}}"
+												}
+											]
+										},
+										"description": "This request updates the mitigation's state to ACCEPTED."
+									},
+									"response": []
+								},
+								{
+									"name": "Update mitigation to COMPLETE",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -1092,72 +1168,7 @@
 												}
 											]
 										},
-										"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
-									},
-									"response": []
-								},
-								{
-									"name": "Update mitigation to ACCEPTED",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"pm.collectionVariables.set(\"mitigation.state\", \"ACCEPTED\");\r",
-													"pm.collectionVariables.set(\"mitigation.time\", \"2021-10-27T05:52:05.506Z\");"
-												],
-												"type": "text/javascript"
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript"
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "bearer",
-											"bearer": [
-												{
-													"key": "token",
-													"value": "{{access_token}}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "PUT",
-										"header": [
-											{
-												"key": "Content-Type",
-												"value": "application/json"
-											}
-										],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"state\": \"{{mitigation.state}}\",\n  \"timeOfValidity\": \"{{mitigation.time}}\"\n}"
-										},
-										"url": {
-											"raw": "{{baseUrl}}{{Mitigation}}/mitigation/:uuid",
-											"host": [
-												"{{baseUrl}}{{Mitigation}}"
-											],
-											"path": [
-												"mitigation",
-												":uuid"
-											],
-											"variable": [
-												{
-													"key": "uuid",
-													"value": "{{UUIDMitigationResponse}}"
-												}
-											]
-										},
-										"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
+										"description": "This request updates the mitigation's state to COMPLETE."
 									},
 									"response": []
 								}
@@ -1217,7 +1228,7 @@
 												"RECOMMENDED"
 											]
 										},
-										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+										"description": "This request retrieves all mitigations currently in the RECOMMENDED state."
 									},
 									"response": []
 								},
@@ -1267,7 +1278,7 @@
 												"ACCEPTED"
 											]
 										},
-										"description": "This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of"
+										"description": "This request retrieves all mitigations currently in the ACCEPTED state."
 									},
 									"response": []
 								}
@@ -1346,7 +1357,7 @@
 												"mitigation"
 											]
 										},
-										"description": "Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+										"description": "Allows a mitigation subscription to be posted to FRAIHMWORK. These subscriptions allow a specified endpoint to be POSTed to by FRAIHMWORK when there is a change to any of the mitigations referenced in the subscription."
 									},
 									"response": []
 								}
@@ -1412,7 +1423,8 @@
 															"value": "{{UUIDmitigationSubscription}}"
 														}
 													]
-												}
+												},
+												"description": "This operation retrieves all mitigation subscriptions from FRAIHMWORK."
 											},
 											"response": []
 										}
@@ -1488,7 +1500,7 @@
 																"mitigation"
 															]
 														},
-														"description": "Allows a system to report one or more faults currently affecting the system. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response)."
+														"description": "Allows a mitigation subscription to be updated."
 													},
 													"response": []
 												},
@@ -1601,8 +1613,7 @@
 															"path": [
 																"mitigation"
 															]
-														},
-														"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the system needs to be registered (under the hood), so a UUID will be created and assigned in the response"
+														}
 													},
 													"response": []
 												}
@@ -1681,8 +1692,7 @@
 																	"value": "{{UUIDmitigationSubscription}}"
 																}
 															]
-														},
-														"description": "Allows a system to report one or more faults currently affecting the system"
+														}
 													},
 													"response": []
 												},
@@ -1810,8 +1820,7 @@
 																	"value": "{{UUIDMitigationResponse2}}"
 																}
 															]
-														},
-														"description": "This information allows FRAIHMWORK to track basic information about a system. Any extra or custom fields are expected to always be present even if null values are provided at first."
+														}
 													},
 													"response": []
 												},
@@ -1916,7 +1925,8 @@
 												}
 											]
 										}
-									]
+									],
+									"description": "The set of operations in this folder are intended to demonstrate the usage of Mitigation Subscriptions within FRAIHMWORK.\n\nIn the \"setup\" folder, a subscription to the previously created mitigation, as well as a new fault and a second mitigation (to the original fault and the new fault) are created.\n\nIn the \"update subscription via PUT\" folder, the mitigation subscription adds the second mitigation.\n\nIn the \"Update new mitigation to terminal state\" folder, when the mitigation is updated to terminal state, the subscription allows the specified endpoint to be POSTed to by FRAIHMWORK. This mitigation cannot be deleted from FRAIHMWORK, however, the subscription and the fault can be."
 								},
 								{
 									"name": "DELETE",
@@ -1979,8 +1989,7 @@
 															"value": "{{UUIDmitigationSubscription}}"
 														}
 													]
-												},
-												"description": "Allows a system to report one or more faults currently affecting the system"
+												}
 											},
 											"response": []
 										}
@@ -1988,9 +1997,11 @@
 								}
 							]
 						}
-					]
+					],
+					"description": "This folder also contains a section on Mitigation Subscriptions. Mitigation subscriptions allow a user to specify an endpoint (URL) to be POSTed to by FRAIHMWORK when there is an event that occurs with one or more of the mitigation instances specified in the subscription."
 				}
-			]
+			],
+			"description": "The requests found within this folder are for creating, reading and updating instances of Mitigations within FRAIHMWORK. Mitigations cannot be deleted.\n\nAdditionally, this folder also contains a section on Mitigation Subscriptions.\n\nIn general, Mitigations are in regard to one or more Fault instances within FRAIHMWORK. Mitigations have specific information that can be found within the Mitigation API specification."
 		}
 	],
 	"event": [
@@ -2024,7 +2035,7 @@
 		},
 		{
 			"key": "baseUrl",
-			"value": "https://<example>.fraihmwork.resilienx.com"
+			"value": "<Request from ResilienX Inc.>"
 		},
 		{
 			"key": "Mitigation",

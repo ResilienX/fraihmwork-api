@@ -4,8 +4,8 @@ Before using, there is requirement for configuring the collection's variables wi
 
 1. Import the collection within Postman.
 2. In the collection folder view, click the "FRAIHMWORK Integrator Starter Kit Collection", and select "Variables". 
-3. Note, the clientId and clientSecret variables are not pre-filled as a matter of security. Contact ResilienX for this information for your deployment's authentication credentials {clientId and clientSecret} for using the collection of example API requests. Fill in the variables with the values provided by ResilienX. 
+3. Note, the baseUrl, clientId and clientSecret variables are not pre-filled as a matter of security. Contact ResilienX for this information for your deployment's authentication credentials {baseUrl, clientId and clientSecret} for using the collection of example API requests. Fill in the variables with the values provided by ResilienX. 
 4. Make individual requests in Postman.
-  a. The workflow for authenticating with the OAuth server is covered in the readme file one level up. Take a moment to familiarize yourself with this workflow; it should take you a few minutes to read through the information.
+  a. The workflow for authenticating with the OAuth server is covered in the Basic API Integration document file one level up in the Documentation folder. Take a moment to familiarize yourself with this workflow; it should take you about 10 minutes to read through the information.
   b. To make a request from the collection once authenticated, click a request in the collection folder tree, and press the 'Send' button. 
   c. Make note of the HTTP response code indicating whether any problems have occurred.
