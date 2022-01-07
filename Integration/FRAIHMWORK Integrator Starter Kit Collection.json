@@ -239,7 +239,7 @@
 							"name": "PUT",
 							"item": [
 								{
-									"name": "Update existing properties about a Component Copy",
+									"name": "Update existing properties about a Component",
 									"event": [
 										{
 											"listen": "prerequest",
@@ -309,7 +309,7 @@
 							"name": "/refresh",
 							"item": [
 								{
-									"name": "Refresh component Copy",
+									"name": "Refresh component",
 									"event": [
 										{
 											"listen": "test",
