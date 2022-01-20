@@ -499,15 +499,15 @@ components:
           format: uuid
           description: The identifier of this maintenance component. This identifier is common with the same component identifier on the monitor endpoint.
                   
-        selfReportedState:
-          description: The original self-reported maintenance state of the component.
+        maintenanceState:
+          description: The maintenance state of the component.
           $ref: '#/components/schemas/MaintenanceState'
           
         maintenanceStatistics:
           $ref: '#/components/schemas/MaintenanceStatistics'
       required: 
         - uuid
-        - selfReportedState
+        - maintenanceState
         - maintenanceStatistics        
     MaintenanceState:
       type: object
@@ -546,7 +546,7 @@ components:
           type: number
           format: double
 
-        totalRepairEntries:
+        totalDownEntries:
           description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
           type: integer
           format: int64
