@@ -538,15 +538,15 @@ components:
           
         totalAvailableHours:
           description: This is the amount of time that the component has been AVAILABLE since it has been registered with FRAIHMWORK. 
-          type: integer
-          format: int64
+          type: number
+          format: double
           
         totalDownHours:
           description: This is the amount of time that the component has been DOWN since it has been registered with FRAIHMWORK. 
-          type: integer
-          format: int64
+          type: number
+          format: double
 
-        totalRepairs:
+        totalRepairEntries:
           description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
           type: integer
           format: int64
