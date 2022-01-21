@@ -1,3 +1,6 @@
+Version 1.1.0
+Adding a Maintenance Component endpoint for statistics and state information. 
+
 Version 1.0.0
 Changing nomenclature from "Events" to "Maintenance Appointments", including impact to endpoints.
 

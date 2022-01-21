@@ -497,7 +497,7 @@ components:
         uuid:
           type: string
           format: uuid
-          description: The identifier of this maintenance component. This identifier is common with the same component identifier on the monitor endpoint.
+          description: The identifier of this maintenance component. This identifier is inherited from/dictated by the FRAIHMWORK Health And Integrity API.
                   
         maintenanceState:
           description: The maintenance state of the component.
