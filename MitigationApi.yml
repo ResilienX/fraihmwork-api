@@ -598,6 +598,18 @@ components:
       - DENIED
       default: RECOMMENDED
       
+    ResolvedBy:
+      type: string
+      description: "
+        This is a description of 
+        HUMAN describes 
+        SERVICE describes 
+        "
+      enum:
+      - HUMAN
+      - SERVICE
+      default: SERVICE
+      
     MitigationList:
       description: List of mitigation actions
       type: array
@@ -644,6 +656,8 @@ components:
           description: Description of the mitigation that the system will take or has taken
         state:
           $ref: '#/components/schemas/MitigationState'
+        resolvedBy:
+          $ref: '#/components/schemas/ResolvedBy'
         timeIssued:
           type: string
           format: date-time
