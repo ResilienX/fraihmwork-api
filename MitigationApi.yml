@@ -598,17 +598,17 @@ components:
       - DENIED
       default: RECOMMENDED
       
-    ResolvedBy:
+    Resolution:
       type: string
       description: "
         This is a description of 
-        HUMAN describes 
-        SERVICE describes 
+        MANUAL describes 
+        AUTOMATIC describes 
         "
       enum:
-      - HUMAN
-      - SERVICE
-      default: SERVICE
+      - MANUAL
+      - AUTOMATIC
+      default: AUTOMATIC
       
     MitigationList:
       description: List of mitigation actions
@@ -656,8 +656,8 @@ components:
           description: Description of the mitigation that the system will take or has taken
         state:
           $ref: '#/components/schemas/MitigationState'
-        resolvedBy:
-          $ref: '#/components/schemas/ResolvedBy'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
         timeIssued:
           type: string
           format: date-time
