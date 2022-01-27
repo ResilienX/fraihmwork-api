@@ -601,9 +601,9 @@ components:
     Resolution:
       type: string
       description: "
-        This is a description of 
-        MANUAL describes 
-        AUTOMATIC describes 
+        This is an indication of whether a mitigation is to be resolved by a  human or by a service
+        MANUAL describes when a mitigation is to be resolved by a human
+        AUTOMATIC describes when a mitigation is to be resolved by a service
         "
       enum:
       - MANUAL
