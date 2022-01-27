@@ -68,8 +68,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - MaintenanceDefinitionAuth:
-        - fraihmwork.maintenance.read
+      - ComponentRead:
+        - fraihmwork.component.read
         
   /maintenance/component/{uuid}:
     get:
@@ -118,9 +118,8 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - MaintenanceDefinitionAuth:
-        - fraihmwork.maintenance.read
-        - fraihmwork.maintenance.write
+      - ComponentRead:
+        - fraihmwork.component.read
 
   /maintenance/appointments:
     get:
@@ -567,3 +566,12 @@ components:
             fraihmwork.maintenance.write: Client can add, delete, or modify maintenance details
             fraihmwork.maintenance.read: Client can view maintenance details
       type: oauth2
+    ComponentRead:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
+      type: oauth2
+      
