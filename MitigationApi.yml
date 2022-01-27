@@ -5,7 +5,7 @@ info:
   description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.8
+  version: 0.0.9
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
