@@ -531,8 +531,8 @@ components:
           type: number
           format: double
           
-        meanTimeToRepairHours:
-          description: The mean of the times to repair the failures, in hours. If a component has been running in its initial downtime, the MTTR is equal to the duration between introduction of the first repairable fault and the current time. Otherwise the MTTR is equal to the mean of the completed dwells within DOWN state.
+        meanTimeToRecoveryHours:
+          description: The mean of the times to recover the failures, in hours. If a component has been running in its initial downtime, the MTTR is equal to the duration between introduction of the first repairable fault and the current time. Otherwise the MTTR is equal to the mean of the completed dwells within DOWN state. A recovery is the time at which all repairs are completed on a component.
           type: number
           format: double
           
