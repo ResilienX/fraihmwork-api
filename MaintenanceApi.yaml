@@ -545,12 +545,12 @@ components:
           type: number
           format: double
 
-        totalDownEntries:
+        totalNumberOfFailures:
           description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
           type: integer
           format: int64
 
-        totalAvailableEntries:
+        totalNumberOfRecoveries:
           description: This is the number of times the component has transitioned into AVAILABLE state including the initial transition due to being registered with FRAIHMWORK. 
           type: integer
           format: int64
