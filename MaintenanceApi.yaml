@@ -5,16 +5,122 @@ info:
   description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. The purpose of this API is to create, read, update, and delete these data. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 1.0.0
+  version: 1.1.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 servers:
 - url: https://<site>.fraihmwork.resilienx.com/api/maintenance/v0
 tags:
-- name: MaintenanceAppointment
+- name: Maintenance Appointment
   description: Maintenance Appointment data model manipulation endpoints
+  
+- name: Maintenance Component
+  description: Maintenance Component data model endpoints  
 paths:
+  /maintenance/component:  
+    get:
+      tags:
+      - Maintenance Component
+      summary: Retrieve all of the components in FRAIHMWORK, filtered by any optional criteria provided.
+      operationId: findMaintenanceComponents
+      parameters:
+      - name: state
+        in: query
+        description: Filter results by the state of the maintenance components. Can leave null to not filter
+        schema:
+          type: string         
+          enum:
+          - AVAILABLE
+          - DOWN
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - ComponentRead:
+        - fraihmwork.component.read
+        
+  /maintenance/component/{uuid}:
+    get:
+      tags:
+      - Maintenance Component
+      summary: Retrieve a component in FRAIHMWORK by uuid.
+      operationId: findMaintenanceComponentByUuid
+      parameters:
+      - name: uuid
+        in: path
+        description: uuid
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MaintenanceComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - ComponentRead:
+        - fraihmwork.component.read
+
   /maintenance/appointments:
     get:
       tags:
@@ -384,6 +490,72 @@ components:
         - componentUuids
         - startTime
         - endTime
+    MaintenanceComponent:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: The identifier of this maintenance component. This identifier is inherited from/dictated by the FRAIHMWORK Health And Integrity API.
+                  
+        maintenanceState:
+          description: The maintenance state of the component.
+          $ref: '#/components/schemas/MaintenanceState'
+          
+        maintenanceStatistics:
+          $ref: '#/components/schemas/MaintenanceStatistics'
+      required: 
+        - uuid
+        - maintenanceState
+        - maintenanceStatistics        
+    MaintenanceState:
+      type: object
+      properties:
+        state:
+          type: string
+          description: "
+          This is a high level description of the component or subsystem state. <br> <br>
+          AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
+          DOWN describes a repairable system or system element that is not operational at a given point in time, whether the cause of downtime has been discovered or the cause is in repair <br> <br>"
+          enum:
+          - AVAILABLE
+          - DOWN
+      required:
+        - state        
+    MaintenanceStatistics:
+      type: object
+      properties:
+        meanTimeBetweenFailureHours:
+          description: The mean of the times between failures, in hours. If a component has been running without downtime, the MTBF is equal to the duration between introduction to FRAIHMWORK and the current time. Otherwise the MTBF is equal to the mean of the completed dwells within AVAILABLE state.
+          type: number
+          format: double
+          
+        meanTimeToRecoveryHours:
+          description: The mean of the times to recover the failures, in hours. If a component has been running in its initial downtime, the MTTR is equal to the duration between introduction of the first repairable fault and the current time. Otherwise the MTTR is equal to the mean of the completed dwells within DOWN state. A recovery is the time at which all repairs are completed on a component.
+          type: number
+          format: double
+          
+        totalAvailableHours:
+          description: This is the amount of time that the component has been AVAILABLE since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+          
+        totalDownHours:
+          description: This is the amount of time that the component has been DOWN since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+
+        totalNumberOfFailures:
+          description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
+          type: integer
+          format: int64
+
+        totalNumberOfRecoveries:
+          description: This is the number of times the component has transitioned into AVAILABLE state including the initial transition due to being registered with FRAIHMWORK. 
+          type: integer
+          format: int64
+          
+          
   securitySchemes:
     MaintenanceDefinitionAuth:      
       flows:
@@ -394,3 +566,12 @@ components:
             fraihmwork.maintenance.write: Client can add, delete, or modify maintenance details
             fraihmwork.maintenance.read: Client can view maintenance details
       type: oauth2
+    ComponentRead:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
+      type: oauth2
+      
