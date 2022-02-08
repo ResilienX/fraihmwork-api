@@ -5,7 +5,7 @@ info:
   description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.8
+  version: 0.0.9
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -598,6 +598,18 @@ components:
       - DENIED
       default: RECOMMENDED
       
+    Resolution:
+      type: string
+      description: "
+        This is an indication of whether a mitigation is to be resolved by a  human or by a service
+        MANUAL describes when a mitigation is to be resolved by a human
+        AUTOMATIC describes when a mitigation is to be resolved by a service
+        "
+      enum:
+      - MANUAL
+      - AUTOMATIC
+      default: AUTOMATIC
+      
     MitigationList:
       description: List of mitigation actions
       type: array
@@ -644,6 +656,8 @@ components:
           description: Description of the mitigation that the system will take or has taken
         state:
           $ref: '#/components/schemas/MitigationState'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
         timeIssued:
           type: string
           format: date-time
