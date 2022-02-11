@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. The purpose of this API is to create, read, update, and delete these data. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 1.1.0
+  version: 1.1.1
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -29,10 +29,7 @@ paths:
         in: query
         description: Filter results by the state of the maintenance components. Can leave null to not filter
         schema:
-          type: string         
-          enum:
-          - AVAILABLE
-          - DOWN
+          $ref: '#/components/schemas/MaintenanceState'
       responses:
         200:
           description: OK
