@@ -520,6 +520,7 @@ components:
           enum:
           - AVAILABLE
           - DOWN
+          - REPAIRING
       required:
         - state        
     MaintenanceStatistics:
