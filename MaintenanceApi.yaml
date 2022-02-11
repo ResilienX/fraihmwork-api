@@ -506,20 +506,15 @@ components:
         - maintenanceState
         - maintenanceStatistics        
     MaintenanceState:
-      type: object
-      properties:
-        state:
-          type: string
-          description: "
-          This is a high level description of the component or subsystem state. <br> <br>
-          AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
-          DOWN describes a repairable system or system element that is not operational at a given point in time, whether the cause of downtime has been discovered or the cause is in repair <br> <br>"
-          enum:
-          - AVAILABLE
-          - DOWN
-          - REPAIRING
-      required:
-        - state        
+        type: string
+        description: "
+        This is a high level description of the component or subsystem state. <br> <br>
+        AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
+        DOWN describes a repairable system or system element that is not operational at a given point in time, whether the cause of downtime has been discovered or the cause is in repair <br> <br>"
+        enum:
+        - AVAILABLE
+        - DOWN
+        - REPAIRING     
     MaintenanceStatistics:
       type: object
       properties:
