@@ -535,6 +535,11 @@ components:
           type: number
           format: double
           
+        meanTimeToRepairHours:
+          description: The mean of the times to repair each of the failures, in hours. If fault repair durations are overlapping each other during a downtime dwell, the mean time to repair is the mean of the respective repair durations from each fault. 
+          type: number
+          format: double          
+          
         totalAvailableHours:
           description: This is the amount of time that the component has been AVAILABLE since it has been registered with FRAIHMWORK. 
           type: number
