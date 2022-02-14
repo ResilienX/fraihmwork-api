@@ -542,9 +542,14 @@ components:
           description: This is the amount of time that the component has been DOWN since it has been registered with FRAIHMWORK. 
           type: number
           format: double
-
+          
+        totalRepairingHours:
+          description: This is the amount of time that the component has been REPAIRING since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+         
         totalNumberOfFailures:
-          description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
+          description: This is the number of times the component has transitioned into DOWN state due to repairable faults. 
           type: integer
           format: int64
 
@@ -553,6 +558,10 @@ components:
           type: integer
           format: int64
           
+        totalNumberOfRepairs:
+          description: This is the number of times the component has transitioned into REPAIRING state due to repair(s) on a component. Note if concurrent faults are being mitigated against a component, this would count as a single repair.
+          type: integer
+          format: int64                    
           
   securitySchemes:
     MaintenanceDefinitionAuth:      
