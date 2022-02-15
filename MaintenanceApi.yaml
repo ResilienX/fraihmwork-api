@@ -554,7 +554,7 @@ components:
           format: int64
 
         totalNumberOfRecoveries:
-          description: This is the number of times the component has transitioned into AVAILABLE state including the initial transition due to being registered with FRAIHMWORK. 
+          description: This is the number of times the component has transitioned into AVAILABLE state, not including the initial transition due to being registered with FRAIHMWORK. 
           type: integer
           format: int64
           
