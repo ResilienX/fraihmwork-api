@@ -510,11 +510,12 @@ components:
         description: "
         This is a high level description of the component or subsystem state. <br> <br>
         AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
-        DOWN describes a repairable system or system element that is not operational at a given point in time, whether the cause of downtime has been discovered or the cause is in repair <br> <br>"
+        DOWN describes a repairable system or system element that is not operational at a given point in time, until the cause(s) for downtime begin any repair. <br> <br>
+        REPAIRING describes a repairable system or system element that has had the repair of at least one repairable fault started. It remains in REPAIRING state until the last repairable fault has been resolved.<br> <br>"
         enum:
         - AVAILABLE
         - DOWN
-        - REPAIRING     
+        - REPAIRING
     MaintenanceStatistics:
       type: object
       properties:
