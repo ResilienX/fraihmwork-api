@@ -2,10 +2,10 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Maintenance API
-  description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. The purpose of this API is to create, read, update, and delete these data. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
+  description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. Additionally, statistics are collected by FRAIHMWORK relating to maintenance of components. The purpose of this API is to create, read, update, and delete maintenance appointments, and to read maintenance statistics. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 1.1.0
+  version: 1.1.1
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -29,10 +29,7 @@ paths:
         in: query
         description: Filter results by the state of the maintenance components. Can leave null to not filter
         schema:
-          type: string         
-          enum:
-          - AVAILABLE
-          - DOWN
+          $ref: '#/components/schemas/MaintenanceState'
       responses:
         200:
           description: OK
@@ -509,19 +506,16 @@ components:
         - maintenanceState
         - maintenanceStatistics        
     MaintenanceState:
-      type: object
-      properties:
-        state:
-          type: string
-          description: "
-          This is a high level description of the component or subsystem state. <br> <br>
-          AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
-          DOWN describes a repairable system or system element that is not operational at a given point in time, whether the cause of downtime has been discovered or the cause is in repair <br> <br>"
-          enum:
-          - AVAILABLE
-          - DOWN
-      required:
-        - state        
+        type: string
+        description: "
+        This is a high level description of the component or subsystem state. <br> <br>
+        AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
+        DOWN describes a repairable system or system element that is not operational at a given point in time, until the cause(s) for downtime begin any repair. <br> <br>
+        REPAIRING describes a repairable system or system element that has had the repair of at least one repairable fault started. It remains in REPAIRING state until the last repairable fault has been resolved.<br> <br>"
+        enum:
+        - AVAILABLE
+        - DOWN
+        - REPAIRING
     MaintenanceStatistics:
       type: object
       properties:
@@ -535,6 +529,11 @@ components:
           type: number
           format: double
           
+        meanTimeToRepairHours:
+          description: The mean of the times to repair each of the failures, in hours. If fault repair durations are overlapping each other during a downtime dwell, the mean time to repair is the mean of the respective repair durations from each fault. 
+          type: number
+          format: double          
+          
         totalAvailableHours:
           description: This is the amount of time that the component has been AVAILABLE since it has been registered with FRAIHMWORK. 
           type: number
@@ -544,17 +543,26 @@ components:
           description: This is the amount of time that the component has been DOWN since it has been registered with FRAIHMWORK. 
           type: number
           format: double
-
+          
+        totalRepairingHours:
+          description: This is the amount of time that the component has been REPAIRING since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+         
         totalNumberOfFailures:
-          description: This is the number of times the component has transitioned out of DOWN state due to clearing all repairable faults. 
+          description: This is the number of times the component has transitioned into DOWN state due to repairable faults. 
           type: integer
           format: int64
 
         totalNumberOfRecoveries:
-          description: This is the number of times the component has transitioned into AVAILABLE state including the initial transition due to being registered with FRAIHMWORK. 
+          description: This is the number of times the component has transitioned into AVAILABLE state, not including the initial transition due to being registered with FRAIHMWORK. 
           type: integer
           format: int64
           
+        totalNumberOfRepairs:
+          description: This is the number of times the component has transitioned into REPAIRING state due to repair(s) on a component. Note if concurrent faults are being mitigated against a component, this would count as a single repair.
+          type: integer
+          format: int64                    
           
   securitySchemes:
     MaintenanceDefinitionAuth:      

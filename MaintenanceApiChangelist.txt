@@ -1,3 +1,6 @@
+Version 1.1.1
+Adding additional statistics relating to repairs. 
+
 Version 1.1.0
 Adding a Maintenance Component endpoint for statistics and state information. 
 
