@@ -1,11 +1,5 @@
-Version 1.1.1
-Adding additional statistics relating to repairs. 
-
-Version 1.1.0
-Adding a Maintenance Component endpoint for statistics and state information. 
-
-Version 1.0.0
-Changing nomenclature from "Events" to "Maintenance Appointments", including impact to endpoints.
+Version 0.1.0
+Changing nomenclature from "Events" to "Maintenance Appointments", including impact to endpoints. Adding a Maintenance Component endpoint for statistics and state information, including recovery, repairs and failures pertaining to repairable faults.
 
 Version 0.0.1: 
 Initial external release
