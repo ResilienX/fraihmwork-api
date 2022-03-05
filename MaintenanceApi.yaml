@@ -1,0 +1,585 @@
+---
+openapi: 3.0.1
+info:
+  title: FRAIHMWORK Maintenance API
+  description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. Additionally, statistics are collected by FRAIHMWORK relating to maintenance of components. The purpose of this API is to create, read, update, and delete maintenance appointments, and to read maintenance statistics. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
+  contact:
+    email: matt.synborski@resilienx.com
+  version: 0.1.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/maintenance/v0
+tags:
+- name: Maintenance Appointment
+  description: Maintenance Appointment data model manipulation endpoints
+  
+- name: Maintenance Component
+  description: Maintenance Component data model endpoints  
+paths:
+  /maintenance/component:  
+    get:
+      tags:
+      - Maintenance Component
+      summary: Retrieve all of the components in FRAIHMWORK, filtered by any optional criteria provided.
+      operationId: findMaintenanceComponents
+      parameters:
+      - name: state
+        in: query
+        description: Filter results by the state of the maintenance components. Can leave null to not filter
+        schema:
+          $ref: '#/components/schemas/MaintenanceState'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - ComponentRead:
+        - fraihmwork.component.read
+        
+  /maintenance/component/{uuid}:
+    get:
+      tags:
+      - Maintenance Component
+      summary: Retrieve a component in FRAIHMWORK by uuid.
+      operationId: findMaintenanceComponentByUuid
+      parameters:
+      - name: uuid
+        in: path
+        description: uuid
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/MaintenanceComponent'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - ComponentRead:
+        - fraihmwork.component.read
+
+  /maintenance/appointments:
+    get:
+      tags:
+        - Maintenance Appointment
+      summary: Retrieves all maintenance appointment information
+      description: Returns all scheduled maintenance appointments and associated information
+      operationId: retrieveMaintenanceAppointments
+      parameters:
+        - in: query
+          name: componentUuid
+          schema:
+            type: string
+            format: uuid
+          required: false
+          description: Uuid of the component's maintenance appointments being requested
+        - in: query
+          name: state
+          schema:
+            type: string
+            format: MaintenanceAppointmentState
+          required: false
+          description: MaintenanceAppointmentState of the maintenance appointments being requested
+        - in: query
+          name: before
+          schema:
+            type: string
+            format: date-time
+          required: false
+          description: The start times of the maintenance appointments being requested are before this date-time (ISO 8601)
+        - in: query
+          name: after
+          schema:
+            type: string
+            format: date-time
+          required: false
+          description: The start times of the maintenance appointments being requested are after this date-time (ISO 8601)
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MaintenanceAppointmentDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceDefinitionAuth:
+        - fraihmwork.maintenance.read
+        - fraihmwork.maintenance.write
+    post:
+      tags:
+        - Maintenance Appointment
+      summary: Add a new maintenance appointment to the FRAIHMWORK model
+      description: Adds a new maintenance appointment to the system
+      operationId: registerMaintenanceAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceAppointmentDefinition'
+      responses:
+        201:
+          description: Creates new maintenance appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already registered maintenance appointment. This will be the response if there is a match in the backend of the exact same maintenance appointment. If the maintenance appointment UUID is specified, then a match with an existing maintenance appointment uuid would also generate this response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed start or end time, or referenced components or users do not exist in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceDefinitionAuth:
+        - fraihmwork.maintenance.write       
+  /maintenance/appointments/{uuid}:
+    get:
+      tags:
+        - Maintenance Appointment
+      summary: Retrieves specific maintenance appointment
+      description: Returns a single maintenance appointment by UUID
+      operationId: retrieveMaintenanceAppointment
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the maintenance appointment being requested
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaintenanceAppointmentDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target maintenance appointment uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceDefinitionAuth:
+        - fraihmwork.maintenance.read
+        - fraihmwork.maintenance.write
+    put:
+      tags:
+        - Maintenance Appointment
+      summary: Updates a specific maintenance appointment
+      description: Updates a specific maintenance appointment by UUID
+      operationId: updateMaintenanceAppointment
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the maintenance appointment being updated. 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaintenanceAppointmentDefinition'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed start or end time, or referenced components or users do not exist in the system
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target maintenance appointment uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceDefinitionAuth:
+        - fraihmwork.maintenance.write
+    delete:
+      tags:
+        - Maintenance Appointment
+      summary: Removes a specific maintenance appointment model from the system
+      description: Deletes a specific maintenance appointment by UUID
+      operationId: deleteMaintenanceAppointment
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the maintenance appointment being deleted
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Could not find a target maintenance appointment uuid in the backend model
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - MaintenanceDefinitionAuth:
+        - fraihmwork.maintenance.write
+                
+
+components:
+  schemas:
+    Response:
+      type: object
+      description: A default uuid / message combination to convey simple success / error messages to the client
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The success message provided back to the client
+      required:
+        - message
+    MaintenanceAppointmentState:
+      type: string
+      description: The state of the maintenance appointment
+      enum:
+        - SCHEDULED
+        - CANCELED
+        - STARTED
+        - COMPLETED        
+    MaintenanceAppointmentDefinition:
+      type: object
+      properties:
+        maintenanceAppointmentUuid:
+          type: string
+          format: uuid
+          description: The internal uuid of the maintenance appointment definition
+        name:
+          type: string
+          description: The name of the maintenance appointment          
+        description:
+          type: string
+          description: The description of the maintenance appointment
+        userContactUuid:
+          type: string
+          format: uuid
+          description: The User Contact uuid for who is responsible for performing the maintenance appointment
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of maintenance appointment via ISO 8601 date-time format
+          example: "2021-01-30T08:30:00Z"
+        endTime:
+          type: string
+          format: date-time
+          description: End time of maintenance appointment via ISO 8601 date-time format
+          example: "2021-01-30T08:30:00Z"
+        componentUuid:
+          type: string
+          format: uuid
+          description: The uuid of the component scheduled for maintenance
+        maintenanceAppointmentState:
+          $ref: '#/components/schemas/MaintenanceAppointmentState'
+      required: 
+        - name
+        - componentUuids
+        - startTime
+        - endTime
+    MaintenanceComponent:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: The identifier of this maintenance component. This identifier is inherited from/dictated by the FRAIHMWORK Health And Integrity API.
+                  
+        maintenanceState:
+          description: The maintenance state of the component.
+          $ref: '#/components/schemas/MaintenanceState'
+          
+        maintenanceStatistics:
+          $ref: '#/components/schemas/MaintenanceStatistics'
+      required: 
+        - uuid
+        - maintenanceState
+        - maintenanceStatistics        
+    MaintenanceState:
+        type: string
+        description: "
+        This is a high level description of the component or subsystem state. <br> <br>
+        AVAILABLE describes a repairable system or system element that is operational at a given point in time <br> <br>
+        DOWN describes a repairable system or system element that is not operational at a given point in time, until the cause(s) for downtime begin any repair. <br> <br>
+        REPAIRING describes a repairable system or system element that has had the repair of at least one repairable fault started. It remains in REPAIRING state until the last repairable fault has been resolved.<br> <br>"
+        enum:
+        - AVAILABLE
+        - DOWN
+        - REPAIRING
+    MaintenanceStatistics:
+      type: object
+      properties:
+        meanTimeBetweenFailureHours:
+          description: The mean of the times between failures, in hours. If a component has been running without downtime, the MTBF is equal to the duration between introduction to FRAIHMWORK and the current time. Otherwise the MTBF is equal to the mean of the completed dwells within AVAILABLE state.
+          type: number
+          format: double
+          
+        meanTimeToRecoveryHours:
+          description: The mean of the times to recover the failures, in hours. If a component has been running in its initial downtime, the MTTR is equal to the duration between introduction of the first repairable fault and the current time. Otherwise the MTTR is equal to the mean of the completed dwells within DOWN state. A recovery is the time at which all repairs are completed on a component.
+          type: number
+          format: double
+          
+        meanTimeToRepairHours:
+          description: The mean of the times to repair each of the failures, in hours. If fault repair durations are overlapping each other during a downtime dwell, the mean time to repair is the mean of the respective repair durations from each fault. 
+          type: number
+          format: double          
+          
+        totalAvailableHours:
+          description: This is the amount of time that the component has been AVAILABLE since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+          
+        totalDownHours:
+          description: This is the amount of time that the component has been DOWN since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+          
+        totalRepairingHours:
+          description: This is the amount of time that the component has been REPAIRING since it has been registered with FRAIHMWORK. 
+          type: number
+          format: double
+         
+        totalNumberOfFailures:
+          description: This is the number of times the component has transitioned into DOWN state due to repairable faults. 
+          type: integer
+          format: int64
+
+        totalNumberOfRecoveries:
+          description: This is the number of times the component has transitioned into AVAILABLE state, not including the initial transition due to being registered with FRAIHMWORK. 
+          type: integer
+          format: int64
+          
+        totalNumberOfRepairs:
+          description: This is the number of times the component has transitioned into REPAIRING state due to repair(s) on a component. Note if concurrent faults are being mitigated against a component, this would count as a single repair.
+          type: integer
+          format: int64                    
+          
+  securitySchemes:
+    MaintenanceDefinitionAuth:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.maintenance.write: Client can add, delete, or modify maintenance details
+            fraihmwork.maintenance.read: Client can view maintenance details
+      type: oauth2
+    ComponentRead:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
+      type: oauth2
+      
