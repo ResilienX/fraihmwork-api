@@ -1,3 +1,6 @@
+Version 0.1.1
+Fixing erroneous required field in MaintenanceAppointmentDefinition. 
+
 Version 0.1.0
 Changing nomenclature from "Events" to "Maintenance Appointments", including impact to endpoints. Adding a Maintenance Component endpoint for statistics and state information, including recovery, repairs and failures pertaining to repairable faults.
 
