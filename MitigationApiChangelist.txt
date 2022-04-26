@@ -1,3 +1,6 @@
+Version 0.0.10:
+- Added description text specifying that MANUAL mitigations can only start in ACCEPTED state.
+
 Version 0.0.9:
 - Added field 'Resolution' to Mitigation to indicate whether a mitigation is resolved by a human or service
 
