@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for maintenance to be scheduled for components. To enable this, appointments with components and duration information must be modelled in the system. Additionally, statistics are collected by FRAIHMWORK relating to maintenance of components. The purpose of this API is to create, read, update, and delete maintenance appointments, and to read maintenance statistics. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 0.1.0
+  version: 0.1.1
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -484,7 +484,7 @@ components:
           $ref: '#/components/schemas/MaintenanceAppointmentState'
       required: 
         - name
-        - componentUuids
+        - componentUuid
         - startTime
         - endTime
     MaintenanceComponent:
