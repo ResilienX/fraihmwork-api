@@ -709,7 +709,7 @@ components:
 
     UnscheduledMaintenanceState:
       type: string
-      description: The state of the maintenance appointment
+      description: The state of the unscheduled maintenance
       enum:
         - REQUESTED
         - STARTED
