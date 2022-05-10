@@ -500,7 +500,7 @@ paths:
               $ref: '#/components/schemas/UnscheduledMaintenanceDefinition'
       responses:
         201:
-          description: Creates new maintenance appointment
+          description: Creates new unscheduled maintenance
           content:
             application/json:
               schema:
