@@ -458,6 +458,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UnscheduledMaintenanceDefinition'
+        400:
+          description: Bad Request (invalid submission). 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                  
         401:
           description: Not authenticated
           content:
@@ -512,7 +518,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         400:
-          description: Bad Request (invalid submission). Likely to happen because of an incorrectly formed start or end time, or referenced components or users do not exist in the system
+          description: Bad Request (invalid submission). 
           content:
             application/json:
               schema:
