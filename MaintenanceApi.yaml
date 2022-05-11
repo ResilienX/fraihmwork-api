@@ -17,7 +17,7 @@ tags:
   
 - name: Maintenance Component
   description: Maintenance Component data model endpoints  
-- name: Maintenance (Unscheduled)
+- name: Unscheduled Maintenance
   description: Unscheduled Maintenance instances for a given single component
 paths:
   /maintenance/component:  
