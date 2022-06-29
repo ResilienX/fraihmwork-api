@@ -1,3 +1,6 @@
+Version 0.0.11
+- Correcting faultIds description to reflect a mitigation's 0..* multiplicity with faults.
+
 Version 0.0.10:
 - Added description text specifying that MANUAL mitigations can only start in ACCEPTED state.
 
