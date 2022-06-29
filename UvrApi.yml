@@ -770,7 +770,7 @@ components:
           items:
             type: string
             format: uuid
-          description: One or more ids of faults that are being addressed by this mitigation
+          description: Zero or more ids of faults that are being addressed by this mitigation
         description:
           type: string
           description: Description of the mitigation that the system will take or has taken
