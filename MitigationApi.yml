@@ -5,7 +5,7 @@ info:
   description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.10
+  version: 0.0.11
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -650,7 +650,7 @@ components:
           items:
             type: string
             format: uuid
-          description: One or more ids of faults that are being addressed by this mitigation
+          description: Zero or more ids of faults that are being addressed by this mitigation
         description:
           type: string
           description: Description of the mitigation that the system will take or has taken
