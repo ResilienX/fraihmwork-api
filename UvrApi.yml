@@ -5,7 +5,7 @@ info:
   description: 'Volume restrictions can be issued for many reasons, and this API serves as a gateway for being able to properly submit them to the appropriate FIMS'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.12
+  version: 0.0.13
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -770,7 +770,7 @@ components:
           items:
             type: string
             format: uuid
-          description: One or more ids of faults that are being addressed by this mitigation
+          description: Zero or more ids of faults that are being addressed by this mitigation
         description:
           type: string
           description: Description of the mitigation that the system will take or has taken

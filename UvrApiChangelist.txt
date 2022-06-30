@@ -1,3 +1,6 @@
+Version 0.0.13
+- Correcting faultIds description to reflect a uvr mitigation's 0..* multiplicity with faults.
+
 Version 0.0.12
 - Added new endpoint for removing a uvr assignment
 
