@@ -394,6 +394,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request - can not delete an appointment in STARTED state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
