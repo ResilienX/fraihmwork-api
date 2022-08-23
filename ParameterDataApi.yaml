@@ -1,7 +1,7 @@
 ---
 openapi: 3.0.1
 info:
-  title: FRAIHMWORK Alerting API
+  title: FRAIHMWORK Parameter Data API
   description: 'FRAIHMWORK allows for parameter time-series data to be provided from the client. This API will versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
