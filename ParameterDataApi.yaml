@@ -90,14 +90,9 @@ components:
         - message
         
     ColumnDefinition:
-      type: object
-      description: The column information for the data.      
-      properties:
-        col0:
-          $ref: '#/components/schemas/ColumnElementDefinition'
-          
-      required: 
-        - col0
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnElementDefinition'
           
     ColumnElementDefinition:
       type: object
@@ -142,19 +137,19 @@ components:
     DataElement:
       type: object
       properties:
-        ts:
+        timestamp:
           description: the timestamp of the sample
           type: string
           format: date-time
             
-        f:
+        fields:
           type: array
           items:
             $ref: '#/components/schemas/ValueSpec'
             
       required:
-        - ts
-        - f
+        - timestamp
+        - fields
 
     DataType:
       type: string
@@ -205,13 +200,10 @@ components:
           description: The version string for the time series data definition
 
         header:
-          type: object
-          properties:
-            header:
-              $ref: '#/components/schemas/HeaderDefinition'
+          $ref: '#/components/schemas/HeaderDefinition'
 
-            data:
-              $ref: '#/components/schemas/DataDefinition'
+        data:
+          $ref: '#/components/schemas/DataDefinition'
 
       required: 
         - header
@@ -220,19 +212,26 @@ components:
     ValueSpec:
       type: object
       properties:
-        v:
-          description: The value of the data sample
-          type: number
-          format: double
+        value:
+          description: The value of the data sample. If using string, do not populate with numeric strings. Use the number or integer type.
+          oneOf:
+            - type: number
+            - type: integer
+            - type: string
           
-        q: 
-          description: The quality score of the data sample
-          type: number
+        quality: 
+          description: The quality score of the data sample (should be bounded 0.0 .. 100.0)
+          type: number          
           format: double
+          minimum: 0.0
+          maximum: 100.0
         
-        a: 
+        annotation: 
           description: The annotation for the data sample
-          type: string        
+          type: string
+          
+      required:
+        - value
         
   securitySchemes:
     ParameterDataDefinitionsAuth:      
