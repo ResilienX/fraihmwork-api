@@ -197,11 +197,8 @@ components:
       type: object
       properties:
         value:
-          description: The value of the data sample. If using string, do not populate with numeric strings. Use the number or integer type.
-          oneOf:
-            - type: number
-            - type: integer
-            - type: string
+          description: The value of the data sample described in string form. 
+          type: string
           
         quality: 
           description: The quality score of the data sample (should be bounded 0.0 .. 100.0)
