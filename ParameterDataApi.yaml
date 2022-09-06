@@ -166,11 +166,6 @@ components:
         - recordCount
         - columns
 
-    RenderType:
-      type: string
-      enum:
-        - VALUE
-
     TimeSeriesDataDefinition:
       type: object
       description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
