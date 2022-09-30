@@ -1,2 +1,5 @@
+Version 0.0.1: 
+Added docType field to required fields.
+
 Version 0.0.0: 
 Initial external release
