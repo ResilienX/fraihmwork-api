@@ -1,3 +1,6 @@
+Version 0.0.2: 
+Removed recordCount field from HeaderDefinition fields.
+
 Version 0.0.1: 
 Added docType field to required fields.
 
