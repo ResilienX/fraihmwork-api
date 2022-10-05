@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for parameter time-series data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 0.0.1
+  version: 0.0.2
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -152,10 +152,6 @@ components:
           description: The end time for the time series
           type: string
           format: date-time
-        
-        recordCount: 
-          description: The number of records in the data.
-          type: integer
           
         columns:
           $ref: '#/components/schemas/ColumnDefinition'
@@ -163,7 +159,6 @@ components:
       required:
         - startTime
         - endTime
-        - recordCount
         - columns
 
     TimeSeriesDataDefinition:
