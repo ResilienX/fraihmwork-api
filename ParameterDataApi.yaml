@@ -1,0 +1,217 @@
+---
+openapi: 3.0.1
+info:
+  title: FRAIHMWORK Parameter Data API
+  description: 'FRAIHMWORK allows for parameter time-series data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
+  contact:
+    email: matt.synborski@resilienx.com
+  version: 0.0.2
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/parameter/v0
+
+tags:
+- name: Parameter
+  description: Parameter data model manipulation endpoints
+
+paths:
+  /parameter:
+    post:
+      tags:
+        - Parameter
+      summary: Add new time series parameter data to FRAIHMWORK model
+      description: Add new time series parameter data to FRAIHMWORK model
+      operationId: registerParameterData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeSeriesDataDefinition'
+      responses:
+        201:
+          description: POSTed new time series parameter data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission). 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ParameterDataDefinitionsAuth:
+        - fraihmwork.parameter.data.write
+
+components:
+  schemas:
+    Response:
+      type: object
+      description: A default uuid / message combination to convey simple success / error messages to the client
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The success message provided back to the client
+      required:
+        - message
+        
+    ColumnDefinition:
+      type: array
+      items:
+        $ref: '#/components/schemas/ColumnElementDefinition'
+          
+    ColumnElementDefinition:
+      type: object
+      description: The column elements      
+      properties:
+        
+        name: 
+          description: The name of the column
+          type: string
+          pattern: '^[a-zA-Z0-9]{2,}'
+          
+        dataType:
+          $ref: '#/components/schemas/DataType'
+                   
+      required:
+        - name
+        - dataType
+
+    DataDefinition:
+      type: array
+      items: 
+        $ref: '#/components/schemas/DataElement'
+        
+    DataElement:
+      type: object
+      properties:
+        timestamp:
+          description: the timestamp of the sample
+          type: string
+          format: date-time
+            
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValueSpec'
+            
+      required:
+        - timestamp
+        - fields
+
+    DataType:
+      type: string
+      enum:
+        - NUMBER
+        - INTEGER
+        - STRING
+        
+    HeaderDefinition:
+      type: object
+      properties: 
+        startTime:
+          description: The start time for the time series
+          type: string
+          format: date-time
+        
+        endTime: 
+          description: The end time for the time series
+          type: string
+          format: date-time
+          
+        columns:
+          $ref: '#/components/schemas/ColumnDefinition'
+        
+      required:
+        - startTime
+        - endTime
+        - columns
+
+    TimeSeriesDataDefinition:
+      type: object
+      description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      properties:
+        docType:
+          type: string          
+          description: The type of the document
+
+        version:
+          type: string
+          description: The version string for the time series data definition
+
+        header:
+          $ref: '#/components/schemas/HeaderDefinition'
+
+        data:
+          $ref: '#/components/schemas/DataDefinition'
+
+      required: 
+        - docType
+        - header
+        - data
+
+    ValueSpec:
+      type: object
+      properties:
+        value:
+          description: The value of the data sample described in string form. 
+          type: string
+          
+        quality: 
+          description: The quality score of the data sample (should be bounded 0.0 .. 100.0)
+          type: number          
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+        
+        annotation: 
+          description: The annotation for the data sample
+          type: string
+          
+      required:
+        - value
+        
+  securitySchemes:
+    ParameterDataDefinitionsAuth:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.parameter.data.read: Client can read parameter data
+            fraihmwork.parameter.data.write: Client can add parameter data 
+      type: oauth2
