@@ -1186,6 +1186,11 @@ components:
           description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Tracks the last time that a component was repaired, replaced, or any other maintenance has been performed, thus requiring a reset in the lifetime statistics below / MTBF time. Formatted according to RFC 3339 section 5.6.
           type: string
           format: date-time
+
+        owner:
+          description: The uuid of the user who created this object
+          type: string
+          format: uuid
           
         sessionRunningTimeSeconds:
           description: If ONLINE, this is the amount of time (ms) passed between when the component started being ONLINE to the present. Otherwise 0. Function of (NOW - Component Startup)
@@ -1253,6 +1258,11 @@ components:
         name:
           type: string
           description: A brief high level summary of the fault
+
+        owner:
+          description: The uuid of the user who created this object
+          type: string
+          format: uuid
           
         description:
           type: string
