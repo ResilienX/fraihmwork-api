@@ -1327,13 +1327,21 @@ components:
         - $ref: '#/components/schemas/Fault'
 
   securitySchemes:
+    ComponentAdmin:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.component.admin: Client may write to any component, version or state data
+      type: oauth2
     ComponentWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.component.write: Client may write any component, version or state data 
+            fraihmwork.component.write: Client may write any component created by themselves, version or state data
       type: oauth2
     ComponentRead:
       flows:
@@ -1343,13 +1351,21 @@ components:
           scopes:
             fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
       type: oauth2
+    FaultAdmin:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.fault.admin: Client may write any detailed fault information to FRAIHMWORK
+      type: oauth2
     FaultWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.write: Client may write any detailed fault information to FRAIHMWORK 
+            fraihmwork.fault.write: Client may write detailed fault information to FRAIHMWORK on faults they created
       type: oauth2
     FaultRead:
       flows:
