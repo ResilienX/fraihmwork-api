@@ -1241,9 +1241,6 @@ components:
           description: Same as TOTAL UPTIME % for now. Will update definition as we gain ability to inject modules for handling different types of components (like using additional properties defined for radars)
           type: number
           format: double
-
-        faultCounters:        
-            $ref: '#/components/schemas/FaultCounters'
             
     FaultCounters:
       type: object
@@ -1338,6 +1335,9 @@ components:
               
             performanceStatistics:
               $ref: '#/components/schemas/ComponentStatistics'
+
+            faultCounters:        
+              $ref: '#/components/schemas/FaultCounters'              
 
     ActiveFault:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
