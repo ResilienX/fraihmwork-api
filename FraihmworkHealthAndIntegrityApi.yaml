@@ -1248,12 +1248,12 @@ components:
       properties:
       
         faultsLifetime:
-          description: Total count of faults that have occured on a component since the TIME OF REGISTRATION.
+          description: Total count of faults that have occurred on a component since the TIME OF REGISTRATION.
           type: integer
           format: int64
           
         faultsSinceStart:
-          description: Total count of faults that have occured on a component since TIME OF STARTUP
+          description: Total count of faults that have occurred on a component since TIME OF STARTUP.
           type: integer
           format: int64
 
