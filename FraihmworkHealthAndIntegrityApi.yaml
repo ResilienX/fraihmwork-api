@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.0.0
+  version: 1.1.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -1241,7 +1241,22 @@ components:
           description: Same as TOTAL UPTIME % for now. Will update definition as we gain ability to inject modules for handling different types of components (like using additional properties defined for radars)
           type: number
           format: double
-        
+            
+    FaultCounters:
+      type: object
+      description: This data type contains counters for faults against a given component relative to various reference times.
+      properties:
+      
+        faultsLifetime:
+          description: Total count of faults that have occurred on a component since the TIME OF REGISTRATION.
+          type: integer
+          format: int64
+          
+        faultsSinceStart:
+          description: Total count of faults that have occurred on a component since TIME OF STARTUP.
+          type: integer
+          format: int64
+
     Fault:
       type: object
       description: A fault describes a specific condition that is adversely affecting the reporting component or subsystem. FRAIHMWORK uses this information to alert maintainers of problems, or to integrate various faults to identify larger system of system problems. Faults are identified by FRAIHMWORK by their name, code and source. Therefore there are assumptions to how faults are reported that should be abided by. Namely - each unique fault should have the same name and code information. Updates to the same fault should be reusing these keys, but can allow for other properties to change over time. If a fault is no longer active, it is expected that the component provides an update notifying FRAIHMWORK that the fault has been cleared. Otherwise, the fault will automatically clear after a default time interval if there have been no updates. 
@@ -1320,6 +1335,9 @@ components:
               
             performanceStatistics:
               $ref: '#/components/schemas/ComponentStatistics'
+
+            faultCounters:        
+              $ref: '#/components/schemas/FaultCounters'              
 
     ActiveFault:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
