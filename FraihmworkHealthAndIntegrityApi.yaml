@@ -1186,11 +1186,6 @@ components:
           description: Defaults to TIME OF REGISTRATION unless there has been a reset from an administrator to start tracking a different period of time. Tracks the last time that a component was repaired, replaced, or any other maintenance has been performed, thus requiring a reset in the lifetime statistics below / MTBF time. Formatted according to RFC 3339 section 5.6.
           type: string
           format: date-time
-
-        owner:
-          description: The uuid of the user who created this object
-          type: string
-          format: uuid
           
         sessionRunningTimeSeconds:
           description: If ONLINE, this is the amount of time (ms) passed between when the component started being ONLINE to the present. Otherwise 0. Function of (NOW - Component Startup)
@@ -1258,12 +1253,6 @@ components:
         name:
           type: string
           description: A brief high level summary of the fault
-
-        owner:
-          description: The uuid of the user who created this object
-          type: string
-          format: uuid
-          
         description:
           type: string
           description: A more detailed description of the fault with as much relevant information as possible. Implementors are encouraged to define a standard format for fault descriptions that works for their service
@@ -1331,10 +1320,21 @@ components:
             performanceStatistics:
               $ref: '#/components/schemas/ComponentStatistics'
 
+            owner:
+              description: The uuid of the user who created this object
+              type: string
+              format: uuid
+
     ActiveFault:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
       allOf:
         - $ref: '#/components/schemas/Fault'
+        - type: object
+          properties:
+            owner:
+              description: The uuid of the user who created this object
+              type: string
+              format: uuid
 
   securitySchemes:
     ComponentAdmin:
