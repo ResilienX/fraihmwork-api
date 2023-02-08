@@ -199,32 +199,6 @@ components:
     HeaderDefinition:
       type: object
       properties: 
-        startTime:
-          description: The start time for the time series
-          type: string
-          format: date-time
-        
-        endTime: 
-          description: The end time for the time series.
-          type: string
-          format: date-time
-        
-        recordCount: 
-          description: The number of records in the data
-          type: integer
-          
-
-        
-      required:
-        - startTime
-        - endTime
-        - recordCount
-        - columns
-
-    SingleDataDefinition:
-      type: object
-      description: A definition of a single parameter data sample. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
-      properties:
         messageType:
           type: string          
           description: The type of the message.
@@ -232,6 +206,15 @@ components:
         version:
           type: string
           description: The version string for the parameter data messageType.
+          
+      required:
+        - messageType
+        - version
+
+    SingleDataDefinition:
+      type: object
+      description: A definition of a single parameter data sample. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      properties:
 
         header:
           $ref: '#/components/schemas/HeaderDefinition'
@@ -243,7 +226,6 @@ components:
           $ref: '#/components/schemas/DataElement'
 
       required: 
-        - messageType
         - header
         - columns
         - data
@@ -252,13 +234,6 @@ components:
       type: object
       description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
       properties:
-        messageType:
-          type: string          
-          description: The type of the message.
-
-        version:
-          type: string
-          description: The version string for the parameter data messageType.
 
         header:
           $ref: '#/components/schemas/HeaderDefinition'
@@ -270,7 +245,6 @@ components:
           $ref: '#/components/schemas/DataDefinition'
 
       required: 
-        - messageType
         - header
         - columns
         - data

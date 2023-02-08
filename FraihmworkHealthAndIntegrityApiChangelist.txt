@@ -1,3 +1,6 @@
+Version 1.1.0
+- Added fault counters within component statistics data type.
+
 Version 1.0.0:
 - Merged registration API elements into this api spec for simplicity and to remove redundant items
 - Merged 'Active' fault and component apis into this one for simplicity

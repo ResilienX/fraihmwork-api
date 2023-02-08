@@ -1,5 +1,9 @@
+
 Version 1.0.0: 
 Overhaul of time series endpoint and constituent types. Addition of single data definition endpoint.
+
+Version 0.0.2: 
+Removed recordCount field from HeaderDefinition fields.
 
 Version 0.0.1: 
 Added docType field to required fields.
