@@ -2,10 +2,10 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Parameter Data API
-  description: 'FRAIHMWORK allows for parameter time-series data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
+  description: 'FRAIHMWORK allows for time series or single sample parameter data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 0.0.1
+  version: 1.0.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -18,13 +18,13 @@ tags:
   description: Parameter data model manipulation endpoints
 
 paths:
-  /parameter:
+  /timeSeries:
     post:
       tags:
         - Parameter
-      summary: Add new time series parameter data to FRAIHMWORK model
-      description: Add new time series parameter data to FRAIHMWORK model
-      operationId: registerParameterData
+      summary: Add new time series of parameter data to FRAIHMWORK model.
+      description: Add new time series of parameter data to FRAIHMWORK model.
+      operationId: registerParameterDataSeries
       requestBody:
         required: true
         content:
@@ -40,7 +40,7 @@ paths:
                 $ref: '#/components/schemas/Response'
           
         400:
-          description: Bad Request (invalid submission). 
+          description: Bad Request (invalid submission)
           content:
             application/json:
               schema:
@@ -73,6 +73,62 @@ paths:
       security:
       - ParameterDataDefinitionsAuth:
         - fraihmwork.parameter.data.write
+        
+  /sample:
+    post:
+      tags:
+        - Parameter
+      summary: Add new timestamped sample of parameter data to FRAIHMWORK model.
+      description: Add new timestamped sample of parameter data to FRAIHMWORK model.
+      operationId: registerParameterDataSample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleDataDefinition'
+      responses:
+        201:
+          description: POSTed new time series parameter data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ParameterDataDefinitionsAuth:
+        - fraihmwork.parameter.data.write        
 
 components:
   schemas:
@@ -92,11 +148,11 @@ components:
     ColumnDefinition:
       type: array
       items:
-        $ref: '#/components/schemas/ColumnElementDefinition'
+        $ref: '#/components/schemas/ColumnElement'
           
-    ColumnElementDefinition:
+    ColumnElement:
       type: object
-      description: The column elements      
+      description: The column elements.
       properties:
         
         name: 
@@ -149,16 +205,15 @@ components:
           format: date-time
         
         endTime: 
-          description: The end time for the time series
+          description: The end time for the time series.
           type: string
           format: date-time
         
         recordCount: 
-          description: The number of records in the data.
+          description: The number of records in the data
           type: integer
           
-        columns:
-          $ref: '#/components/schemas/ColumnDefinition'
+
         
       required:
         - startTime
@@ -166,42 +221,73 @@ components:
         - recordCount
         - columns
 
+    SingleDataDefinition:
+      type: object
+      description: A definition of a single parameter data sample. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      properties:
+        messageType:
+          type: string          
+          description: The type of the message.
+
+        version:
+          type: string
+          description: The version string for the parameter data messageType.
+
+        header:
+          $ref: '#/components/schemas/HeaderDefinition'
+          
+        columns:
+          $ref: '#/components/schemas/ColumnDefinition'          
+
+        data:
+          $ref: '#/components/schemas/DataElement'
+
+      required: 
+        - messageType
+        - header
+        - columns
+        - data
+
     TimeSeriesDataDefinition:
       type: object
       description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
       properties:
-        docType:
+        messageType:
           type: string          
-          description: The type of the document
+          description: The type of the message.
 
         version:
           type: string
-          description: The version string for the time series data definition
+          description: The version string for the parameter data messageType.
 
         header:
           $ref: '#/components/schemas/HeaderDefinition'
+          
+        columns:
+          $ref: '#/components/schemas/ColumnDefinition'
 
         data:
           $ref: '#/components/schemas/DataDefinition'
 
       required: 
-        - docType
+        - messageType
         - header
+        - columns
         - data
 
     ValueSpec:
       type: object
       properties:
         value:
-          description: The value of the data sample described in string form. 
+          description: The value of the data sample described in string form
           type: string
           
         quality: 
-          description: The quality score of the data sample (should be bounded 0.0 .. 100.0)
+          description: The quality score of the data sample (should be bounded 0.0 .. 1.0)
           type: number          
           format: double
           minimum: 0.0
-          maximum: 100.0
+          maximum: 1.0
         
         annotation: 
           description: The annotation for the data sample
