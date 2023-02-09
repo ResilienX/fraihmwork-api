@@ -797,6 +797,10 @@ paths:
       security:
       - FaultRead:
         - fraihmwork.fault.read
+      - FaultWrite:
+        - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
   /fault/{uuid}:
     get:
