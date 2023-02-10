@@ -152,7 +152,7 @@ components:
           
     ColumnElement:
       type: object
-      description: The column elements.
+      description: The column element.
       properties:
         
         name: 
@@ -203,7 +203,7 @@ components:
           type: string          
           description: The type of the message.
 
-        version:
+        messageVersion:
           type: string
           description: The version string for the parameter data messageType.
           
