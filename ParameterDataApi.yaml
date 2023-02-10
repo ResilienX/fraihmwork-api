@@ -146,7 +146,7 @@ components:
         - message
         
     ColumnDefinition:
-      description: The definition of the columns of the parameter data. Must have the same length as the DataElements fields array
+      description: The definition of the columns of the parameter data. Must have the same length as the DataSample fields array
       type: array
       items:
         $ref: '#/components/schemas/ColumnElement'
