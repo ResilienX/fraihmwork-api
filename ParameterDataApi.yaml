@@ -22,8 +22,8 @@ paths:
     post:
       tags:
         - Parameter
-      summary: Add new time series of parameter data to FRAIHMWORK model.
-      description: Add new time series of parameter data to FRAIHMWORK model.
+      summary: Add new time series of parameter data to FRAIHMWORK model
+      description: Add new time series of parameter data to FRAIHMWORK model
       operationId: registerParameterDataSeries
       requestBody:
         required: true
@@ -78,8 +78,8 @@ paths:
     post:
       tags:
         - Parameter
-      summary: Add new timestamped sample of parameter data to FRAIHMWORK model.
-      description: Add new timestamped sample of parameter data to FRAIHMWORK model.
+      summary: Add new timestamped sample of parameter data to FRAIHMWORK model
+      description: Add new timestamped sample of parameter data to FRAIHMWORK model
       operationId: registerParameterDataSample
       requestBody:
         required: true
@@ -205,7 +205,7 @@ components:
 
         messageVersion:
           type: string
-          description: The version string for the parameter data messageType.
+          description: The version string for the parameter data messageType
           
       required:
         - messageType
@@ -213,7 +213,7 @@ components:
 
     SingleDataDefinition:
       type: object
-      description: A definition of a single parameter data sample. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      description: A definition of a single parameter data sample. This is loosely based upon Json Time Series, Version 1.0 (https://docs.eagle.io/en/latest/reference/index.html)
       properties:
 
         header:
@@ -232,7 +232,7 @@ components:
 
     TimeSeriesDataDefinition:
       type: object
-      description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0 (https://docs.eagle.io/en/latest/reference/index.html)
       properties:
 
         header:
