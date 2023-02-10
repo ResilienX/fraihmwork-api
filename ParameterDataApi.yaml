@@ -162,7 +162,7 @@ components:
           pattern: '^[a-zA-Z0-9]{2,}'
         
         units: 
-          description: The units for the parameter data elements in a given column
+          description: The units for the parameter data values in a given column
           type: string
         
         dataType:
@@ -178,34 +178,12 @@ components:
       items: 
         $ref: '#/components/schemas/DataSample'
         
-
-    DataElement:
-      type: object
-      properties:
-        value:
-          description: The magnitude of the data value described in string form
-          type: string
-          
-        quality: 
-          description: The quality ratio of the data value (bounded from 0.0 to 1.0)
-          type: number          
-          format: double
-          minimum: 0.0
-          maximum: 1.0
-        
-        annotation: 
-          description: The annotation for the data value
-          type: string
-          
-      required:
-        - value        
-        
     DataSample:
-      description: A row of data elements described by the column definition, associated with a single discrete timestamp
+      description: A row of data values described by the column definition, associated with a single discrete timestamp
       type: object
       properties:
         timestamp:
-          description: the timestamp of the data elements
+          description: the timestamp of the data values
           type: string
           format: date-time
             
@@ -213,11 +191,10 @@ components:
           description: Must have the same length as the ColumnDefinition array
           type: array
           items:
-            $ref: '#/components/schemas/DataElement'
-            
-      required:
-        - timestamp
-        - fields
+            properties:
+              value:
+                description: The magnitude of the data value described in string form
+                type: string
 
     DataType:
       type: string
