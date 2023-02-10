@@ -152,7 +152,7 @@ components:
           
     ColumnElement:
       type: object
-      description: The column element.
+      description: The column element
       properties:
         
         name: 
@@ -201,7 +201,7 @@ components:
       properties: 
         messageType:
           type: string          
-          description: The type of the message.
+          description: The type of the message
 
         messageVersion:
           type: string
@@ -257,7 +257,7 @@ components:
           type: string
           
         quality: 
-          description: The quality score of the data sample (should be bounded 0.0 .. 1.0)
+          description: The quality ratio of the data sample (bounded from 0.0 to 1.0)
           type: number          
           format: double
           minimum: 0.0
