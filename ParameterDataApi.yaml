@@ -176,14 +176,36 @@ components:
       description: The time series data, an ordered collection relative to the timestamp field
       type: array
       items: 
-        $ref: '#/components/schemas/DataElements'
+        $ref: '#/components/schemas/DataSample'
         
-    DataElements:
-      description: A row of data elements described by the column definition, associated with a discrete timestamp
+
+    DataElement:
+      type: object
+      properties:
+        value:
+          description: The magnitude of the data value described in string form
+          type: string
+          
+        quality: 
+          description: The quality ratio of the data value (bounded from 0.0 to 1.0)
+          type: number          
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+        
+        annotation: 
+          description: The annotation for the data value
+          type: string
+          
+      required:
+        - value        
+        
+    DataSample:
+      description: A row of data elements described by the column definition, associated with a single discrete timestamp
       type: object
       properties:
         timestamp:
-          description: the timestamp of the sample
+          description: the timestamp of the data elements
           type: string
           format: date-time
             
@@ -221,7 +243,7 @@ components:
 
     SingleDataDefinition:
       type: object
-      description: A definition of a single parameter data sample. 
+      description: A definition of a set of parameter data having a single discrete timestamp
       properties:
 
         header:
@@ -231,7 +253,7 @@ components:
           $ref: '#/components/schemas/ColumnDefinition'
 
         data:
-          $ref: '#/components/schemas/DataElements'
+          $ref: '#/components/schemas/DataSample'
 
       required: 
         - header
@@ -256,27 +278,6 @@ components:
         - header
         - columns
         - data
-
-    DataElement:
-      type: object
-      properties:
-        value:
-          description: The value of the data sample described in string form
-          type: string
-          
-        quality: 
-          description: The quality ratio of the data sample (bounded from 0.0 to 1.0)
-          type: number          
-          format: double
-          minimum: 0.0
-          maximum: 1.0
-        
-        annotation: 
-          description: The annotation for the data sample
-          type: string
-          
-      required:
-        - value
         
   securitySchemes:
     ParameterDataDefinitionsAuth:      
