@@ -89,7 +89,7 @@ paths:
               $ref: '#/components/schemas/SingleDataDefinition'
       responses:
         201:
-          description: POSTed new time series parameter data
+          description: POSTed new single parameter data sample
           content:
             application/json:
               schema:
@@ -153,10 +153,10 @@ components:
         timestamp:
           type: string
           format: date-time
-          description: The timestamp the applies to the measurements in the data field (DataSample)
+          description: The timestamp that applies to the measurements in the data field (DataSample)
           
         data: 
-          description: A row of one or more data values, associated with a single discrete timestamp. The fields within this object should always follow a consistent order from request to request. Key/value pairs should be used, including units in the key name
+          description: A row of one or more data values, associated with a single discrete timestamp. Key/value pairs should be used, including units in the key name. The fields within this object should always follow a consistent order from row to row given a combination of messageType and version
           type: object
           additionalProperties: true    
         
@@ -188,7 +188,7 @@ components:
 
     SingleDataDefinition:
       type: object
-      description: A definition of a set of parameter data having a single discrete timestamp. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys. 
+      description: A definition of a set of parameter data having a single discrete timestamp. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys
       properties:
 
         header:
