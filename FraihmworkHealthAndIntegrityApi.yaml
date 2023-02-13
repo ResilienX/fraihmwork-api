@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.1.0
+  version: 1.2.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -74,7 +74,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite: [system.write]
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     get:
       deprecated: true
@@ -118,6 +121,10 @@ paths:
       security:
       - ComponentRead:
         - fraihmwork.component.read
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /system/{uuid}:
     get:
@@ -175,6 +182,10 @@ paths:
       security:
       - ComponentRead:
         - fraihmwork.component.read
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     put:
       deprecated: true
@@ -232,6 +243,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     delete:  
       deprecated: true
@@ -282,6 +295,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /system/{uuid}/refresh:
     post:
@@ -327,6 +342,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /component:
     post:
@@ -374,7 +391,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite: [system.write]
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     get:
       tags:
@@ -435,6 +455,10 @@ paths:
       security:
       - ComponentRead:
         - fraihmwork.component.read
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /component/{uuid}:
     get:
@@ -485,6 +509,10 @@ paths:
       security:
       - ComponentRead:
         - fraihmwork.component.read
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     put:
       tags:
@@ -541,6 +569,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
     delete:  
       tags:
@@ -590,6 +620,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /component/{uuid}/refresh:
     post:
@@ -634,6 +666,8 @@ paths:
       security:
       - ComponentWrite:
         - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
   /fault:
     post:
@@ -695,6 +729,8 @@ paths:
       security:
       - FaultWrite:
         - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
     get:
       tags:
@@ -761,6 +797,10 @@ paths:
       security:
       - FaultRead:
         - fraihmwork.fault.read
+      - FaultWrite:
+        - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
   /fault/{uuid}:
     get:
@@ -805,6 +845,10 @@ paths:
       security:
       - FaultRead:
         - fraihmwork.fault.read
+      - FaultWrite:
+        - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
     put:
       tags:
@@ -867,6 +911,8 @@ paths:
       security:
       - FaultWrite:
         - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
         
     delete:
       tags:
@@ -922,6 +968,8 @@ paths:
       security:
       - FaultWrite:
         - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
   /fault/{uuid}/refresh:
     post:
@@ -978,6 +1026,8 @@ paths:
       security:
       - FaultWrite:
         - fraihmwork.fault.write
+      - FaultAdmin:
+        - fraihmwork.fault.admin
 
   /requestId:
     get:
@@ -1023,6 +1073,10 @@ paths:
       security:
       - ComponentRead:
         - fraihmwork.component.read
+      - ComponentWrite:
+        - fraihmwork.component.write
+      - ComponentAdmin:
+        - fraihmwork.component.admin
 
 components:
   schemas:
@@ -1268,7 +1322,6 @@ components:
         name:
           type: string
           description: A brief high level summary of the fault
-          
         description:
           type: string
           description: A more detailed description of the fault with as much relevant information as possible. Implementors are encouraged to define a standard format for fault descriptions that works for their service
@@ -1336,22 +1389,41 @@ components:
             performanceStatistics:
               $ref: '#/components/schemas/ComponentStatistics'
 
-            faultCounters:        
-              $ref: '#/components/schemas/FaultCounters'              
+            owner:
+              description: The uuid of the user who created this object
+              type: string
+              format: uuid
+
+            faultCounters:
+              $ref: '#/components/schemas/FaultCounters'
 
     ActiveFault:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
       allOf:
         - $ref: '#/components/schemas/Fault'
+        - type: object
+          properties:
+            owner:
+              description: The uuid of the user who created this object
+              type: string
+              format: uuid
 
   securitySchemes:
+    ComponentAdmin:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.component.admin: Client may write to any component, version or state data
+      type: oauth2
     ComponentWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.component.write: Client may write any component, version or state data 
+            fraihmwork.component.write: Client may write any component created by themselves, version or state data
       type: oauth2
     ComponentRead:
       flows:
@@ -1361,13 +1433,21 @@ components:
           scopes:
             fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
       type: oauth2
+    FaultAdmin:
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            fraihmwork.fault.admin: Client may write any detailed fault information to FRAIHMWORK
+      type: oauth2
     FaultWrite:
       flows:
         clientCredentials:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.fault.write: Client may write any detailed fault information to FRAIHMWORK 
+            fraihmwork.fault.write: Client may write detailed fault information to FRAIHMWORK on faults they created
       type: oauth2
     FaultRead:
       flows:

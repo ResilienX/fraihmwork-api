@@ -1,3 +1,8 @@
+Version 1.2.0
+- Added the new "owner" field to ActiveComponent and ActiveFault
+- Added new Admin scopes for components and faults
+- Updated the endpoints to reflect the new scope definitions
+
 Version 1.1.0
 - Added fault counters within component statistics data type.
 
