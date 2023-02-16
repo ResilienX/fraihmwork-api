@@ -200,7 +200,7 @@ components:
 
     TimeSeriesDataDefinition:
       type: object
-      description: A time series collection for a set of parameter data. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys. It is encouraged that each element in the array has the same keys in the same order from data sample row to data sample row. Note: Time series data will be sorted by the server if not following order of occurence
+      description: A time series collection for a set of parameter data. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys. It is encouraged that each element in the array has the same keys in the same order from data sample row to data sample row. Time series data will be sorted by the server if not following order of occurence
       properties:
 
         header:
