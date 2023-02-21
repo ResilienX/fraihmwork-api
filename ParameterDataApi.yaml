@@ -190,13 +190,12 @@ components:
       type: object
       description: A definition of a set of parameter data having a single discrete timestamp. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys
       allOf:
-      
+      - $ref: '#/components/schemas/DataSample'      
       - type: object
         properties:          
           header:
             $ref: '#/components/schemas/HeaderDefinition'
-            
-      - $ref: '#/components/schemas/DataSample'
+
 
     TimeSeriesDataDefinition:
       type: object
