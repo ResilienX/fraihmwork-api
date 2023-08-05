@@ -2,10 +2,10 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Health And Integrity API
-  description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This initial version does not imply any protections against malicious behavior from trusted endpoints. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
+  description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.1.0
+  version: 1.2.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -57,6 +57,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot create new components
           content: 
             application/json:
               schema:
@@ -74,7 +80,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite: [system.write]
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
     get:
       deprecated: true
@@ -98,7 +104,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read components
           content: 
             application/json:
               schema:
@@ -116,8 +122,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentRead:
-        - fraihmwork.component.read
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
   /system/{uuid}:
     get:
@@ -149,7 +154,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read this component
           content: 
             application/json:
               schema:
@@ -173,8 +178,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentRead:
-        - fraihmwork.component.read
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
     put:
       deprecated: true
@@ -207,6 +211,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot update this component
           content: 
             application/json:
               schema:
@@ -230,8 +240,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
     delete:  
       deprecated: true
@@ -257,6 +266,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot delete this component
           content: 
             application/json:
               schema:
@@ -280,8 +295,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
   /system/{uuid}/refresh:
     post:
@@ -308,6 +322,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot update components
           content: 
             application/json:
               schema:
@@ -325,8 +345,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
   /component:
     post:
@@ -357,6 +376,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot create components
           content: 
             application/json:
               schema:
@@ -374,7 +399,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite: [system.write]
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
     get:
       tags:
@@ -414,7 +439,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read components
           content:
             application/json:
               schema:
@@ -433,8 +458,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - ComponentRead:
-        - fraihmwork.component.read
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
   /component/{uuid}:
     get:
@@ -464,7 +488,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read this component
           content:
             application/json:
               schema:
@@ -483,8 +507,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - ComponentRead:
-        - fraihmwork.component.read
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
     put:
       tags:
@@ -516,6 +539,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot update this component
           content: 
             application/json:
               schema:
@@ -539,8 +568,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
     delete:  
       tags:
@@ -565,6 +593,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot delete this component
           content: 
             application/json:
               schema:
@@ -588,8 +622,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
   /component/{uuid}/refresh:
     post:
@@ -615,6 +648,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client cannot update this component
           content: 
             application/json:
               schema:
@@ -632,8 +671,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentWrite:
-        - fraihmwork.component.write
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
   /fault:
     post:
@@ -664,16 +702,16 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
-          content: 
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - this service will not provide fault information
+          description: Forbidden - client cannot create faults
           content: 
             application/json:
               schema:
-                $ref: '#/components/schemas/Response'   
+                $ref: '#/components/schemas/Response'
         404:
           description: The referenced component UUID cannot be found
           content: 
@@ -693,8 +731,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - FaultWrite:
-        - fraihmwork.fault.write
+      - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
 
     get:
       tags:
@@ -746,7 +783,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read faults
           content: 
             application/json:
               schema:
@@ -759,8 +796,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false
       security:
-      - FaultRead:
-        - fraihmwork.fault.read
+      - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 
   /fault/{uuid}:
     get:
@@ -790,7 +826,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden
+          description: Forbidden - client cannot read faults
           content: 
             application/json:
               schema:
@@ -803,8 +839,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       deprecated: false      
       security:
-      - FaultRead:
-        - fraihmwork.fault.read
+      - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 
     put:
       tags:
@@ -836,12 +871,12 @@ paths:
                 $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
-          content: 
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - this service cannot post fault information
+          description: Forbidden - client cannot update this item
           content: 
             application/json:
               schema:
@@ -865,8 +900,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - FaultWrite:
-        - fraihmwork.fault.write
+      - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
         
     delete:
       tags:
@@ -896,7 +930,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - this service cannot delete this item
+          description: Forbidden - client cannot delete this item
           content: 
             application/json:
               schema:
@@ -920,8 +954,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - FaultWrite:
-        - fraihmwork.fault.write
+      - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
 
   /fault/{uuid}/refresh:
     post:
@@ -952,7 +985,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - this service cannot post fault information
+          description: Forbidden - client cannot update item
           content: 
             application/json:
               schema:
@@ -976,8 +1009,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - FaultWrite:
-        - fraihmwork.fault.write
+      - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
 
   /requestId:
     get:
@@ -1021,8 +1053,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - ComponentRead:
-        - fraihmwork.component.read
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
 components:
   schemas:
@@ -1345,35 +1376,20 @@ components:
         - $ref: '#/components/schemas/Fault'
 
   securitySchemes:
-    ComponentWrite:
-      flows:
-        clientCredentials:
-          tokenUrl: https://well-known/oauth-authorization-server/token
-          refreshUrl: https://well-known/oauth-authorization-server/refresh
-          scopes:
-            fraihmwork.component.write: Client may write any component, version or state data 
+    OAuth2:
       type: oauth2
-    ComponentRead:
       flows:
         clientCredentials:
+          # Note that multiple authorization servers can be specified to serve this API, and this description only provides details for the default
+          # internal security configuration. Each of the scopes below corresponds to a FRAIHMWORK permission, and can be configured to align to a 
+          # different scope or role provided by a 3rd party authorization server, if required. However, at time of writing it is assumed that 
+          # authentication activities are always happening over a client-credentials oauth2 flow.
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
+            fraihmwork.component.admin: Client may create, read, update, or delete any component
+            fraihmwork.component.write: Client may create new components, and update and delete components they create, and read all components
             fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
-      type: oauth2
-    FaultWrite:
-      flows:
-        clientCredentials:
-          tokenUrl: https://well-known/oauth-authorization-server/token
-          refreshUrl: https://well-known/oauth-authorization-server/refresh
-          scopes:
-            fraihmwork.fault.write: Client may write any detailed fault information to FRAIHMWORK 
-      type: oauth2
-    FaultRead:
-      flows:
-        clientCredentials:
-          tokenUrl: https://well-known/oauth-authorization-server/token
-          refreshUrl: https://well-known/oauth-authorization-server/refresh
-          scopes:
+            fraihmwork.fault.admin: Client may create, read, update, or delete any fault
+            fraihmwork.fault.write: Client may create new faults, update and delete faults they create, and read all faults
             fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
-      type: oauth2
