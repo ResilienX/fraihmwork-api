@@ -1,3 +1,9 @@
+Version 1.2.0
+- Added comments to oauth security schemes section to indicate possibility of multiple authorization servers
+- Update oauth security scheme to be formatted as per swagger best practices, instead of by scope
+- Added fraihmwork.component.admin and fraihmwork.fault.admin scopes to indicate updated usage
+- Filled in missing 401 and 403 errors for requests that did not have them. Also added some descriptions for 403s
+
 Version 1.1.0
 - Added fault counters within component statistics data type.
 
