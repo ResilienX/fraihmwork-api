@@ -1361,7 +1361,7 @@ components:
         - type: object
           properties:
             selfReportedState:
-              description: The original self-reported state of the component. Useful for when an override is performed due to a fault or other special circumstance. 
+              # The original self-reported state of the component. Useful for when an override is performed due to a fault or other special circumstance. 
               $ref: '#/components/schemas/State'
               
             performanceStatistics:
