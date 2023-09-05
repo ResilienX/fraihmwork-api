@@ -2,10 +2,10 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Parameter Data API
-  description: 'FRAIHMWORK allows for parameter time-series data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
+  description: 'FRAIHMWORK allows for time series or single sample parameter data to be provided from the client. This API will be versioned according to SemVer 2.0 rules (as described here: https://semver.org/)'
   contact:
     email: matt.synborski@resilienx.com
-  version: 0.0.2
+  version: 0.1.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -18,13 +18,13 @@ tags:
   description: Parameter data model manipulation endpoints
 
 paths:
-  /parameter:
+  /series:
     post:
       tags:
         - Parameter
-      summary: Add new time series parameter data to FRAIHMWORK model
-      description: Add new time series parameter data to FRAIHMWORK model
-      operationId: registerParameterData
+      summary: Add new time series of parameter data to FRAIHMWORK model
+      description: Add new time series of parameter data to FRAIHMWORK model
+      operationId: registerParameterDataSeries
       requestBody:
         required: true
         content:
@@ -40,7 +40,7 @@ paths:
                 $ref: '#/components/schemas/Response'
           
         400:
-          description: Bad Request (invalid submission). 
+          description: Bad Request (invalid submission)
           content:
             application/json:
               schema:
@@ -73,6 +73,62 @@ paths:
       security:
       - ParameterDataDefinitionsAuth:
         - fraihmwork.parameter.data.write
+        
+  /sample:
+    post:
+      tags:
+        - Parameter
+      summary: Add new timestamped sample of parameter data to FRAIHMWORK model
+      description: Add new timestamped sample of parameter data to FRAIHMWORK model
+      operationId: registerParameterDataSample
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SingleDataDefinition'
+      responses:
+        201:
+          description: POSTed new single parameter data sample
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        400:
+          description: Bad Request (invalid submission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ParameterDataDefinitionsAuth:
+        - fraihmwork.parameter.data.write        
 
 components:
   schemas:
@@ -88,122 +144,75 @@ components:
           description: The success message provided back to the client
       required:
         - message
-        
-    ColumnDefinition:
-      type: array
-      items:
-        $ref: '#/components/schemas/ColumnElementDefinition'
-          
-    ColumnElementDefinition:
-      type: object
-      description: The column elements      
-      properties:
-        
-        name: 
-          description: The name of the column
-          type: string
-          pattern: '^[a-zA-Z0-9]{2,}'
-          
-        dataType:
-          $ref: '#/components/schemas/DataType'
-                   
-      required:
-        - name
-        - dataType
 
-    DataDefinition:
-      type: array
-      items: 
-        $ref: '#/components/schemas/DataElement'
-        
-    DataElement:
+    DataSample:
       type: object
+      description: A definition of a set of parameter data having a single discrete timestamp
       properties:
-        timestamp:
-          description: the timestamp of the sample
+      
+        timeOfApplicability:
           type: string
           format: date-time
-            
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValueSpec'
-            
-      required:
-        - timestamp
-        - fields
-
-    DataType:
-      type: string
-      enum:
-        - NUMBER
-        - INTEGER
-        - STRING
+          description: The time at which the parameter data value or values are measured or sampled
+          
+        data: 
+          description: A row of one or more data values, associated with a single discrete timestamp. Key/value pairs should be used, including units in the key name. The fields within this object should always follow a consistent order from row to row given a combination of messageType and messageVersion
+          type: object
+          additionalProperties: true    
         
+      required:
+        - timeOfApplicability
+        - data    
+
     HeaderDefinition:
       type: object
       properties: 
-        startTime:
-          description: The start time for the time series
+      
+        componentUuid:
           type: string
-          format: date-time
-        
-        endTime: 
-          description: The end time for the time series
+          format: uuid
+          description: The unique identifier of the component within FRAIHMWORK that the parameter data associates with
+      
+        messageType:
+          type: string          
+          description: The type of the message, dictated by the client for delineating individual message formats
+
+        messageVersion:
           type: string
-          format: date-time
+          description: The version string for the parameter data messageType. If the client changes the data fields within a message stream, they should increment the version accordingly to distinguish message format along with the messageType
           
-        columns:
-          $ref: '#/components/schemas/ColumnDefinition'
-        
       required:
-        - startTime
-        - endTime
-        - columns
+        - componentUuid
+        - messageType
+        - messageVersion
+
+    SingleDataDefinition:
+      type: object
+      description: A definition of a set of parameter data having a single discrete timestamp. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys
+      allOf:
+      - $ref: '#/components/schemas/DataSample'      
+      - type: object
+        properties:          
+          header:
+            $ref: '#/components/schemas/HeaderDefinition'
+
 
     TimeSeriesDataDefinition:
       type: object
-      description: A definition of time series data. This is loosely based upon Json Time Series, Version 1.0. (https://docs.eagle.io/en/latest/reference/index.html)
+      description: A time series collection for a set of parameter data. For multiple parameter observations for the given timestamp, use multiple key/value pairs with unique keys. It is encouraged that each element in the array has the same keys in the same order from data sample row to data sample row. Time series data will be sorted by the server if not following order of occurrence
       properties:
-        docType:
-          type: string          
-          description: The type of the document
-
-        version:
-          type: string
-          description: The version string for the time series data definition
 
         header:
           $ref: '#/components/schemas/HeaderDefinition'
 
-        data:
-          $ref: '#/components/schemas/DataDefinition'
-
+        series:
+          type: array
+          items: 
+            $ref: '#/components/schemas/DataSample'
+                        
       required: 
-        - docType
         - header
-        - data
-
-    ValueSpec:
-      type: object
-      properties:
-        value:
-          description: The value of the data sample described in string form. 
-          type: string
-          
-        quality: 
-          description: The quality score of the data sample (should be bounded 0.0 .. 100.0)
-          type: number          
-          format: double
-          minimum: 0.0
-          maximum: 100.0
-        
-        annotation: 
-          description: The annotation for the data sample
-          type: string
-          
-      required:
-        - value
+        - series
         
   securitySchemes:
     ParameterDataDefinitionsAuth:      
