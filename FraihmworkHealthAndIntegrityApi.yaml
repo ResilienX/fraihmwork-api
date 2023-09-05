@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.2.0
+  version: 1.3.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -25,6 +25,9 @@ tags:
   
 - name: UUID Control
   description: Functions for helping manage UUIDs for components and faults
+  
+- name: Blocklist
+  description: Blocklist management apis  
 
 paths:
   /system:
@@ -1054,6 +1057,210 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+        
+  /blocklist:
+    get:
+      tags:
+      - Blocklist
+      summary: Requests the current blocklist
+      description: This call requests the list of all components and systems that are currently being blocklisted
+      operationId: getBlocklistedComponents
+      responses:
+        200:
+          description: Returned blocklist information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blocklist'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.read]
+    
+    post:
+      tags:
+      - Blocklist
+      summary: Posts a blocklisted subsystem to the blocklist
+      description: This call adds a system to the collection of blocklisted systems. Returns a blocklist UUID so that this can be referenced in the future
+      operationId: postBlocklistedComponent
+      requestBody:
+        description: JSON description of the blocklisted system, including why it is being blocklisted
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlocklistedComponent'
+      responses:
+        201:
+          description: Successfully posted new blocklisted system information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.manage]
+        
+  /blocklist/{uuid}:
+    put:
+      tags:
+      - Blocklist
+      summary: Updates a blocklisted subsystem in the blocklist
+      description: This call replaces a blocklist entry so that it can be updated. It takes the blocklist UUID as a parameter
+      operationId: updateBlocklistEntry
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system properties being updated
+      requestBody:
+        description: JSON description of the blocklisted system, including why it is being blocklisted
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlocklistedComponent'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.manage]
+
+    delete:  
+      tags:
+      - Blocklist
+      summary: Deletes an entry from the blocklist
+      description: This operation removes a system from the blocklist - forcing an update to the full blocklist with the targeted system no longer in it. This can result in the sending of an empty blocklist.
+      operationId: deleteBlocklistEntry
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the blocklist properties being deleted
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.manage]
 
 components:
   schemas:
@@ -1375,6 +1582,62 @@ components:
       allOf:
         - $ref: '#/components/schemas/Fault'
 
+    BlocklistedComponent:
+      type: object
+      properties:
+        componentId:
+          type: string
+          format: uuid
+          description: The id of the system or component that is being blocklisted
+        faultIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The list of all fault ids that are causing the blocklisting of this system
+        sourceId:
+          type: string
+          format: uuid
+          description: the id of the system or component that issued this blocklisting
+        description:
+          type: string
+          description: The reason for the blocklist
+        timeOfBlocklist:
+          type: string
+          format: date-time
+          description: The timestamp that this component started to be blocklisted. Timestamp format is as specified by RFC 3339 section 5.6. 
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this blocklist state was confirmed to still be correct. Assumed to be timestamp of last receipt of message if not provided. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required:
+        - componentId
+        - faultIds
+        - sourceId
+        - description
+        - timeOfBlocklist
+
+    Blocklist:
+      type: object
+      properties:
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The timestamp when this overall blocklist state was issued or confirmed to still be correct prior to issuing. Timestamp format is as specified by RFC 3339 section 5.6. 
+        blocklist:
+          items:
+            type: object
+            properties:
+              blocklistId:
+                type: string
+                format: uuid
+                description: The uuid of this blocklist entry
+              entry:
+                $ref: '#/components/schemas/BlocklistedComponent'
+      required:
+        - timeOfValidity
+        - blocklist        
+
   securitySchemes:
     OAuth2:
       type: oauth2
@@ -1393,3 +1656,5 @@ components:
             fraihmwork.fault.admin: Client may create, read, update, or delete any fault
             fraihmwork.fault.write: Client may create new faults, update and delete faults they create, and read all faults
             fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
+            fraihmwork.blocklist.manage: Client can modify the blocklist
+            fraihmwork.blocklist.read: Client can read the blocklist action list            

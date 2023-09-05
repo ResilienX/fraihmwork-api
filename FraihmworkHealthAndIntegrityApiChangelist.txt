@@ -1,3 +1,8 @@
+Version 1.3.0
+- Moved Blocklister API elements to FraihmworkHealthAndIntegrityApi. 
+- Updated security scopes to follow convention in destination spec.
+- Removed subscription elements from Blocklister API elements.
+
 Version 1.2.0
 - Added comments to oauth security schemes section to indicate possibility of multiple authorization servers
 - Update oauth security scheme to be formatted as per swagger best practices, instead of by scope
