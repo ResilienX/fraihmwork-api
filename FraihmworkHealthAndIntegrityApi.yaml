@@ -27,7 +27,7 @@ tags:
   description: Functions for helping manage UUIDs for components and faults
   
 - name: Blocklist
-  description: Blocklist management apis  
+  description: Blocklist management api endpoints  
 
 paths:
   /system:
@@ -1078,6 +1078,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         406:
           description: Not acceptable - only responds in application/json format
           content: 
@@ -1091,7 +1097,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.blocklist.read]
+      - OAuth2: [fraihmwork.blocklist.read, fraihmwork.blocklist.manage]
     
     post:
       tags:
@@ -1131,6 +1137,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         406:
           description: Not acceptable - only responds in application/json format
           content: 
@@ -1187,6 +1199,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         404:
           description: UUID not found
           content: 
@@ -1241,6 +1259,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         404:
           description: UUID not found
           content: 
