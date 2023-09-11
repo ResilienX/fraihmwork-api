@@ -1680,5 +1680,5 @@ components:
             fraihmwork.fault.admin: Client may create, read, update, or delete any fault
             fraihmwork.fault.write: Client may create new faults, update and delete faults they create, and read all faults
             fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
-            fraihmwork.blocklist.manage: Client can modify the blocklist
-            fraihmwork.blocklist.read: Client can read the blocklist action list            
+            fraihmwork.blocklist.manage: Client may create new elements within the Blocklist, and update and delete elements they create
+            fraihmwork.blocklist.read: Client may query for the blocklist
