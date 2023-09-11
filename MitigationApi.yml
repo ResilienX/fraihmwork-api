@@ -5,7 +5,7 @@ info:
   description: 'Often faults can be detected and resolved by a system or person and this information should be passed on to the user to indicate that the action is available (and whether to take that action or not)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 0.0.11
+  version: 0.1.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -45,6 +45,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         406:
           description: Not acceptable - only responds in application/json format
           content: 
@@ -58,13 +64,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
+      
     post:
       tags:
       - Mitigation
       summary: Posts a mitigation action for one or more faults
-      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code.
+      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code. Note, requests with the fraihmwork.mitigation.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
       operationId: postMitigation
       requestBody:
         description: JSON description of the mitigation action
@@ -98,6 +104,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to create mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         406:
           description: Not acceptable - only responds in application/json format
           content: 
@@ -111,7 +123,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationManage: [mitigation.manage]
+      - OAuth2: [fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
   
   /mitigation/{uuid}:
     get:
@@ -147,6 +159,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read this mitigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                   
         404:
           description: UUID not found
           content: 
@@ -166,14 +184,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
   
     put:
       tags:
       - Mitigation
       summary: Updates a mitigation action entry's state
-      description: This call updates the state of an existing mitigation
+      description: This call updates the state of an existing mitigation. Note, requests with the fraihmwork.mitigation.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
       operationId: updateMitigationState
       parameters:
         - in: path
@@ -209,6 +226,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to update this mitigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
         404:
           description: UUID not found
           content: 
@@ -228,8 +251,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationManage:
-        - fraihmwork.mitigation.manage
+      - OAuth2: [fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
         
   /mitigation/state/{state}:
     get:
@@ -263,6 +285,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                   
         404:
           description: Mitigations not found
           content: 
@@ -282,8 +310,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
 
   /subscription/mitigation:
     post:
@@ -337,8 +364,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
     
   /subscription/mitigation/{subscriptionUuid}:
     get:
@@ -387,8 +413,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
     
     put:
       tags:
@@ -443,8 +468,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read       
+      - OAuth2: [fraihmwork.mitigation.read] 
+        
     delete:
       tags:
       - Mitigation Subscription
@@ -491,8 +516,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationRead:
-        - fraihmwork.mitigation.read
+      - OAuth2: [fraihmwork.mitigation.read]
   
   /subscriber/mitigation/update:
     post:
@@ -547,8 +571,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - MitigationManage:
-        - fraihmwork.mitigation.manage
+      - OAuth2: [fraihmwork.mitigation.read]
 
 components:
   schemas:
@@ -691,21 +714,19 @@ components:
           description: The requested time for the subscription to expire. If not specified, will expire only when the mitigation reaches an 'end state'. Timestamp format is as specified by RFC 3339 section 5.6. 
       required: 
         - baseUrl
-          
+
   securitySchemes:
-    MitigationManage:      
+    OAuth2:
+      type: oauth2      
       flows:
         clientCredentials:
+          # Note that multiple authorization servers can be specified to serve this API, and this description only provides details for the default
+          # internal security configuration. Each of the scopes below corresponds to a FRAIHMWORK permission, and can be configured to align to a 
+          # different scope or role provided by a 3rd party authorization server, if required. However, at time of writing it is assumed that 
+          # authentication activities are always happening over a client-credentials oauth2 flow.        
           tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh          
           scopes:
-            fraihmwork.mitigation.manage: Client can update the list of mitigation actions
-      type: oauth2
-      
-    MitigationRead:
-      flows:
-       clientCredentials:
-         tokenUrl: https://well-known/oauth-authorization-server/token
-         scopes:
-           fraihmwork.mitigation.read: Client can read the mitigation actions list
-      type: oauth2 
-            
+            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator.
+            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator.
+            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator.
