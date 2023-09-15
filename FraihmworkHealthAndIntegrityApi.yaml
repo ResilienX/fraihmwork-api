@@ -351,8 +351,8 @@ paths:
     post:
       tags:
       - Components
-      summary: Post an update on all component properties
-      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response. Note, requests with the fraihmwork.component.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
+      summary: Post a new component
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response. 
       operationId: postComponentInformation
       requestBody:
         description: JSON description of the current component state
@@ -678,7 +678,7 @@ paths:
       tags:
       - Faults
       summary: Posts a new fault that is affecting a component
-      description: Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response). Note, requests with the fraihmwork.fault.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.   
+      description: Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response). 
       operationId: postNewFault
       requestBody:
         description: JSON description of a new, updated, or cleared fault

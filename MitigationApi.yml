@@ -64,13 +64,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
       
     post:
       tags:
       - Mitigation
       summary: Posts a mitigation action for one or more faults
-      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code. Note, requests with the fraihmwork.mitigation.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
+      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code. 
       operationId: postMitigation
       requestBody:
         description: JSON description of the mitigation action
@@ -184,7 +184,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
   
     put:
       tags:
@@ -310,7 +310,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
 
   /subscription/mitigation:
     post:
@@ -364,7 +364,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
     
   /subscription/mitigation/{subscriptionUuid}:
     get:
@@ -413,7 +413,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
     
     put:
       tags:
@@ -468,7 +468,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read] 
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin] 
         
     delete:
       tags:
@@ -572,7 +572,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
 
 components:
   schemas:
