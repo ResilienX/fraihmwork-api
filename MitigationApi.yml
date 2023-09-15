@@ -516,7 +516,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
       security:
-      - OAuth2: [fraihmwork.mitigation.read]
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+
   
   /subscriber/mitigation/update:
     post:
