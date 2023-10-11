@@ -1193,7 +1193,7 @@ paths:
       - Blocklist
       - Mitigate
       summary: Updates a blocklisted subsystem in the blocklist
-      description: This call replaces a blocklist entry so that it can be updated. It takes the blocklist UUID as a parameter
+      description: This call replaces a blocklist entry so that it can be updated. It takes the blocklist UUID as a parameter.
       operationId: updateBlocklistEntry
       parameters:
         - in: path
