@@ -2003,7 +2003,7 @@ components:
           type: integer
           minimum: 1
           example: 100
-          description: Seconds within which a component update is expected from the client. If no update is received, the component will consider the component lifeless.
+          description: Seconds within which a component update is expected from the client. If no update is received, the component will consider the component unlively.
         reporter:
           type: string
           format: uuid
