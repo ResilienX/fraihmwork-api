@@ -2113,6 +2113,6 @@ components:
             fraihmwork.blocklist.admin: Client may create, read, update, or delete any blocklist entry regardless of creator
             fraihmwork.blocklist.write: Client may create new elements within the Blocklist, and update and delete elements they create. Client can read all blocklist information regardless of creator
             fraihmwork.blocklist.read: Client may read all blocklist entries, regardless of creator
-            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator.
-            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator.
-            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator.
+            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator
+            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator
+            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator
