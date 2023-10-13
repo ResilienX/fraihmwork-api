@@ -1,3 +1,8 @@
+Version 1.2.1
+- Clarified scope descriptions
+- Added note in API request descriptions on write scopes impacting authorization on components/faults
+- Updated descriptions for 403 errors
+
 Version 1.2.0
 - Added comments to oauth security schemes section to indicate possibility of multiple authorization servers
 - Update oauth security scheme to be formatted as per swagger best practices, instead of by scope

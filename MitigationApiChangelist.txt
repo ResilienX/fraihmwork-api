@@ -1,3 +1,8 @@
+Version 0.1.0
+- Changed scopes to be consistent with FHAIS API scopes. Clarified scope descriptions
+- Added note in API request descriptions on write scopes impacting authorization on mitigations
+- Updated descriptions for 403 errors
+
 Version 0.0.11
 - Correcting faultIds description to reflect a mitigation's 0..* multiplicity with faults.
 
