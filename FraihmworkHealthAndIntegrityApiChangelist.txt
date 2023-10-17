@@ -7,6 +7,11 @@ Version 1.3.0
 - Removed subscription elements from Mitigator API elements
 - Set the base path to just /api and prefixed all normal paths with /monitor/v1 or /mitigate/v1 paths. This results in the same paths as before for all component and fault endpoints
 
+Version 1.2.1
+- Clarified scope descriptions
+- Added note in API request descriptions on write scopes impacting authorization on components/faults
+- Updated descriptions for 403 errors
+
 Version 1.2.0
 - Added comments to oauth security schemes section to indicate possibility of multiple authorization servers
 - Update oauth security scheme to be formatted as per swagger best practices, instead of by scope

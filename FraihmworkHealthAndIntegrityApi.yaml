@@ -2104,15 +2104,15 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.component.admin: Client may create, read, update, or delete any component
-            fraihmwork.component.write: Client may create new components, and update and delete components they create, and read all components
-            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
-            fraihmwork.fault.admin: Client may create, read, update, or delete any fault
-            fraihmwork.fault.write: Client may create new faults, update and delete faults they create, and read all faults
-            fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
-            fraihmwork.blocklist.admin: Client may create, read, update, or delete any blocklist entry regardless of creator
-            fraihmwork.blocklist.write: Client may create new elements within the Blocklist, and update and delete elements they create. Client can read all blocklist information regardless of creator
-            fraihmwork.blocklist.read: Client may read all blocklist entries, regardless of creator
-            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator
-            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator
-            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator
+            fraihmwork.component.admin: Client may create, read, update, or delete any component regardless of creator.
+            fraihmwork.component.write: Client may create new components, but can only update and delete components they create. Client may read all components regardless of creator.
+            fraihmwork.component.read: Client may read any component that FRAIHMWORK can provide, regardless of creator.
+            fraihmwork.fault.admin: Client may create, read, update, or delete any fault regardless of creator.
+            fraihmwork.fault.write: Client may create new faults, but can only update and delete faults they create. Client may read all faults regardless of creator.
+            fraihmwork.fault.read: Client may read any fault that FRAIHMWORK can provide, regardless of creator.
+            fraihmwork.blocklist.admin: Client may create, read, update, or delete any blocklist entry regardless of creator.
+            fraihmwork.blocklist.write: Client may create new elements within the Blocklist, and update and delete elements they create. Client can read all blocklist information regardless of creator.
+            fraihmwork.blocklist.read: Client may read all blocklist entries, regardless of creator.
+            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator.
+            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator.
+            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator.
