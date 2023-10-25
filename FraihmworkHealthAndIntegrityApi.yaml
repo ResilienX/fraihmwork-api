@@ -682,7 +682,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: UUID not found
+          description: Target component not found
           content: 
             application/json:
               schema:
@@ -720,14 +720,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
           
-        400:
-          description: Bad Request (invalid submission)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -775,14 +769,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-        400:
-          description: Bad Request (invalid submission)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
