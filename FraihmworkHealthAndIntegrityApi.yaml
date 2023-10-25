@@ -682,7 +682,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: UUID not found
+          description: Target component not found
           content: 
             application/json:
               schema:
@@ -696,6 +696,105 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
+  /monitor/v1/component/{uuid}/timeOfPerformance:
+    post:
+      tags:
+      - Components
+      - Monitor
+      summary: Resets the time of performance 
+      description: Given a specific component UUID, this operation establishes a new start time for the measurement of the 'time of performance' field tracked by components. When received, the server immediately sets the start time to the current clock time. Note, requests with the fraihmwork.component.write permission will only be accepted if the client used is the 'owner' of the component. Otherwise a 403 forbidden will be returned. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.     
+      operationId: resetTimeOfPerformance
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component for Time of Performance to be reset
+      responses:
+        200:
+          description: Time of performance successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to reset this component's time of performance
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Target component could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  /monitor/v1/component/{uuid}/timeOfReplacement:
+    post:
+      tags:
+      - Components
+      - Monitor
+      summary: Resets the time of replacement 
+      description: Given a specific component UUID, this operation establishes a new start time for the measurement of the 'time of replacement' field tracked by components. When received, the server immediately sets the start time to the current clock time. Note, requests with the fraihmwork.component.write permission will only be accepted if the client used is the 'owner' of the component. Otherwise a 403 forbidden will be returned. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.     
+      operationId: resetTimeOfReplacement
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component for Time of Replacement to be reset
+      responses:
+        200:
+          description: Time of replacement successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to reset this component's time of replacement
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Target component could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
   /monitor/v1/fault:
     post:
       tags:
