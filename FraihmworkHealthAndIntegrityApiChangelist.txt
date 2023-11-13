@@ -1,3 +1,13 @@
+Version 1.3.0
+- Moved Blocklister API elements to FraihmworkHealthAndIntegrityApi
+- Moved Mitigator API elements to FraihmworkHealthAndIntegrityApi
+- Added endpoints for resetting the timeOfPerformance and timeOfReplacement, previously only available in an internal api specification
+- Updated security scopes to follow convention in destination spec
+- Updated blocklister scopes to match read/write/admin pattern
+- Removed subscription elements from Blocklister API elements
+- Removed subscription elements from Mitigator API elements
+- Set the base path to just /api and prefixed all normal paths with /monitor/v1 or /mitigate/v1 paths. This results in the same paths as before for all component and fault endpoints
+
 Version 1.2.1
 - Clarified scope descriptions
 - Added note in API request descriptions on write scopes impacting authorization on components/faults
