@@ -5,33 +5,46 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.2.0
+  version: 1.3.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 
 servers:
-- url: https://<site>.fraihmwork.resilienx.com/api/monitor/v1
+- url: https://<site>.fraihmwork.resilienx.com/api
 
 tags:
-- name: System
-  description: High level component and service information. These are deprecated and replaced by the component endpoints to avoid confusion about ResilienX FRAIHMWORK terminology.
+- name: Monitor
+  description: Functions relating to monitoring capabilities provided by FRAIHMWORK
   
+- name: Mitigate
+  description: Functions relating to mitigation capabilities provided by FRAIHMWORK
+
+- name: Blocklist
+  description: Blocklist management api endpoints  
+
 - name: Components
   description: All component related api endpoints
   
 - name: Faults
   description: All fault related api endpoints
   
+- name: Mitigation
+  description: Mitigation information
+
+- name: System
+  description: Deprecated system endpoints, replaced by "Components"
+  
 - name: UUID Control
   description: Functions for helping manage UUIDs for components and faults
 
 paths:
-  /system:
+  /monitor/v1/system:
     post:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Post an update on all current component properties
       description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response
       operationId: postSystemInformation
@@ -86,6 +99,7 @@ paths:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Request existing registration details for information about a component
       description: This endpoint allows requesting services to find information about registered instaces that FRAIHMWORK is currently aware of
       operationId: getRegistrations
@@ -124,11 +138,12 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
-  /system/{uuid}:
+  /monitor/v1/system/{uuid}:
     get:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Request existing registration for specific component
       description: This endpoint allows requesting services to find information about registered instances that FRAIHMWORK is currently aware of
       operationId: getRegistration
@@ -184,6 +199,7 @@ paths:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Update existing properties about a component
       description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. 
       operationId: updateSystemInformation
@@ -246,6 +262,7 @@ paths:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Deletes an active entry
       description: This operation removes a component's basic information from FRAIHMWORK, thus rendering itself inactive.
       operationId: deleteSystemInformation
@@ -297,11 +314,12 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /system/{uuid}/refresh:
+  /monitor/v1/system/{uuid}/refresh:
     post:
       deprecated: true
       tags:
       - System
+      - Monitor
       summary: Refresh existing component properties
       description: Permits an already registered component to be refreshed without changing any properties
       operationId: refreshSystemInformation
@@ -346,13 +364,13 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
-
-  /component:
+  /monitor/v1/component:
     post:
       tags:
       - Components
-      summary: Post an update on all component properties
-      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response
+      - Monitor
+      summary: Post a new component
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Using this endpoint means that the component needs to be registered (under the hood), so a UUID will be created and assigned in the response. 
       operationId: postComponentInformation
       requestBody:
         description: JSON description of the current component state
@@ -381,7 +399,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot create components
+          description: Forbidden - client is not authorized to create components
           content: 
             application/json:
               schema:
@@ -404,6 +422,7 @@ paths:
     get:
       tags:
       - Components
+      - Monitor
       summary: Retrieve all of the components in FRAIHMWORK, filtered by any optional criteria provided.
       operationId: findAllComponents
       parameters:
@@ -439,7 +458,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot read components
+          description: Forbidden - client is not authorized to read components
           content:
             application/json:
               schema:
@@ -460,10 +479,11 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
-  /component/{uuid}:
+  /monitor/v1/component/{uuid}:
     get:
       tags:
       - Components
+      - Monitor
       summary: findComponentByUuid
       operationId: findComponentByUuid
       parameters:
@@ -488,7 +508,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot read this component
+          description: Forbidden - client is not authorized to read this component
           content:
             application/json:
               schema:
@@ -512,8 +532,9 @@ paths:
     put:
       tags:
       - Components
+      - Monitor
       summary: Update existing properties about a component
-      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. 
+      description: This information allows FRAIHMWORK to track basic information about a component. Any extra or custom fields are expected to always be present even if null values are provided at first. Note, requests with the fraihmwork.component.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.       
       operationId: updateComponentInformation
       parameters:
         - in: path
@@ -544,7 +565,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot update this component
+          description: Forbidden - client is not authorized to update this component
           content: 
             application/json:
               schema:
@@ -573,8 +594,9 @@ paths:
     delete:  
       tags:
       - Components
+      - Monitor
       summary: Deletes an active entry
-      description: This operation removes a components's basic information from FRAIHMWORK, thus rendering itself inactive.
+      description: This operation removes a components's basic information from FRAIHMWORK, thus rendering itself inactive. Note, requests with the fraihmwork.component.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
       operationId: deleteComponentInformation
       parameters:
         - in: path
@@ -598,7 +620,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot delete this component
+          description: Forbidden - client is not authorized to delete this component
           content: 
             application/json:
               schema:
@@ -624,12 +646,13 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /component/{uuid}/refresh:
+  /monitor/v1/component/{uuid}/refresh:
     post:
       tags:
       - Components
+      - Monitor
       summary: Refresh existing component properties
-      description: Permits an already registered component to be refreshed without changing any properties
+      description: Permits an already registered component to be refreshed without changing any properties. Note, requests with the fraihmwork.component.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
       operationId: refreshComponentInformation
       parameters:
         - in: path
@@ -653,13 +676,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot update this component
+          description: Forbidden - client is not authorized to update this component
           content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: UUID not found
+          description: Target component not found
           content: 
             application/json:
               schema:
@@ -673,12 +696,112 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /fault:
+  /monitor/v1/component/{uuid}/timeOfPerformance:
+    post:
+      tags:
+      - Components
+      - Monitor
+      summary: Resets the time of performance 
+      description: Given a specific component UUID, this operation establishes a new start time for the measurement of the 'time of performance' field tracked by components. When received, the server immediately sets the start time to the current clock time. Note, requests with the fraihmwork.component.write permission will only be accepted if the client used is the 'owner' of the component. Otherwise a 403 forbidden will be returned. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.     
+      operationId: resetTimeOfPerformance
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component for Time of Performance to be reset
+      responses:
+        200:
+          description: Time of performance successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to reset this component's time of performance
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Target component could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  /monitor/v1/component/{uuid}/timeOfReplacement:
+    post:
+      tags:
+      - Components
+      - Monitor
+      summary: Resets the time of replacement 
+      description: Given a specific component UUID, this operation establishes a new start time for the measurement of the 'time of replacement' field tracked by components. When received, the server immediately sets the start time to the current clock time. Note, requests with the fraihmwork.component.write permission will only be accepted if the client used is the 'owner' of the component. Otherwise a 403 forbidden will be returned. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.     
+      operationId: resetTimeOfReplacement
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the component for Time of Replacement to be reset
+      responses:
+        200:
+          description: Time of replacement successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to reset this component's time of replacement
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Target component could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  /monitor/v1/fault:
     post:
       tags:
       - Faults
+      - Monitor
       summary: Posts a new fault that is affecting a component
-      description: Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response).
+      description: Allows a component to report one or more faults currently affecting the component. Using this endpoint means that the client is not managing their own fault IDs, and the fault will require a new tracking UUID (that will be created and assigned in the response). 
       operationId: postNewFault
       requestBody:
         description: JSON description of a new, updated, or cleared fault
@@ -707,7 +830,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot create faults
+          description: Forbidden - client is not authorized to create faults
           content: 
             application/json:
               schema:
@@ -735,7 +858,8 @@ paths:
 
     get:
       tags:
-        - Faults
+      - Faults
+      - Monitor
       summary: Find all faults provided certain optional querying parameters
       operationId: findAllFaults
       parameters:
@@ -783,7 +907,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot read faults
+          description: Forbidden - client is not authorized to read faults
           content: 
             application/json:
               schema:
@@ -798,10 +922,11 @@ paths:
       security:
       - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 
-  /fault/{uuid}:
+  /monitor/v1/fault/{uuid}:
     get:
       tags:
-        - Faults
+      - Faults
+      - Monitor
       summary: findFaultByUuid
       operationId: findFaultByUuid
       parameters:
@@ -826,7 +951,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot read faults
+          description: Forbidden - client is not authorized to read this fault
           content: 
             application/json:
               schema:
@@ -844,8 +969,9 @@ paths:
     put:
       tags:
       - Faults
+      - Monitor
       summary: Updates a fault that is affecting a component
-      description: Allows a component to report one or more faults currently affecting the component
+      description: Allows a component to report one or more faults currently affecting the component. Note, requests with the fraihmwork.fault.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.   
       operationId: updateFault
       parameters:
         - in: path
@@ -876,7 +1002,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot update this item
+          description: Forbidden - client is not authorized to update this fault
           content: 
             application/json:
               schema:
@@ -905,8 +1031,9 @@ paths:
     delete:
       tags:
       - Faults
+      - Monitor
       summary: Clears a new fault that is no longer affecting a component
-      description: Allows a component to clear a fault no longer affecting it
+      description: Allows a component to clear a fault no longer affecting it. Note, requests with the fraihmwork.fault.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.   
       operationId: deleteFault
       parameters:
         - in: path
@@ -930,7 +1057,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot delete this item
+          description: Forbidden - client is not authorized to delete this fault
           content: 
             application/json:
               schema:
@@ -956,12 +1083,13 @@ paths:
       security:
       - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
 
-  /fault/{uuid}/refresh:
+  /monitor/v1/fault/{uuid}/refresh:
     post:
       tags:
       - Faults
+      - Monitor
       summary: Refresh a fault that is affecting a component
-      description: Allows a component to refresh a fault currently affecting the component without changing any properties
+      description: Allows a component to refresh a fault currently affecting the component without changing any properties. Note, requests with the fraihmwork.fault.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
       operationId: refreshFault
       parameters:
         - in: path
@@ -985,7 +1113,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client cannot update item
+          description: Forbidden - client is not authorized to update this fault
           content: 
             application/json:
               schema:
@@ -1011,10 +1139,11 @@ paths:
       security:
       - OAuth2: [fraihmwork.fault.write, fraihmwork.fault.admin]
 
-  /requestId:
+  /monitor/v1/requestId:
     get:
       tags:
       - UUID Control
+      - Monitor
       summary: Request a unique ID to use in future API posts
       description: If the component does not already provide a UUID as part of its software suite, it will need to request a UUID from FRAIHMWORK to uniquely identify the source. Note that this operation does not guarantee any registration of the UUID - it merely generates one. The next call should be to register the UUID created
       operationId: requestId
@@ -1055,99 +1184,609 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
+  /mitigate/v1/blocklist:
+    get:
+      tags:
+      - Blocklist
+      - Mitigate
+      summary: Requests the current blocklist
+      description: This call requests the list of all components and systems that are currently being blocklisted
+      operationId: getBlocklistedComponents
+      responses:
+        200:
+          description: Returned blocklist information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Blocklist'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.read, fraihmwork.blocklist.write, fraihmwork.blocklist.admin]
+    
+    post:
+      tags:
+      - Blocklist
+      - Mitigate
+      summary: Posts a blocklisted subsystem to the blocklist
+      description: This call adds a system to the collection of blocklisted systems. Returns a blocklist UUID so that this can be referenced in the future
+      operationId: postBlocklistedComponent
+      requestBody:
+        description: JSON description of the blocklisted system, including why it is being blocklisted
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlocklistedComponent'
+      responses:
+        201:
+          description: Successfully posted new blocklisted system information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.write, fraihmwork.blocklist.admin]
+
+  /mitigate/v1/blocklist/{uuid}:
+    put:
+      tags:
+      - Blocklist
+      - Mitigate
+      summary: Updates a blocklisted subsystem in the blocklist
+      description: This call replaces a blocklist entry so that it can be updated. It takes the blocklist UUID as a parameter.
+      operationId: updateBlocklistEntry
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the system properties being updated
+      requestBody:
+        description: JSON description of the blocklisted system, including why it is being blocklisted
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlocklistedComponent'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.write, fraihmwork.blocklist.admin]
+
+    delete:  
+      tags:
+      - Blocklist
+      - Mitigate
+      summary: Deletes an entry from the blocklist
+      description: This operation removes a system from the blocklist - forcing an update to the full blocklist with the targeted system no longer in it. This can result in the sending of an empty blocklist.
+      operationId: deleteBlocklistEntry
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the blocklist properties being deleted
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.blocklist.write, fraihmwork.blocklist.admin]
+
+  /mitigate/v1/mitigation:
+    get:
+      tags:
+      - Mitigation
+      - Mitigate
+      summary: Requests the current list of all mitigation actions 
+      description: This call requests the list of all mitigation actions that have been issued since the start of the system. This is likely not going to be a commonly used call, see /mitigation/{status} below.
+      operationId: getMitigations
+      responses:
+        200:
+          description: Returned list of mitigation actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationList'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+      
+    post:
+      tags:
+      - Mitigation
+      - Mitigate
+      summary: Posts a mitigation action for one or more faults
+      description: This call adds a system to the collection of possible mitigations. Returns a UUID upon successful POST. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code. 
+      operationId: postMitigation
+      requestBody:
+        description: JSON description of the mitigation action
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Mitigation'
+      responses:
+        201:
+          description: Successfully posted new mitigation action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to create mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+  
+  /mitigate/v1/mitigation/{uuid}:
+    get:
+      tags:
+      - Mitigation
+      - Mitigate
+      summary: Requests a specific mitigation action
+      description: This call requests a mitigation action tied to its UUID
+      operationId: getMitigationByUuid
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the mitigation action to be returned
+      responses:
+        200:
+          description: Returned list of mitigation actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationDetails'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read this mitigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                   
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+  
+    put:
+      tags:
+      - Mitigation
+      - Mitigate
+      summary: Updates a mitigation action entry's state
+      description: This call updates the state of an existing mitigation. Note, requests with the fraihmwork.mitigation.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
+      operationId: updateMitigationState
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the mitigation action to be updated
+      requestBody:
+        description: JSON description of the mitigation action
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StateAndTime'
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload or parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to update this mitigation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+
+  /mitigate/v1/mitigation/state/{state}:
+    get:
+      tags:
+      - Mitigation
+      - Mitigate
+      summary: Requests all mitigations with specific state
+      description: This call requests all mitigations having a specific state
+      operationId: getMitigationByState
+      parameters:
+        - in: path
+          name: state
+          required: true
+          schema:
+            $ref: '#/components/schemas/MitigationState'
+      responses:
+        200:
+          description: Returned list of mitigations belonging to the same Mitigation State
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MitigationList'
+        400:
+          description: Invalid State action
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read mitigations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'                   
+        404:
+          description: Mitigations not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.mitigation.read, fraihmwork.mitigation.write, fraihmwork.mitigation.admin]
+
+
 components:
   schemas:
-    Response:
-      type: object
-      properties:
-        itemId:
-          type: string
-          format: uuid
-        message:
-          type: string
-          description: The success message provided back to the client
-      required:
-        - message
+    ActiveComponent:
+      description: The final component data that are used for external consumption by displays and other services. These data may be altered between initial receipt and this value. 
+      allOf:
+        - $ref: '#/components/schemas/MonitoredComponent'
+        - type: object
+          properties:
+            selfReportedState:
+              # The original self-reported state of the component. Useful for when an override is performed due to a fault or other special circumstance. 
+              $ref: '#/components/schemas/State'
+              
+            performanceStatistics:
+              $ref: '#/components/schemas/ComponentStatistics'
 
-    MonitoredComponent:
+            faultCounters:        
+              $ref: '#/components/schemas/FaultCounters'              
+
+    ActiveFault:
+      description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
+      allOf:
+        - $ref: '#/components/schemas/Fault'
+
+    Blocklist:
       type: object
       properties:
-        uuid:
-          type: string
-          format: uuid
-          description: The unique identifier of this component, if provided by the client. If left blank, it is assumed that the UUID is being handled by the FRAIHMWORK server.
-        name:
-          type: string
-          description: The name of the component
-        description:
-          type: string
-          description: Summary of services provided by this component
-        componentLibraryName:
-          type: string
-          description: An optional reference to a pre-configured component library entity
-        state:
-          $ref: '#/components/schemas/State'
-        version:
-          $ref: '#/components/schemas/Version'
-        physicalLocation:
-          type: string
-          description: General description of where the component or component actually is (to differentiate it from other, redundant components)
-        networkAddress:
-          type: string
-          description: An IPv4, IPv6, DNS or other URI that can be used to reach back to this component. This is for documentation purposes and will not currently be validated
-        manufacturer:
-          type: string
-          description: Company or entity providing the service or component
-        model:
-          type: string
-          description: The exact model string or number that describes this component
-        startupTime:
-          type: string
-          format: date-time
-          description: The time that this component last reached an operational state. If not provided, FRAIHMWORK will assume that the start time is last time it received a message with state = OPERATIONAL from this component. Follows format as specified by RFC 3339 section 5.6, which is a specific implementation of ISO 8601
-        parent:
-          type: string
-          format: uuid
-          description: This is an optional field that can be used to denote that this is a subsystem of a different component. If left blank, it is assumed that there is no parent for this component, otherwise, it is expected that the UUID provided corresponds to an already existing and registered component.
         timeOfValidity:
           type: string
           format: date-time
-          description: The last timestamp when this message's information was guaranteed to be accurate. If this field is not provided, it is assumed that the time of receipt of this message is the time of validity
-        timeout:
-          type: integer
-          minimum: 1
-          example: 100
-          description: Seconds within which a component update is expected from the client. If no update is received, the component will consider the component lifeless.
-        reporter:
+          description: The timestamp when this overall blocklist state was issued or confirmed to still be correct prior to issuing. Timestamp format is as specified by RFC 3339 section 5.6. 
+        blocklist:
+          items:
+            type: object
+            properties:
+              blocklistId:
+                type: string
+                format: uuid
+                description: The uuid of this blocklist entry
+              entry:
+                $ref: '#/components/schemas/BlocklistedComponent'
+      required:
+        - timeOfValidity
+        - blocklist        
+
+    BlocklistedComponent:
+      type: object
+      properties:
+        componentId:
           type: string
           format: uuid
-          description: The unique identifier of the reporter of this component, if applicable. This assumes that the reporting entity is also a component with a UUID already assigned. This is to allow for components to report status on other components' (such as child entities) behalf.
-        extensions:
-          description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
-          type: object
-          additionalProperties: true
-
-      required: 
-        - name
-        - state
-
-    Version:
-      type: object
-      description: The version of the component. For maximum flexibility, this is provided as string values to allow for different versioning schemes.
-      properties:
-        hardware:
+          description: The id of the system or component that is being blocklisted
+        faultIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: The list of all fault ids that are causing the blocklisting of this system
+        sourceId:
           type: string
-          description: The version of the component's hardware package, if applicable
-        software:
+          format: uuid
+          description: the id of the system or component that issued this blocklisting
+        description:
           type: string
-          description: The version of the component's software package, if applicable
-        firmware:
+          description: The reason for the blocklist
+        timeOfBlocklist:
           type: string
-          description: The version of the component's firmware package, if applicable
-        configuration:
+          format: date-time
+          description: The timestamp that this component started to be blocklisted. Timestamp format is as specified by RFC 3339 section 5.6. 
+        timeOfValidity:
           type: string
-          description: The version of the component's configuration, if applicable
-
+          format: date-time
+          description: The last timestamp when this blocklist state was confirmed to still be correct. Assumed to be timestamp of last receipt of message if not provided. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required:
+        - componentId
+        - faultIds
+        - sourceId
+        - description
+        - timeOfBlocklist
     ComponentRegistrationInformation:
       type: object
       properties:
@@ -1177,29 +1816,6 @@ components:
       required:
         - uuid
         - name
-
-    State:
-      type: object
-      properties:
-        state:
-          type: string
-          description: "
-          This is a high level description of the component or subsystem state. <br> <br>
-          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
-          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
-          ONLINE describes a component with services provided  <br> <br>
-          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
-          enum:
-          - UNAVAILABLE
-          - STARTING_UP
-          - ONLINE
-          - FAULTED
-        description:
-          type: string
-          description: An optional detailed description of the component state in order to provide more context for future queries or for the display. This field can be left blank if the enum fully describes the component state with no additional qualifications. This is provided by the client, and there are currently no restrictions on what this field can be used for. 
-      required:
-        - state
-
     ComponentStatistics:
       type: object
       properties:
@@ -1272,21 +1888,6 @@ components:
           description: Same as TOTAL UPTIME % for now. Will update definition as we gain ability to inject modules for handling different types of components (like using additional properties defined for radars)
           type: number
           format: double
-            
-    FaultCounters:
-      type: object
-      description: This data type contains counters for faults against a given component relative to various reference times.
-      properties:
-      
-        faultsLifetime:
-          description: Total count of faults that have occurred on a component since the TIME OF REGISTRATION.
-          type: integer
-          format: int64
-          
-        faultsSinceStart:
-          description: Total count of faults that have occurred on a component since TIME OF STARTUP.
-          type: integer
-          format: int64
 
     Fault:
       type: object
@@ -1354,26 +1955,241 @@ components:
         - code
         - severity
 
-    ActiveComponent:
-      description: The final component data that are used for external consumption by displays and other services. These data may be altered between initial receipt and this value. 
-      allOf:
-        - $ref: '#/components/schemas/MonitoredComponent'
-        - type: object
-          properties:
-            selfReportedState:
-              # The original self-reported state of the component. Useful for when an override is performed due to a fault or other special circumstance. 
-              $ref: '#/components/schemas/State'
-              
-            performanceStatistics:
-              $ref: '#/components/schemas/ComponentStatistics'
+    FaultCounters:
+      type: object
+      description: This data type contains counters for faults against a given component relative to various reference times.
+      properties:
+      
+        faultsLifetime:
+          description: Total count of faults that have occurred on a component since the TIME OF REGISTRATION.
+          type: integer
+          format: int64
+          
+        faultsSinceStart:
+          description: Total count of faults that have occurred on a component since TIME OF STARTUP.
+          type: integer
+          format: int64
 
-            faultCounters:        
-              $ref: '#/components/schemas/FaultCounters'              
+    Mitigation:
+      description: A message used to describe an mitigation to be taken against a fault.
+      type: object
+      properties:
+        issuerId:
+          type: string
+          format: uuid
+          description: The source component that issued this mitigation
+        executorId:
+          type: string
+          format: uuid
+          description: The component ID of the system that will execute this mitigation
+        executorCallback:
+          type: string
+          format: url
+          description: The base URL callback that is used to inform the executor that the action has been accepted or denied, or of any other status changes. When the state changes, a POST call will be made to the URL defined here, and will contain the same body provided in the /subscriber/mitigation/update endpoint.
+        faultIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Zero or more ids of faults that are being addressed by this mitigation
+        description:
+          type: string
+          description: Description of the mitigation that the system will take or has taken
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+        timeIssued:
+          type: string
+          format: date-time
+          description: The timestamp that this component instantiated this action. Timestamp format is as specified by RFC 3339 section 5.6. 
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this action was accurate. If not provided, assumed to be the time of receipt of latest message Timestamp format is as specified by RFC 3339 section 5.6. 
+      required: 
+        - issuerId
+        - executorId
+        - description
+        - timeIssued
 
-    ActiveFault:
-      description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
-      allOf:
-        - $ref: '#/components/schemas/Fault'
+    MitigationDetails:
+      description: Mitigation action
+      type: object
+      properties:
+        mitigationId:
+          type: string
+          format: uuid
+        mitigation:
+          $ref: '#/components/schemas/Mitigation'
+      required:
+        - mitigationId
+        - mitigation
+
+    MitigationList:
+      description: List of mitigation actions
+      type: array
+      items:
+        $ref: '#/components/schemas/MitigationDetails'
+   
+    MitigationState:
+      type: string
+      description: "
+        This is a description of the current state of the action being taken. If this field is not provided, it is assumed to be 'RECOMMENDED'
+        RECOMMENDED describes a mitigation action that was recommended to an end user, but is waiting for further instruction. Generally, from here the state can only change to 'ACCEPTED', 'REVOKED' or 'DENIED'
+        ACCEPTED describes an action that has been accepted by a user or system, but has not yet been executed. From here, the state should only change to 'STARTED', 'REVOKED', or 'FAILED'
+        STARTED describes an action that has been started and is still in progress. From herer, the state should only change to 'COMPLETE' or 'FAILED'
+        COMPLETE describes an action that has been full resolved. This is an end state for the action
+        FAILED describes an action that was unsuccessful in completing its task or its completion resulted in an unsatisfactory mitigation. This is an end state for the action
+        REVOKED describes an action that the issuing system can no longer take or no longer desires to take. It effectively cancels the action, and is an end state.
+        DENIED describes an action where a system or user has declined to allow the action to take place. It is an end state for the action
+        "
+      enum:
+      - RECOMMENDED
+      - ACCEPTED
+      - STARTED
+      - COMPLETE
+      - FAILED
+      - REVOKED
+      - DENIED
+      default: RECOMMENDED
+
+    MonitoredComponent:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: The unique identifier of this component, if provided by the client. If left blank, it is assumed that the UUID is being handled by the FRAIHMWORK server.
+        name:
+          type: string
+          description: The name of the component
+        description:
+          type: string
+          description: Summary of services provided by this component
+        componentLibraryName:
+          type: string
+          description: An optional reference to a pre-configured component library entity
+        state:
+          $ref: '#/components/schemas/State'
+        version:
+          $ref: '#/components/schemas/Version'
+        physicalLocation:
+          type: string
+          description: General description of where the component or component actually is (to differentiate it from other, redundant components)
+        networkAddress:
+          type: string
+          description: An IPv4, IPv6, DNS or other URI that can be used to reach back to this component. This is for documentation purposes and will not currently be validated
+        manufacturer:
+          type: string
+          description: Company or entity providing the service or component
+        model:
+          type: string
+          description: The exact model string or number that describes this component
+        startupTime:
+          type: string
+          format: date-time
+          description: The time that this component last reached an operational state. If not provided, FRAIHMWORK will assume that the start time is last time it received a message with state = OPERATIONAL from this component. Follows format as specified by RFC 3339 section 5.6, which is a specific implementation of ISO 8601
+        parent:
+          type: string
+          format: uuid
+          description: This is an optional field that can be used to denote that this is a subsystem of a different component. If left blank, it is assumed that there is no parent for this component, otherwise, it is expected that the UUID provided corresponds to an already existing and registered component.
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this message's information was guaranteed to be accurate. If this field is not provided, it is assumed that the time of receipt of this message is the time of validity
+        timeout:
+          type: integer
+          minimum: 1
+          example: 100
+          description: Seconds within which a component update is expected from the client. If no update is received, the component will consider the component unlively.
+        reporter:
+          type: string
+          format: uuid
+          description: The unique identifier of the reporter of this component, if applicable. This assumes that the reporting entity is also a component with a UUID already assigned. This is to allow for components to report status on other components' (such as child entities) behalf.
+        extensions:
+          description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
+          type: object
+          additionalProperties: true
+
+      required: 
+        - name
+        - state
+
+    Resolution:
+      type: string
+      description: "
+        This is an indication of whether a mitigation is to be resolved by a human or by a service
+        MANUAL describes when a mitigation is to be resolved by a human. Mitigations having MANUAL resolution must only start in ACCEPTED state. Attempts to start mitigations in RECOMMENDED state will return a invalid payload code.
+        AUTOMATIC describes when a mitigation is to be resolved by a service
+        "
+      enum:
+      - MANUAL
+      - AUTOMATIC
+      default: AUTOMATIC
+
+    Response:
+      type: object
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The success message provided back to the client
+      required:
+        - message
+    
+    State:
+      type: object
+      properties:
+        state:
+          type: string
+          description: "
+          This is a high level description of the component or subsystem state. <br> <br>
+          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
+          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
+          ONLINE describes a component with services provided  <br> <br>
+          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
+          enum:
+          - UNAVAILABLE
+          - STARTING_UP
+          - ONLINE
+          - FAULTED
+        description:
+          type: string
+          description: An optional detailed description of the component state in order to provide more context for future queries or for the display. This field can be left blank if the enum fully describes the component state with no additional qualifications. This is provided by the client, and there are currently no restrictions on what this field can be used for. 
+      required:
+        - state
+
+    StateAndTime:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The timestamp that this state change was issued. If not provided, assumed to be the time of receipt of latest message. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required:
+        - state
+
+    Version:
+      type: object
+      description: The version of the component. For maximum flexibility, this is provided as string values to allow for different versioning schemes.
+      properties:
+        hardware:
+          type: string
+          description: The version of the component's hardware package, if applicable
+        software:
+          type: string
+          description: The version of the component's software package, if applicable
+        firmware:
+          type: string
+          description: The version of the component's firmware package, if applicable
+        configuration:
+          type: string
+          description: The version of the component's configuration, if applicable
 
   securitySchemes:
     OAuth2:
@@ -1387,9 +2203,15 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
-            fraihmwork.component.admin: Client may create, read, update, or delete any component
-            fraihmwork.component.write: Client may create new components, and update and delete components they create, and read all components
-            fraihmwork.component.read: Client may query for any component, version or state data that FRAIHMWORK can provide
-            fraihmwork.fault.admin: Client may create, read, update, or delete any fault
-            fraihmwork.fault.write: Client may create new faults, update and delete faults they create, and read all faults
-            fraihmwork.fault.read: Client may query for any detailed fault information that FRAIHMWORK can provide
+            fraihmwork.component.admin: Client may create, read, update, or delete any component regardless of creator.
+            fraihmwork.component.write: Client may create new components, but can only update and delete components they create. Client may read all components regardless of creator.
+            fraihmwork.component.read: Client may read any component that FRAIHMWORK can provide, regardless of creator.
+            fraihmwork.fault.admin: Client may create, read, update, or delete any fault regardless of creator.
+            fraihmwork.fault.write: Client may create new faults, but can only update and delete faults they create. Client may read all faults regardless of creator.
+            fraihmwork.fault.read: Client may read any fault that FRAIHMWORK can provide, regardless of creator.
+            fraihmwork.blocklist.admin: Client may create, read, update, or delete any blocklist entry regardless of creator.
+            fraihmwork.blocklist.write: Client may create new elements within the Blocklist, and update and delete elements they create. Client can read all blocklist information regardless of creator.
+            fraihmwork.blocklist.read: Client may read all blocklist entries, regardless of creator.
+            fraihmwork.mitigation.admin: Client may create, read, update, or delete any mitigation regardless of creator.
+            fraihmwork.mitigation.write: Client may create new mitigations, but can only update and delete mitigations they create. Client may read all mitigations regardless of creator.
+            fraihmwork.mitigation.read: Client may read any mitigation that FRAIHMWORK can provide, regardless of creator.
