@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "be03457f-aad6-4935-91b7-62a29023db3a",
+		"_postman_id": "5919f83c-36fb-42b5-ab27-1c5e69e6932e",
 		"name": "FRAIHMWORK Integrator Starter Kit Collection",
 		"description": "Expected usage of this collection is to run individual requests, rather than folder-wise execution of the collection. This collection allows the publishing and receipt of API requests and responses to a FRAIHMWORK deployment, demonstrating how exchanges with FRAIHMWORK are done via the provided APIs and endpoints.\n\nBefore using, there is requirement for configuring the collection's variables with authentication information.\n\nIn the \"Variables\" section of this portion of the collection, enter the following configuration items:\n\n*   clientId\n*   clientSecret\n*   baseUrl\n    \n\nThese items should be requested from ResilienX Inc.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -59,11 +59,6 @@
 								{
 									"key": "grant_type",
 									"value": "client_credentials",
-									"type": "text"
-								},
-								{
-									"key": "scopes",
-									"value": "fraihmwork.component.admin",
 									"type": "text"
 								}
 							]
