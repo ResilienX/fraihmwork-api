@@ -795,6 +795,224 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  /monitor/v1/component/{uuid}/unavailability-schedule:
+    post:
+      tags:
+      - Components
+      summary: Save a new unavailability schedule for a component.
+      description: |
+        Post a new unavailability schedule for a component.
+        - Schedules can include "All" to represent every day of the week.
+        - Users can also post separate days, such as "Monday" in addition to "All," to provide more control over the unavailability schedule for specific days.
+      operationId: saveUnavailabilityScheduleUsingPOST
+      parameters:
+      - in: path
+        name: uuid
+        description: The UUID of the component
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: The unavailability schedule data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnavailabilitySchedule'
+      responses:
+        201:
+          description: Successfully saved the unavailability schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to save the schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
+    get:
+      tags:
+      - Components
+      summary: Get the unavailability schedule for a component.
+      description: |
+        Retrieve the unavailability schedule for a specific component.
+        - The response will group days with similar time periods together.
+        - If a day has a unique unavailability period that does not match any other day, it will be listed separately.
+        - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
+      operationId: getUnavailabilityScheduleUsingGET
+      parameters:
+      - in: path
+        name: uuid
+        description: The UUID of the component
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: Successfully retrieved the unavailability schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnavailabilitySchedule'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read the schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+
+    delete:
+      tags:
+      - Components
+      summary: Delete the unavailability schedule for a component.
+      description: |
+        Delete the unavailability schedule for a component.
+        - If only the component ID is provided, all days and all time periods will be deleted.
+        - If a specific day is provided, the entire unavailability for that day, including all its time periods, will be deleted.
+        - If both a day and a time period are specified, only that specific time period for the given day will be deleted.
+      operationId: deleteUnavailabilityScheduleUsingDELETEQuery
+      parameters:
+      - in: path
+        name: uuid
+        description: The UUID of the component
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: day
+        description: The day of the week to delete schedules for
+        required: false
+        schema:
+          type: string
+          enum:
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            - Sunday
+            - All
+      - in: query
+        name: startTime
+        description: The start time of the period to delete
+        required: false
+        schema:
+          type: string
+          format: time
+      - in: query
+        name: endTime
+        description: The end time of the period to delete
+        required: false
+        schema:
+          type: string
+          format: time
+      responses:
+        200:
+          description: Successfully deleted the unavailability schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        204:
+          description: No Content
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to delete the schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
   /monitor/v1/fault:
     post:
       tags:
@@ -1787,6 +2005,48 @@ components:
         - sourceId
         - description
         - timeOfBlocklist
+           
+    UnavailabilitySchedule:
+      type: object
+      required:
+        - componentId
+        - schedules
+      properties:
+        componentId:
+          type: string
+          format: uuid
+        schedules:
+          type: array
+          items:
+            type: object
+            properties:
+              days:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    - Sunday
+                    - All
+              timePeriods:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    startTime:
+                      type: string
+                      format: time
+                      default: "00:00"
+                    endTime:
+                      type: string
+                      format: time
+                      default: "23:59"
+        
     ComponentRegistrationInformation:
       type: object
       properties:
