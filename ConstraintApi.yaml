@@ -750,7 +750,7 @@ components:
         - constraint
           
     ConstraintMitigation:
-      description: A combination of the mitigation type as defined above and the current UTM API definition of a Constraint constraint
+      description: A combination of the mitigation type as defined above and the current UTM API definition of a constraint
       type: object
       properties:
         issuerId:

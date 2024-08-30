@@ -1,5 +1,6 @@
 Version 1.0.0
 - Complete renaming of the UVR api so that it is now correctly referencing 'Constraints', which is the updated terminology for UTM systems, and has been for some time now.
+- Updated file name to be .yaml instead of .yml to be in line with rest of repository
 
 Version 0.0.13
 - Correcting faultIds description to reflect a uvr mitigation's 0..* multiplicity with faults.
