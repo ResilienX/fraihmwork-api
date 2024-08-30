@@ -795,34 +795,30 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
-  /monitor/v1/component/{uuid}/unavailability-schedule:
+  /monitor/v1/component/schedule/unavailability/add:
     post:
       tags:
       - Components
-      summary: Save a new unavailability schedule for a component.
+      summary: Add unavailability schedules for one or more components.
       description: |
-        Post a new unavailability schedule for a component.
-        - Schedules can include "All" to represent every day of the week.
+        Add unavailability schedules for one or more components.
+        - You can specify schedules for multiple components in one request.
+        - Multiple schedules can be added in a single request by providing an array of `UnavailabilitySchedule` objects.
+        - Schedules can specify specific days or use "All" to represent every day of the week.
         - Users can also post separate days, such as "Monday" in addition to "All," to provide more control over the unavailability schedule for specific days.
-      operationId: saveUnavailabilityScheduleUsingPOST
-      parameters:
-      - in: path
-        name: uuid
-        description: The UUID of the component
-        required: true
-        schema:
-          type: string
-          format: uuid
+      operationId: addUnavailabilityScheduleUsingPOST
       requestBody:
-        description: The unavailability schedule data
+        description: The unavailability schedule data for one or more components
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UnavailabilitySchedule'
+              type: array
+              items:
+                $ref: '#/components/schemas/UnavailabilitySchedule'
       responses:
         201:
-          description: Successfully saved the unavailability schedule
+          description: Successfully added the unavailability schedule(s)
           content:
             application/json:
               schema:
@@ -840,7 +836,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to save the schedule
+          description: Forbidden - client is not authorized to add the schedule
           content:
             application/json:
               schema:
@@ -860,31 +856,40 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
+  /monitor/v1/component/schedule/unavailability:
     get:
       tags:
       - Components
-      summary: Get the unavailability schedule for a component.
+      summary: Get the unavailability schedule for one or more components.
       description: |
-        Retrieve the unavailability schedule for a specific component.
-        - The response will group days with similar time periods together.
-        - If a day has a unique unavailability period that does not match any other day, it will be listed separately.
-        - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
+        Retrieve the unavailability schedule for one or more components.
+        - Provide one or more `componentId` values as query parameters to filter the results.
+        - If no `componentId` is provided, schedules for all components will be retrieved.
+        - The response will return a separate schedule for each component.
+        - Within each component's schedule:
+          - Days with identical time periods will be grouped together.
+          - If a day has a unique unavailability period that does not match any other day for that component, it will be listed separately.
+          - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
       operationId: getUnavailabilityScheduleUsingGET
       parameters:
-      - in: path
-        name: uuid
-        description: The UUID of the component
+      - in: query
+        name: componentIds
+        description: The UUID(s) of the component(s)
         required: true
         schema:
-          type: string
-          format: uuid
+          type: array
+          items:
+            type: string
+            format: uuid
       responses:
         200:
-          description: Successfully retrieved the unavailability schedule
+          description: Successfully retrieved the unavailability schedule(s)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UnavailabilitySchedule'
+                type: array
+                items:
+                  $ref: '#/components/schemas/UnavailabilitySchedule'
         401:
           description: Not authenticated
           content:
@@ -918,62 +923,36 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
-    delete:
+  /monitor/v1/component/schedule/unavailability/remove:
+    post:
       tags:
       - Components
-      summary: Delete the unavailability schedule for a component.
+      summary: Remove unavailability schedules for one or more components.
       description: |
-        Delete the unavailability schedule for a component.
-        - If only the component ID is provided, all days and all time periods will be deleted.
-        - If a specific day is provided, the entire unavailability for that day, including all its time periods, will be deleted.
-        - If both a day and a time period are specified, only that specific time period for the given day will be deleted.
-      operationId: deleteUnavailabilityScheduleUsingDELETEQuery
-      parameters:
-      - in: path
-        name: uuid
-        description: The UUID of the component
+        Remove unavailability schedules for one or more components.
+        - If only the `componentId` is provided without any schedules, all days and all time periods for that component will be deleted.
+        - If specific `days` are provided, the entire unavailability schedule for those days, including all time periods, will be deleted for the specified component(s).
+        - If both `days` and `timePeriods` are provided, only the specified time periods for those days will be deleted.
+        - If no `componentId` is provided, the request will result in an error since `componentId` is required.
+        - To remove schedules for multiple components, provide each `componentId` with the corresponding schedules, days and timePeriods.
+
+      operationId: removeUnavailabilityScheduleUsingPOST
+      requestBody:
+        description: The unavailability schedule data for removal
         required: true
-        schema:
-          type: string
-          format: uuid
-      - in: query
-        name: day
-        description: The day of the week to delete schedules for
-        required: false
-        schema:
-          type: string
-          enum:
-            - Monday
-            - Tuesday
-            - Wednesday
-            - Thursday
-            - Friday
-            - Saturday
-            - Sunday
-            - All
-      - in: query
-        name: startTime
-        description: The start time of the period to delete
-        required: false
-        schema:
-          type: string
-          format: time
-      - in: query
-        name: endTime
-        description: The end time of the period to delete
-        required: false
-        schema:
-          type: string
-          format: time
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UnavailabilitySchedule'
       responses:
         200:
-          description: Successfully deleted the unavailability schedule
+          description: Successfully removed the unavailability schedule(s)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-        204:
-          description: No Content
         400:
           description: Bad request
           content:
@@ -987,7 +966,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to delete the schedule
+          description: Forbidden - client is not authorized to remove the schedule
           content:
             application/json:
               schema:
@@ -2015,6 +1994,10 @@ components:
         componentId:
           type: string
           format: uuid
+          description: |
+            The unique identifier for the component. 
+            - This can represent one or more component IDs when the schedule is applied to multiple components.
+            - In cases where multiple component IDs are used, each component's unavailability schedule should be represented as a separate object within an array.
         schedules:
           type: array
           items:
@@ -2033,6 +2016,10 @@ components:
                     - Saturday
                     - Sunday
                     - All
+                description: |
+                  Specifies the days of the week when the component is unavailable.
+                  - Users can list individual days (e.g. Monday, Tuesday) to set specific unavailability schedules for those days.
+                  - If 'All' is selected, the component will be marked as unavailable for the entire week.
               timePeriods:
                 type: array
                 items:
@@ -2040,13 +2027,28 @@ components:
                   properties:
                     startTime:
                       type: string
-                      format: time
+                      format: date-time
                       default: "00:00"
+                      description: |
+                        Start time of the unavailability period. If not specified, defaults to the start of the day (00:00).
+                        - For example, setting `startTime` to 00:00 and `endTime` to 23:59 will make the component unavailable from the beginning to the end of the day.
+                        - Note that at 00:00 on the next day, the component becomes available again.
                     endTime:
                       type: string
-                      format: time
+                      format: date-time
                       default: "23:59"
-        
+                      description: |
+                        End time of the unavailability period. If not specified, defaults to the end of the day (23:59).
+                        - The period from 00:00 to 23:59 is intended to cover the entire day.
+                        - At 23:59, the unavailability period ends, and at 00:00 on the next day, the component becomes available again.
+                  description: |
+                    Defines specific time periods when the component is unavailable.
+                    - If `startTime` is not specified, the unavailability period will begin at the start of the day (00:00).
+                    - If `endTime` is not specified, the unavailability period will end at the close of the day (23:59).
+                    - If neither `startTime` nor `endTime` is specified, the component is assumed to be unavailable for the entire day.
+                    - If only one is specified, the system will assume the missing time as either the start or end of the day.
+
+
     ComponentRegistrationInformation:
       type: object
       properties:
