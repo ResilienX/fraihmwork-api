@@ -795,7 +795,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
-  /monitor/v1/component/schedule/unavailability/add:
+  /monitor/v1/component/schedule/unavailability:
     post:
       tags:
       - Components
@@ -805,7 +805,9 @@ paths:
         - You can specify schedules for multiple components in one request.
         - Multiple schedules can be added in a single request by providing an array of `UnavailabilitySchedule` objects.
         - Schedules can specify specific days or use "All" to represent every day of the week.
-        - Users can also post separate days, such as "Monday" in addition to "All," to provide more control over the unavailability schedule for specific days.
+        - Users can also post separate days, such as "Monday", "Tuesday" in addition to "All," to provide more control over the unavailability schedule for specific days.
+        - Each day in the schedule can have specific start and end times, allowing full control over when the component is unavailable.
+        - Start and end times must be provided in the format "HH:MM" and can be used to define precise periods of unavailability within each day.
       operationId: addUnavailabilityScheduleUsingPOST
       requestBody:
         description: The unavailability schedule data for one or more components
@@ -856,7 +858,6 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /monitor/v1/component/schedule/unavailability:
     get:
       tags:
       - Components
@@ -866,17 +867,15 @@ paths:
         - Provide one or more `componentId` values as query parameters to filter the results.
         - If no `componentId` is provided, schedules for all components will be retrieved.
         - The response will return a separate schedule for each component.
-        - Within each component's schedule:
-          - Days with identical time periods may be grouped together.
-          - If a day has a unique unavailability period that does not match any other day for that component, it will be listed separately.
-          - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
-          - Note: The order in which days and schedules are returned is not guaranteed and should not be relied upon.
+        - Each day within a component's schedule will be returned individually, whether it has a time period or not.
+        - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
+        - The order in which days and schedules are returned is not guaranteed and should not be relied upon.
       operationId: getUnavailabilityScheduleUsingGET
       parameters:
       - in: query
         name: componentIds
         description: The UUID(s) of the component(s)
-        required: true
+        required: false
         schema:
           type: array
           items:
@@ -901,38 +900,25 @@ paths:
                           timePeriods:
                             - startTime: "14:00"
                               endTime: "23:59"
-                        - days: ["Tuesday", "Thursday", "Friday", "Saturday"]
+                        - days: ["Tuesday"]
                           timePeriods:
-                            - startTime: "17:00"
-                              endTime: "23:59"
-                        - days: ["Wednesday", "Sunday"]
-                          timePeriods: []
-                multipleComponents:
-                  summary: Example response for multiple components
-                  value: 
-                    - componentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-                      schedules:
-                        - days: ["Monday"]
+                            - startTime: "15:00"
+                              endTime: "20:59"
+                        - days: ["Thursday"]
                           timePeriods:
                             - startTime: "14:00"
                               endTime: "23:59"
-                        - days: ["Tuesday", "Thursday", "Friday", "Saturday"]
+                        - days: ["Friday"]
                           timePeriods:
-                            - startTime: "17:00"
+                            - startTime: "14:00"
                               endTime: "23:59"
-                        - days: ["Wednesday", "Sunday"]
+                        - days: ["Saturday"]
+                          timePeriods:
+                            - startTime: "12:00"
+                              endTime: "23:59"
+                        - days: ["Wednesday"]
                           timePeriods: []
-                    - componentId: "4fb85f64-5717-4562-b3fc-2c963f66afb7"
-                      schedules:
-                        - days: ["Monday", "Wednesday"]
-                          timePeriods:
-                            - startTime: "08:00"
-                              endTime: "12:00"
-                        - days: ["Thursday"]
-                          timePeriods:
-                            - startTime: "18:00"
-                              endTime: "22:00"
-                        - days: ["Friday", "Sunday"]
+                        - days: ["Sunday"]
                           timePeriods: []
         400:
           description: Bad request - Invalid component ID.
@@ -984,7 +970,7 @@ paths:
         - If specific `days` are provided, the entire unavailability schedule for those days, including all time periods, will be deleted for the specified component(s).
         - If both `days` and `timePeriods` are provided, only the specified time periods for those days will be deleted.
         - If no `componentId` is provided, the request will result in an error since `componentId` is required.
-        - To remove schedules for multiple components, provide each `componentId` with the corresponding schedules, days and timePeriods.
+        - To remove schedules for multiple components, provide each `componentId` with the corresponding schedules, days, and timePeriods.
 
       operationId: removeUnavailabilityScheduleUsingPOST
       requestBody:
@@ -2052,6 +2038,9 @@ components:
           type: array
           items:
             type: object
+            required:
+              - days
+              - timePeriods
             properties:
               days:
                 type: array
@@ -2068,7 +2057,7 @@ components:
                     - All
                 description: |
                   Specifies the days of the week when the component is unavailable.
-                  - Users can list individual days (e.g. Monday, Tuesday) to set specific unavailability schedules for those days.
+                  - Users can list individual days (e.g., Monday, Tuesday, All) to set specific unavailability schedules for those days.
                   - If 'All' is selected, the component will be marked as unavailable for the entire week.
               timePeriods:
                 type: array
@@ -2077,26 +2066,23 @@ components:
                   properties:
                     startTime:
                       type: string
-                      format: date-time
-                      default: "00:00"
+                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
                       description: |
-                        Start time of the unavailability period. If not specified, defaults to the start of the day (00:00).
-                        - For example, setting `startTime` to 00:00 and `endTime` to 23:59 will make the component unavailable from the beginning to the end of the day.
-                        - Note that at 00:00 on the next day, the component becomes available again.
+                        Start time of the unavailability period, formatted as "HH:MM".
+                        - If not specified and `timePeriods` is provided, defaults to the start of the day (00:00).
+                        - This allows for defining specific periods of unavailability within the day.
                     endTime:
                       type: string
-                      format: date-time
-                      default: "23:59"
+                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
                       description: |
-                        End time of the unavailability period. If not specified, defaults to the end of the day (23:59).
-                        - The period from 00:00 to 23:59 is intended to cover the entire day.
-                        - At 23:59, the unavailability period ends, and at 00:00 on the next day, the component becomes available again.
+                        End time of the unavailability period, formatted as "HH:MM".
+                        - If not specified and `timePeriods` is provided, defaults to the end of the day (23:59).
+                        - This allows for defining specific periods of unavailability within the day.
                   description: |
                     Defines specific time periods when the component is unavailable.
-                    - If `startTime` is not specified, the unavailability period will begin at the start of the day (00:00).
-                    - If `endTime` is not specified, the unavailability period will end at the close of the day (23:59).
-                    - If neither `startTime` nor `endTime` is specified, the component is assumed to be unavailable for the entire day.
-                    - If only one is specified, the system will assume the missing time as either the start or end of the day.
+                    - The `timePeriods` array must be present, but individual `startTime` and `endTime` fields are optional.
+                    - If `timePeriods` is provided as an empty array, the component will be considered unavailable for the entire day (00:00 to 23:59).
+                    - If `timePeriods` is specified with `startTime` and `endTime`, it will define a specific period of unavailability within the day.
 
 
     ComponentRegistrationInformation:
