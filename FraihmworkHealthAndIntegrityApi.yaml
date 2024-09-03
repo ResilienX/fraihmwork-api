@@ -867,9 +867,10 @@ paths:
         - If no `componentId` is provided, schedules for all components will be retrieved.
         - The response will return a separate schedule for each component.
         - Within each component's schedule:
-          - Days with identical time periods will be grouped together.
+          - Days with identical time periods may be grouped together.
           - If a day has a unique unavailability period that does not match any other day for that component, it will be listed separately.
           - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
+          - Note: The order in which days and schedules are returned is not guaranteed and should not be relied upon.
       operationId: getUnavailabilityScheduleUsingGET
       parameters:
       - in: query
@@ -890,6 +891,49 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UnavailabilitySchedule'
+              examples:
+                singleComponent:
+                  summary: Example response for a single component
+                  value: 
+                    - componentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                      schedules:
+                        - days: ["Monday"]
+                          timePeriods:
+                            - startTime: "14:00"
+                              endTime: "23:59"
+                        - days: ["Tuesday", "Thursday", "Friday", "Saturday"]
+                          timePeriods:
+                            - startTime: "17:00"
+                              endTime: "23:59"
+                        - days: ["Wednesday", "Sunday"]
+                          timePeriods: []
+                multipleComponents:
+                  summary: Example response for multiple components
+                  value: 
+                    - componentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                      schedules:
+                        - days: ["Monday"]
+                          timePeriods:
+                            - startTime: "14:00"
+                              endTime: "23:59"
+                        - days: ["Tuesday", "Thursday", "Friday", "Saturday"]
+                          timePeriods:
+                            - startTime: "17:00"
+                              endTime: "23:59"
+                        - days: ["Wednesday", "Sunday"]
+                          timePeriods: []
+                    - componentId: "4fb85f64-5717-4562-b3fc-2c963f66afb7"
+                      schedules:
+                        - days: ["Monday", "Wednesday"]
+                          timePeriods:
+                            - startTime: "08:00"
+                              endTime: "12:00"
+                        - days: ["Thursday"]
+                          timePeriods:
+                            - startTime: "18:00"
+                              endTime: "22:00"
+                        - days: ["Friday", "Sunday"]
+                          timePeriods: []
         400:
           description: Bad request - Invalid component ID.
           content:
