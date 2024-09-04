@@ -2057,7 +2057,7 @@ components:
                     - All
                 description: |
                   Specifies the days of the week that the time periods apply to
-                  - Users can list individual days (e.g., Monday, Tuesday, All) to set specific unavailability schedules for those days.
+                  - Users can list individual days (e.g., Monday, Tuesday, All) to specify scheduling data for those days.
                   - If 'All' is selected, the component will be marked as unavailable for the entire week.
               timePeriods:
                 type: array
