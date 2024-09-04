@@ -2021,7 +2021,7 @@ components:
         - description
         - timeOfBlocklist
            
-    UnavailabilitySchedule:
+    RecurringSchedule:
       type: object
       required:
         - componentId
