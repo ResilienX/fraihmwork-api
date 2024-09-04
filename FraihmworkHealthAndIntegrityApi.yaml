@@ -803,10 +803,11 @@ paths:
       description: |
         Add unavailability schedules for one or more components.
         - You can specify schedules for multiple components in one request.
-        - Multiple schedules can be added in a single request by providing an array of `UnavailabilitySchedule` objects.
+        - Multiple schedules can be added in a single request by providing an array of `RecurringSchedule` objects.
+        - Each component can only have one timezone (`zone`), which applies to all schedules.
         - Schedules can specify specific days or use "All" to represent every day of the week.
-        - Users can also post separate days, such as "Monday", "Tuesday" in addition to "All," to provide more control over the unavailability schedule for specific days.
-        - Each day in the schedule can have specific start and end times, allowing full control over when the component is unavailable.
+        - Users can also post separate `days`, such as "Monday", "Tuesday" in addition to "All," to provide more control over the unavailability schedule for specific days.
+        - Each day in the schedule can have specific `start` and `end` times, allowing full control over when the component is unavailable.
         - Start and end times must be provided in the format "HH:MM" and can be used to define precise periods of unavailability within each day.
       operationId: addUnavailabilityScheduleUsingPOST
       requestBody:
@@ -817,7 +818,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/UnavailabilitySchedule'
+                $ref: '#/components/schemas/RecurringSchedule'
       responses:
         201:
           description: Successfully added the unavailability schedule(s)
@@ -866,8 +867,9 @@ paths:
         Retrieve the unavailability schedule for one or more components.
         - Provide one or more `componentId` values as query parameters to filter the results.
         - If no `componentId` is provided, schedules for all components will be retrieved.
-        - The response will return a separate schedule for each component.
-        - Each day within a component's schedule will be returned individually, whether it has a time period or not.
+        - Each component has only one time `zone` for all schedules.
+        - The response will return a separate unavailability schedule for each component.
+        - Each day within a component's unavailability schedule will be returned individually, whether it has a time period or not.
         - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
         - The order in which days and schedules are returned is not guaranteed and should not be relied upon.
       operationId: getUnavailabilityScheduleUsingGET
@@ -889,37 +891,38 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UnavailabilitySchedule'
+                  $ref: '#/components/schemas/RecurringSchedule'
               examples:
                 singleComponent:
                   summary: Example response for a single component
                   value: 
                     - componentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                      zone: "UTC"
                       schedules:
                         - days: ["Monday"]
-                          timePeriods:
-                            - startTime: "14:00"
-                              endTime: "23:59"
+                          periods:
+                            - start: "14:00"
+                              end: "23:59"
                         - days: ["Tuesday"]
-                          timePeriods:
-                            - startTime: "15:00"
-                              endTime: "20:59"
+                          periods:
+                            - start: "09:00"
+                              end: "17:00"
                         - days: ["Thursday"]
-                          timePeriods:
-                            - startTime: "14:00"
-                              endTime: "23:59"
+                          periods:
+                            - start: "08:00"
+                              end: "16:00"
                         - days: ["Friday"]
-                          timePeriods:
-                            - startTime: "14:00"
-                              endTime: "23:59"
+                          periods:
+                            - start: "10:00"
+                              end: "18:00"
                         - days: ["Saturday"]
-                          timePeriods:
-                            - startTime: "12:00"
-                              endTime: "23:59"
+                          periods:
+                            - start: "12:00"
+                              end: "20:00"
                         - days: ["Wednesday"]
-                          timePeriods: []
+                          periods: []
                         - days: ["Sunday"]
-                          timePeriods: []
+                          periods: []
         400:
           description: Bad request - Invalid component ID.
           content:
@@ -933,7 +936,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to read the schedule
+          description: Forbidden - client is not authorized to read the unavailability schedule
           content:
             application/json:
               schema:
@@ -966,11 +969,13 @@ paths:
       summary: Remove unavailability schedules for one or more components.
       description: |
         Remove unavailability schedules for one or more components.
-        - If only the `componentId` is provided without any schedules, all days and all time periods for that component will be deleted.
-        - If specific `days` are provided, the entire unavailability schedule for those days, including all time periods, will be deleted for the specified component(s).
-        - If both `days` and `timePeriods` are provided, only the specified time periods for those days will be deleted.
+        - If only the `componentId` is provided without any schedules, all days and all periods for that component will be deleted.
+        - If specific `days` are provided, the entire unavailability schedule for those days, including all periods, will be deleted for the specified component(s).
+        - If both `days` and `periods` are provided, only the specified periods for those days will be deleted.
+        - If `days`, `periods`, `start`, and `end` are provided, the request will delete specific time periods within those days, targeting the exact `start` and `end` times.
+        - If a `zone` (timezone) is provided, the schedules associated with that timezone will also be removed.
         - If no `componentId` is provided, the request will result in an error since `componentId` is required.
-        - To remove schedules for multiple components, provide each `componentId` with the corresponding schedules, days, and timePeriods.
+        - To remove schedules for multiple components, provide each `componentId` with the corresponding `schedules`, `days`, and `Periods`.
 
       operationId: removeUnavailabilityScheduleUsingPOST
       requestBody:
@@ -981,7 +986,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/UnavailabilitySchedule'
+                $ref: '#/components/schemas/RecurringSchedule'
       responses:
         200:
           description: Successfully removed the unavailability schedule(s)
@@ -2435,6 +2440,11 @@ components:
           format: uuid
           description: |
             The unique identifier for the component. 
+        zone:
+          type: string
+          description: |
+            Specifies the time zone for the component. All schedules for this component will have this timezone.
+            - If not provided, defaults to UTC.
         schedules:
           type: array
           items:
@@ -2460,10 +2470,6 @@ components:
                   Specifies the days of the week that the periods apply to.
                   - Users can list individual days (e.g., Monday, Tuesday, All) to specify scheduling data for those days.
                   - If 'All' is selected, the component will be marked as unavailable for the entire week.
-              zone:
-                type: string
-                description: |
-                  Specifies the time zone for the schedule. If not provided, defaults to UTC.
               periods:
                 type: array
                 items:
@@ -2480,15 +2486,15 @@ components:
                       description: |
                         Start time of the period, formatted as "HH:MM".
                         - If not specified, defaults to the start of the day (00:00).
-                        - The start time is inclusive, meaning it begins at 00:00:00.
-                        - This allows for defining specific periods of scheduling within the day.
+                        - The period begins precisely at this time (e.g., 00:00:00).
                     end:
                       type: string
                       pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
                       description: |
                         End time of the period, formatted as "HH:MM".
-                        - If not specified, defaults to the end of the day (23:59). Here the end time is inclusive.
-                        - For example, setting it to 23:59 includes everything up to 23:59:59, before it transitions to 00:00 of the next day.
+                        - If not specified, defaults to the end of the day (23:59).
+                        - The end time is an inclusive boundary, meaning the specified time will be fully included.
+                        - For example, specifying 12:01 as the end time will include the entirety of 12:01, and the true boundary will be between the end of 12:01 and the beginning of 12:02.
 
 
   securitySchemes:
