@@ -2020,71 +2020,6 @@ components:
         - sourceId
         - description
         - timeOfBlocklist
-           
-    RecurringSchedule:
-      type: object
-      required:
-        - componentId
-        - schedules
-      properties:
-        componentId:
-          type: string
-          format: uuid
-          description: |
-            The unique identifier for the component. 
-            - This can represent one or more component IDs when the schedule is applied to multiple components.
-            - In cases where multiple component IDs are used, each component's unavailability schedule should be represented as a separate object within an array.
-        schedules:
-          type: array
-          items:
-            type: object
-            required:
-              - days
-              - timePeriods
-            properties:
-              days:
-                type: array
-                items:
-                  type: string
-                  enum:
-                    - Monday
-                    - Tuesday
-                    - Wednesday
-                    - Thursday
-                    - Friday
-                    - Saturday
-                    - Sunday
-                    - All
-                description: |
-                  Specifies the days of the week that the time periods apply to
-                  - Users can list individual days (e.g., Monday, Tuesday, All) to specify scheduling data for those days.
-                  - If 'All' is selected, the component will be marked as unavailable for the entire week.
-              timePeriods:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    startTime:
-                      type: string
-                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
-                      description: |
-                        Start time of the unavailability period, formatted as "HH:MM".
-                        - If not specified and `timePeriods` is provided, defaults to the start of the day (00:00).
-                        - This allows for defining specific periods of unavailability within the day.
-                    endTime:
-                      type: string
-                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
-                      description: |
-                        End time of the unavailability period, formatted as "HH:MM".
-                        - If not specified and `timePeriods` is provided, defaults to the end of the day (23:59).
-                        - This allows for defining specific periods of unavailability within the day.
-                  description: |
-                    Defines specific time periods when the component is unavailable.
-                    - The `timePeriods` array must be present, but individual `startTime` and `endTime` fields are optional.
-                    - If `timePeriods` is provided as an empty array, the component will be considered unavailable for the entire day (00:00 to 23:59).
-                    - If `timePeriods` is specified with `startTime` and `endTime`, it will define a specific period of unavailability within the day.
-
-
     ComponentRegistrationInformation:
       type: object
       properties:
@@ -2488,6 +2423,73 @@ components:
         configuration:
           type: string
           description: The version of the component's configuration, if applicable
+
+    RecurringSchedule:
+      type: object
+      required:
+        - componentId
+        - schedules
+      properties:
+        componentId:
+          type: string
+          format: uuid
+          description: |
+            The unique identifier for the component. 
+        schedules:
+          type: array
+          items:
+            type: object
+            required:
+              - days
+              - periods
+            properties:
+              days:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    - Sunday
+                    - All
+                description: |
+                  Specifies the days of the week that the periods apply to.
+                  - Users can list individual days (e.g., Monday, Tuesday, All) to specify scheduling data for those days.
+                  - If 'All' is selected, the component will be marked as unavailable for the entire week.
+              zone:
+                type: string
+                description: |
+                  Specifies the time zone for the schedule. If not provided, defaults to UTC.
+              periods:
+                type: array
+                items:
+                  type: object
+                  description: |
+                    Defines specific periods for the schedule.
+                    - The `periods` array must be present, but individual `start` and `end` fields are optional.
+                    - If `periods` is provided as an empty array, the schedule will apply for the entire day (00:00 to 23:59).
+                    - If `start` and `end` are specified, they define a specific time range for the day.
+                  properties:
+                    start:
+                      type: string
+                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
+                      description: |
+                        Start time of the period, formatted as "HH:MM".
+                        - If not specified, defaults to the start of the day (00:00).
+                        - The start time is inclusive, meaning it begins at 00:00:00.
+                        - This allows for defining specific periods of scheduling within the day.
+                    end:
+                      type: string
+                      pattern: "^(2[0-3]|[01][0-9]):[0-5][0-9]$"
+                      description: |
+                        End time of the period, formatted as "HH:MM".
+                        - If not specified, defaults to the end of the day (23:59). Here the end time is inclusive.
+                        - For example, setting it to 23:59 includes everything up to 23:59:59, before it transitions to 00:00 of the next day.
+
 
   securitySchemes:
     OAuth2:
