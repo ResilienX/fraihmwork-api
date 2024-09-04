@@ -2,7 +2,7 @@ Version 1.4.0
 - Added POST /monitor/v1/component/schedule/unavailability: Add unavailability schedules for one or more components.
 - Added GET /monitor/v1/component/schedule/unavailability: Retrieve unavailability schedules.
 - Added POST /monitor/v1/component/schedule/unavailability/remove: Remove unavailability schedules by component, day, or time period.
-- Added new UnavailabilitySchedule schema: Includes componentId and an array of schedules, with days (Monday, Tuesday... or All) and timePeriods defining startTime and endTime for unavailability.
+- Added new RecurringSchedule schema: Includes componentId and an array of schedules, with days (e.g., Monday, Tuesday, All) and Periods defining start and end for unavailability.
 
 Version 1.3.0
 - Moved Blocklister API elements to FraihmworkHealthAndIntegrityApi
