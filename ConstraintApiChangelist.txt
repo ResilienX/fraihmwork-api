@@ -1,0 +1,42 @@
+Version 1.0.0
+- Complete renaming of the UVR api so that it is now correctly referencing 'Constraints', which is the updated terminology for UTM systems, and has been for some time now.
+- Updated file name to be .yaml instead of .yml to be in line with rest of repository
+
+Version 0.0.13
+- Correcting faultIds description to reflect a uvr mitigation's 0..* multiplicity with faults.
+
+Version 0.0.12
+- Added new endpoint for removing a uvr assignment
+
+Version 0.0.11:
+- Clarified descriptions for the UVR PUT commands to allow for leaving the UVR null if it is not changing
+
+Version 0.0.10:
+- Added new endpoints for assigning default UVRs against specific system UUIDs
+
+Version 0.0.9:
+- Internalized the external ASTM UTM spec, because it isn't quite correct on its own and needed some coercion
+
+Version 0.0.8:
+- Added Uvr Subscription PUT and DELETE
+
+Version 0.0.7:
+- Fixed the utm.yaml reference file version to 0.3.5.
+
+Version 0.0.6:
+- Fixed the servers.url tag to correctly include the /api part of the path and adding .com to the path as well.
+
+Version 0.0.5
+-Added Put request body for UVR Update
+
+Version 0.0.4
+- Added Uvr Subscription POST and GET
+
+Version 0.0.3:
+- Updated getUvrMitigationByUuid return type from UvrMitigationList to UvrMitigationDetails
+
+Version 0.0.2:
+- Updated post argument from Uvr to UvrMitigation
+
+Version 0.0.1: 
+Initial external release

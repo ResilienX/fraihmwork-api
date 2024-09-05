@@ -1,0 +1,1152 @@
+---
+openapi: 3.0.1
+info:
+  title: Constraint Reporting API
+  description: 'Constraints can be issued for many reasons, and this API serves as a gateway for being able to properly submit them to the appropriate FIMS'
+  contact:
+    email: g.dorchies@resilienx.com
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api/constraint/v1
+
+tags:
+- name: Assignments
+  description: Constraint assignments to component UUIDs
+  
+- name: Constraint
+  description: Constraint information. Constraints are a specific type of mitigation, so all Constraint UUIDs are considered both Mitigation and Constraint ids, as far as subscriptions are concerned.
+  
+- name: Constraint Subscription
+  description: Subscribe to one, multiple, or all constraint updates
+
+- name: Constraint Subscriber
+  description: Endpoint(s) opened up by clients who can execute or care about constraint actions
+
+paths:
+  /constraint:
+    get:
+      tags:
+      - Constraint
+      summary: Requests the current list of all active Constraints 
+      description: This call requests the list of all Constraints that have been issued since the start of the system. This is likely not going to be a commonly used call, see /constraint/{state} below.
+      operationId: getConstraints
+      responses:
+        200:
+          description: Returned list of Constraints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintMitigationList'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+    post:
+      tags:
+      - Constraint
+      summary: Posts a Constraint 
+      description: This call adds a constraint to the UTM ecosystem
+      operationId: postConstraintMitigation
+      requestBody:
+        description: JSON description of the Constraint
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConstraintMitigation'
+      responses:
+        201:
+          description: Successfully posted new Constraint action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintManage:
+        - fraihmwork.constraint.manage
+
+  /constraint/{uuid}:
+    get:
+      tags:
+      - Constraint
+      summary: Requests a specific Constraint
+      description: This call requests a constraint action tied to its UUID
+      operationId: getConstraintByUuid
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the constraint to be returned
+      responses:
+        200:
+          description: Returned list of constraint actions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintMitigationDetails'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+    put:
+      tags:
+      - Constraint
+      summary: Updates a constraint entry
+      description: This call updates an existing constraint entry, as long as the state has not reached ACCEPTED yet. This call will fail if the Constraint has already reached an ACCEPTED state and the Constraint payload has changed. If the Constraint field is not filled out, it is assumed that no change is being made to it (only state or time are changing)
+      operationId: updateConstraint
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the constraint to be updated
+      requestBody:
+        description: JSON description of the constraint
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConstraintUpdateBody'
+                        
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload or parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintManage:
+        - fraihmwork.constraint.manage
+      
+  /subscription/constraint:
+    post:
+      tags:
+      - Constraint Subscription
+      summary: Subscribe to one, more, or all constraint updates 
+      description: This call adds a system to a list of subscribers for one, multiple, or all constraint updates
+      operationId: subscribeToConstraint
+      requestBody:
+        description: JSON description of the subscription requested
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConstraintSubscription'
+      responses:
+        201:
+          description: Successfully subscribed to Constraint information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+  
+  /subscription/constraint/{subscriptionUuid}:
+    get:
+      tags:
+      - Constraint Subscription
+      summary: Get constraint subscription information 
+      description: Retrieves a specific constraint subscription
+      operationId: getConstraintSubscriptionInformation
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the subscription to retrieve information on
+      responses:
+        200:
+          description: Successfully retrieved subscription information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintSubscription'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+      
+    put:
+      tags:
+      - Constraint Subscription
+      summary: Update subscription for Constraint information
+      description: This call updates/modifies the subscription of a subscriber
+      operationId: updateConstraintSubscription
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the  subscription that is being updated
+      requestBody:
+        description: JSON description of the subscription requested
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConstraintSubscription'
+      responses:
+        200:
+          description: Successfully updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintSubscription'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+        
+    delete:
+      tags:
+      - Constraint Subscription
+      summary: Cancels a subscription
+      description: This unsubscribes a subscription made by a subscriber to get future Constraint updates
+      operationId: unsubscribeFromConstraint
+      parameters:
+        - in: path
+          name: subscriptionUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the subscription to remove
+      responses:
+        200:
+          description: Successfully unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+        
+  /subscriber/constraint/update:
+    post:
+      tags:
+      - Constraint Subscriber
+      summary: Posts a constraint update to an executor
+      description: This call POSTs the latest updates on a constraint to an endpoint that is marked as an executor for it
+      operationId: postConstraintUpdate
+      requestBody:
+        description: JSON description of the constraint action
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                constraintId:
+                  type: string
+                  format: uuid
+                  description: The id of the constraint that is being pushed
+                payload:
+                  $ref: '#/components/schemas/Constraint'
+      responses:
+        201:
+          description: Successfully pushed update
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid payload
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintManage:
+        - fraihmwork.constraint.manage
+
+  /defaults/assign:
+    post:
+      tags:
+      - Assignments
+      summary: Assign a Constraint to a component UUID 
+      description: Assigns a default Constraint to a component so that when the component reaches a FAULTED state, the Constraint is automatically registered with the system
+      operationId: assignConstraintToComponent
+      requestBody:
+        description: JSON description of the current system state
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        201:
+          description: Assign Constraint to Component
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'          
+        400:
+          description: Bad Request (invalid submission)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintManage:
+        - fraihmwork.constraint.manage
+    get:
+      tags:
+      - Assignments
+      summary: Request all assigned Constraint / component matching
+      description: Retrieves a list of all default Constraints and the components they are assigned to
+      operationId: getAssignments
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/AssignmentDetails'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+
+  /defaults/assign/{assignmentUuid}:
+    delete:
+      tags:
+      - Assignments
+      summary: Removes a constraint assignment
+      description: This removes the assignment of a constraint to a component
+      operationId: deleteConstraintAssignment
+      parameters:
+        - in: path
+          name: assignmentUuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Uuid of the assignment to remove
+      responses:
+        200:
+          description: Successfully deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Invalid parameters
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - ConstraintRead:
+        - fraihmwork.constraint.read
+            
+components:
+  securitySchemes:
+    ConstraintManage:      
+      flows:
+        clientCredentials:
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          scopes:
+            fraihmwork.constraint.manage: Client can update the list of constraint actions
+      type: oauth2
+      
+    ConstraintRead:
+      flows:
+       clientCredentials:
+         tokenUrl: https://well-known/oauth-authorization-server/token
+         scopes:
+            fraihmwork.constraint.read: Client can read the constraint actions list
+      type: oauth2 
+  schemas:
+    Response:
+      type: object
+      properties:
+        itemId:
+          type: string
+          format: uuid
+        message:
+          type: string
+          description: The message provided back to the client
+      required:
+        - message
+        
+    Assignment:
+      type: object
+      properties:
+        componentUuid:
+          type: string
+          format: uuid
+          description: The component to assign this Constraint to
+        duration:
+          type: integer
+          description: The minimum duration in seconds that this Constraint should last, by default. All timestamps in the Constraint object will be replaced with a "begin" time of NOW and an end time of begin + this field.
+        constraint:
+          $ref: '#/components/schemas/Constraint'
+      required:
+        - componentUuid
+        - duration
+        - constraint
+     
+    AssignmentDetails:
+      description: A combination of the Constraint Mitigation and Constraint payload types
+      type: object
+      properties:
+        assignmentUuid:
+          type: string
+          format: uuid
+          description: The id of the constraint assignment to a component
+        assignment:
+          $ref: '#/components/schemas/Assignment'
+
+    MitigationState:
+      type: string
+      description: "
+        This is a description of the current state of the action being taken. If this field is not provided, it is assumed to be 'RECOMMENDED'
+        RECOMMENDED describes a mitigation action that was recommended to an end user, but is waiting for further instruction. Generally, from here the state can only change to 'ACCEPTED', 'REVOKED' or 'DENIED'
+        ACCEPTED describes an action that has been accepted by a user or system, but has not yet been executed. From here, the state should only change to 'STARTED', 'REVOKED', or 'FAILED'
+        STARTED describes an action that has been started and is still in progress. From herer, the state should only change to 'COMPLETE' or 'FAILED'
+        COMPLETE describes an action that has been full resolved. This is an end state for the action
+        FAILED describes an action that was unsuccessful in completing its task or its completion resulted in an unsatisfactory mitigation. This is an end state for the action
+        REVOKED describes an action that the issuing system can no longer take or no longer desires to take. It effectively cancels the action, and is an end state.
+        DENIED describes an action where a system or user has declined to allow the action to take place. It is an end state for the action
+        "
+      enum:
+      - RECOMMENDED
+      - ACCEPTED
+      - STARTED
+      - COMPLETE
+      - FAILED
+      - REVOKED
+      - DENIED
+      default: RECOMMENDED
+      
+    ConstraintMitigationList:
+      description: List of constraints
+      type: array
+      items:
+       $ref: '#/components/schemas/ConstraintMitigationDetails'
+       
+          
+    ConstraintMitigationDetails:
+      description: ConstraintMitigation action
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        constraintMitigation:
+          $ref: '#/components/schemas/ConstraintMitigation'
+      required:
+        - constraintId
+        - constraint
+          
+    ConstraintMitigation:
+      description: A combination of the mitigation type as defined above and the current UTM API definition of a constraint
+      type: object
+      properties:
+        issuerId:
+          type: string
+          format: uuid
+          description: The source component that issued this mitigation
+        executorId:
+          type: string
+          format: uuid
+          description: The component ID of the system that will execute this mitigation
+        executorCallback:
+          type: string
+          format: url
+          description: The base URL callback that is used to tell the executor that the action has been accepted or denied, or of any other status changes. The full URL that is triggered will be this + the /subscriber endpoint defined 
+        faultIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Zero or more ids of faults that are being addressed by this mitigation
+        description:
+          type: string
+          description: Description of the mitigation that the system will take or has taken
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeIssued:
+          type: string
+          format: date-time
+          description: The timestamp that this component instantiated this action. Timestamp format is as specified by RFC 3339 section 5.6. 
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this action was accurate. If not provided, assumed to be the time of receipt of latest message Timestamp format is as specified by RFC 3339 section 5.6. 
+        constraint:
+          $ref: '#/components/schemas/Constraint'
+          
+      required: 
+        - issuerId
+        - executorId
+        - description
+        - timeIssued
+        - constraint
+          
+    ConstraintUpdateBody:
+      description: A combination of the Constraint Mitigation and Constraint payload types
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The last timestamp when this action was accurate. If not provided, assumed to be the time of receipt of latest message Timestamp format is as specified by RFC 3339 section 5.6. 
+        constraint:
+          description: Only needed if the constraint is being changed as a result of this update. Constraint definitions can only be changed in the RECOMMENDED state.
+          $ref: '#/components/schemas/Constraint'
+      required:
+        - state
+
+    ConstraintSubscription:
+      type: object
+      properties:
+        baseUrl:
+          type: string
+          format: url
+          description: The base url that the constraint manager will send updates to. This should not include any specific endpoint information that is already included in this API description, as it will be appended automatically
+        interestedUuids:
+          description: List of specific constraints to subscribe to. If not specified, it is assumed that all constraint updates are desired
+          type: array
+          items:
+            type: string
+            format: uuid
+        stopTime: 
+          type: string
+          format: date-time
+          description: The requested time for the subscription to expire. If not specified, will expire only when the constraint reaches an 'end state'. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required: 
+        - baseUrl
+
+
+############# THE FOLLOWING IS COPIED AND SLIGHTLY MODIFIED (TO MAKE SENSE) 
+############# FROM https://raw.githubusercontent.com/astm-utm/Protocol/6bca5e934aef5c1da229e62a633707f871ca39c1/utm.yaml#/components/schemas/Constraint ########################
+
+    UUIDv4:
+      description: |-
+        Universally-unique identifier (version 4).
+      type: string
+      format: uuid
+      example: "03e5572a-f733-49af-bc14-8a18bd53ee39"
+
+    EntityOVN:
+      title: EntityOVN
+      description: |-
+        A token associated with a particular UTM Entity+version created
+        by the DSS upon creation or modification of an Entity reference and provided
+        to the client creating or modifying the Entity reference.  The EntityOVN
+        is stored privately by the DSS and then compared against entries in a Key
+        provided to mutate the airspace.  The EntityOVN is also provided by
+        the client whenever that client transmits the full information of the Entity
+        (either via GET, or via a subscription notification).
+      type: string
+      minLength: 16
+      maxLength: 128
+      example: "9d158f59-80b7-4c11-9c0c-8a2b4d936b2d"
+
+    Time:
+      required:
+        - value
+        - format
+      type: object
+      properties:
+        value:
+          type: string
+          description: RFC3339-formatted time/date string.  The time zone must be 'Z'.
+          format: date-time
+          example: '1985-04-12T23:20:50.52Z'
+        format:
+          type: string
+          enum:
+            - RFC3339
+
+    CircleProperties:
+      required:
+        - radius
+      type: object
+      properties:
+        radius:
+          $ref: '#/components/schemas/Radius'
+
+    Radius:
+      required:
+        - value
+        - units
+      type: object
+      properties:
+        value:
+          format: float
+          description: Distance from the centerpoint of a circular area, along the WGS84 ellipsoid.
+          type: number
+          example: 300.183
+        units:
+          type: string
+          description: FIXM-compatible units.  Only meters ("M") are acceptable for UTM.
+          enum:
+            - M
+
+    Altitude:
+      type: object
+      required:
+        - value
+        - reference
+        - units
+      properties:
+        value:
+          description: |-
+            The numeric value of the altitude. Note that min and max values are
+            added as a sanity check. As use cases evolve and more options are
+            made available in terms of units of measure or reference systems,
+            these bounds should be re-evaluated.
+          type: number
+          format: double
+          minimum: -8000
+          exclusiveMinimum: false
+          maximum: 100000
+          exclusiveMaximum: false
+        reference:
+          description: |-
+            A code indicating the reference for a vertical distance. See AIXM 5.1
+            and FIXM 4.2.0. Currently, UTM only allows WGS84 with no immediate
+            plans to allow other options. FIXM and AIXM allow for 'SFC' which is
+            equivalent to AGL.
+          type: string
+          enum:
+            - W84
+        units:
+          description: |-
+            The reference quantities used to express the value of altitude. See
+            FIXM 4.2. Currently, UTM only allows meters with no immediate plans
+            to allow other options.
+          type: string
+          enum:
+            - M
+
+    LongitudeOrLatitude:
+      description: |-
+        Longitude (degrees east of the Prime Meridian or degrees, with reference to the WGS84 ellipsoid) or Latitude
+        (degrees north of the equator, with reference to the WGS84 ellipsoid).
+      minimum: -180
+      exclusiveMinimum: false
+      maximum: 180
+      exclusiveMaximum: false
+      type: number
+      format: double
+      example: 12.34
+
+    LonLatPair:
+      description: Longitude/Latitude pair (in that order) used for specifying geographical vertex. Specified as an array. Order is important!
+      type: array
+      maxItems: 2
+      minItems: 2
+      items:
+        $ref: '#/components/schemas/LongitudeOrLatitude'
+      example: [-122.106325, 47.660898]
+
+    Polygon:
+      type: object
+      required:
+        - type
+        - coordinates
+      description: GeoJSon Polygon. Positions all 2D.
+      externalDocs:
+        url: https://tools.ietf.org/html/rfc7946#section-3.1.6
+      properties:
+        type:
+          description: |
+            The type of Geometry. In this case, must be 'Polygon' per GeoJSON
+            spec.  Note that the "coordinates" member is validated to be be an
+            array of size one. This implies there are no interior rings allowed
+            currently.
+          type: string
+          enum:
+            - Polygon
+        coordinates:
+          type: array
+          description: >-
+            The number of polygons allowed.  Currently 1, implying no interior
+            rings.  If this number is changes, the maxItems should be considered.
+            From RFC7946:
+            o  For type "Polygon", the "coordinates" member MUST be an array of
+            linear ring coordinate arrays.
+            o  For Polygons with more than one of these rings, the first MUST be
+            the exterior ring, and any others MUST be interior rings.  The
+            exterior ring bounds the surface, and the interior rings (if
+            present) bound holes within the surface.
+            Again, note we only allow a single set of coordinates, implying no
+            interior rings.
+          minItems: 1
+          maxItems: 1
+          items:
+            type: array
+            description: >-
+              The number of vertices in this polygon. From RFC7946:
+                o  A linear ring is a closed LineString with four or more positions.
+                o  The first and last positions are equivalent, and they MUST contain
+                identical values; their representation SHOULD also be identical.
+                o  A linear ring is the boundary of a surface or the boundary of a
+                hole in a surface.
+                o  A linear ring MUST follow the right-hand rule with respect to the
+                area it bounds, i.e., exterior rings are counterclockwise, and
+                holes are clockwise.  (also in the spec:  parsers SHOULD NOT reject
+                Polygons that do not follow the right-hand rule.)
+                https://tools.ietf.org/html/rfc7946#section-3.1.6
+            minItems: 4
+            maxItems: 100
+            items:
+              $ref: '#/components/schemas/LonLatPair'
+
+    Circle:
+      description: |-
+        Local extension of the GeoJSON specification to add a circular area defined by a
+        Point/Radius pair. We extend the Properties object to include a 'radius' value (see
+        CircleProperties for details).
+      required:
+        - type
+        - geometry
+        - properties
+      type: object
+      properties:
+        type:
+          description: The type of Geometry. In this case, must be 'Feature' per GeoJSON spec.
+          type: string
+          enum:
+            - Feature
+        geometry:
+          type: object
+          properties:
+            type:
+              description: The type of Geometry. Must be Point.
+              type: string
+              enum:
+                - Point
+            coordinates:
+              $ref: '#/components/schemas/LonLatPair'
+        properties:
+          $ref: '#/components/schemas/CircleProperties'
+
+    Volume3D:
+      description: |-
+        A three-dimensional geographic volume consisting of a vertically-extruded shape.  Exactly
+        one outline must be specified.
+      type: object
+      properties:
+        outline_circle:
+          $ref: '#/components/schemas/Circle'
+          description: A circular geographic shape on the surface of the earth.
+        outline_polygon:
+          $ref: '#/components/schemas/Polygon'
+          description: A polygonal geographic shape on the surface of the earth.
+        altitude_lower:
+          description: Minimum bounding altitude of this volume. Must be less than
+            altitude_upper, if specified.
+          $ref: '#/components/schemas/Altitude'
+        altitude_upper:
+          description: Maximum bounding altitude of this volume. Must be greater than
+            altitude_lower, if specified.
+          $ref: '#/components/schemas/Altitude'
+
+    Volume4D:
+      description: Contiguous block of geographic spacetime.
+      required:
+        - volume
+      type: object
+      properties:
+        volume:
+          $ref: '#/components/schemas/Volume3D'
+        time_start:
+          description: Beginning time of this volume. Must be before time_end.
+          $ref: '#/components/schemas/Time'
+        time_end:
+          description: End time of this volume. Must be after time_start.
+          $ref: '#/components/schemas/Time'
+
+    UssBaseURL:
+      description: |-
+        The base URL of a USS implementation of part or all of the USS-USS API. Per the USS-USS API, the full URL
+        of a particular resource can be constructed by appending, e.g., `/uss/v1/{resource}/{id}` to this base URL.
+        Accordingly, this URL may not have a trailing '/' character.
+      type: string
+      example: 'https://utm_uss.com/utm'
+
+    ConstraintReference:
+      description: A ConstraintReference (area in which a Constraint is present, along
+        with other high-level information, but no details).  The DSS reports only
+        these references and clients must exchange details and additional information
+        peer-to-peer.
+      required:
+        - id
+        - owner
+        - time_start
+        - time_end
+        - uss_base_url
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUIDv4'
+        owner:
+          type: string
+          example: 'uss1'
+          description: |-
+            Created by the DSS based on creating client's ID (via access token).  Used internal
+            to the DSS for restricting mutation and deletion operations to owner.  Used by USSs
+            to reject Constraint update notifications originating from a USS that does not own
+            the Constraint.
+        ovn:
+          description: |-
+            Opaque version number of this Constraint.  Populated only when the ConstraintReference
+            is owned by the USS retrieving or providing it.  Not populated when the
+            ConstraintReference is not owned by the USS retrieving or providing it (instead, the
+            USS must obtain the OVN from the details retrieved from the owning USS).
+          $ref: '#/components/schemas/EntityOVN'
+        time_start:
+          $ref: '#/components/schemas/Time'
+        time_end:
+          $ref: '#/components/schemas/Time'
+        uss_base_url:
+          $ref: '#/components/schemas/UssBaseURL'
+
+    ConstraintDetails:
+      description: Details of a UTM Constraint. Note that this data is
+        not stored in the DSS; only with the clients.
+      required:
+        - volumes
+      type: object
+      properties:
+        volumes:
+          description: |-
+            Volumes that wholly contain the Constraint while being as small as practical.
+
+            The end time may not be in the past.
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/Volume4D'
+        type:
+          description: Type of airspace feature this Constraint represents.
+          type: string
+          example: 'NonUTMAircraftOperations'
+
+    Constraint:
+      description: Full specification of a UTM Constraint.
+      required:
+        - reference
+        - details
+      type: object
+      properties:
+        reference:
+          $ref: '#/components/schemas/ConstraintReference'
+        details:
+          $ref: '#/components/schemas/ConstraintDetails'
