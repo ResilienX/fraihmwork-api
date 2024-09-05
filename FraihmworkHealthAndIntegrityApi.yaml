@@ -2443,7 +2443,7 @@ components:
         timezone:
           type: string
           description: |
-            Specifies the time zone for the component. All schedules for this component will have this timezone.
+            Specifies the time zone for the component. All schedules for this component will have this time zone. Should be specified as either a standard time zone id (UTC, GMT, EST, etc.) or as an offset as seen in RFC3339 (+01:00, -02:30, etc.).```
             - If not provided, defaults to UTC.
         schedules:
           type: array
