@@ -2440,7 +2440,7 @@ components:
           format: uuid
           description: |
             The unique identifier for the component. 
-        zone:
+        timezone:
           type: string
           description: |
             Specifies the time zone for the component. All schedules for this component will have this timezone.
