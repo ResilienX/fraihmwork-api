@@ -2375,58 +2375,6 @@ components:
           description: The success message provided back to the client
       required:
         - message
-    
-    State:
-      type: object
-      properties:
-        state:
-          type: string
-          description: "
-          This is a high level description of the component or subsystem state. <br> <br>
-          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
-          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
-          ONLINE describes a component with services provided  <br> <br>
-          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
-          enum:
-          - UNAVAILABLE
-          - STARTING_UP
-          - ONLINE
-          - FAULTED
-        description:
-          type: string
-          description: An optional detailed description of the component state in order to provide more context for future queries or for the display. This field can be left blank if the enum fully describes the component state with no additional qualifications. This is provided by the client, and there are currently no restrictions on what this field can be used for. 
-      required:
-        - state
-
-    StateAndTime:
-      type: object
-      properties:
-        state:
-          $ref: '#/components/schemas/MitigationState'
-        timeOfValidity:
-          type: string
-          format: date-time
-          description: The timestamp that this state change was issued. If not provided, assumed to be the time of receipt of latest message. Timestamp format is as specified by RFC 3339 section 5.6. 
-      required:
-        - state
-
-    Version:
-      type: object
-      description: The version of the component. For maximum flexibility, this is provided as string values to allow for different versioning schemes.
-      properties:
-        hardware:
-          type: string
-          description: The version of the component's hardware package, if applicable
-        software:
-          type: string
-          description: The version of the component's software package, if applicable
-        firmware:
-          type: string
-          description: The version of the component's firmware package, if applicable
-        configuration:
-          type: string
-          description: The version of the component's configuration, if applicable
-
     RecurringSchedule:
       type: object
       required:
@@ -2497,6 +2445,58 @@ components:
                         - T11:41:23+02:00 (EET - Eastern European Time)
                         - Seconds are optional in this format. If not provided, the time defaults to the end of the minute (e.g., T11:41:59Z), and the end time is set as an inclusive boundary.
                         - If not specified, defaults to the end of the day (T23:59:59Z).
+
+    State:
+      type: object
+      properties:
+        state:
+          type: string
+          description: "
+          This is a high level description of the component or subsystem state. <br> <br>
+          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
+          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
+          ONLINE describes a component with services provided  <br> <br>
+          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
+          enum:
+          - UNAVAILABLE
+          - STARTING_UP
+          - ONLINE
+          - FAULTED
+        description:
+          type: string
+          description: An optional detailed description of the component state in order to provide more context for future queries or for the display. This field can be left blank if the enum fully describes the component state with no additional qualifications. This is provided by the client, and there are currently no restrictions on what this field can be used for. 
+      required:
+        - state
+
+    StateAndTime:
+      type: object
+      properties:
+        state:
+          $ref: '#/components/schemas/MitigationState'
+        timeOfValidity:
+          type: string
+          format: date-time
+          description: The timestamp that this state change was issued. If not provided, assumed to be the time of receipt of latest message. Timestamp format is as specified by RFC 3339 section 5.6. 
+      required:
+        - state
+
+    Version:
+      type: object
+      description: The version of the component. For maximum flexibility, this is provided as string values to allow for different versioning schemes.
+      properties:
+        hardware:
+          type: string
+          description: The version of the component's hardware package, if applicable
+        software:
+          type: string
+          description: The version of the component's software package, if applicable
+        firmware:
+          type: string
+          description: The version of the component's firmware package, if applicable
+        configuration:
+          type: string
+          description: The version of the component's configuration, if applicable
+
 
   securitySchemes:
     OAuth2:
