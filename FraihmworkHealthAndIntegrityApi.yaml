@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.3.0
+  version: 1.4.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -795,6 +795,244 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
+  /monitor/v1/component/schedule/unavailability:
+    post:
+      tags:
+      - Components
+      summary: Add unavailability schedules for one or more components.
+      description: |
+        Add unavailability schedules for one or more components.
+        - You can specify schedules for multiple components in one request.
+        - Multiple schedules can be added in a single request by providing an array of `RecurringSchedule` objects.
+        - Schedules can specify specific days or use "All" to represent every day of the week.
+        - Users can also post separate `days`, such as "Monday", "Tuesday" in addition to "All," to provide more control over the unavailability schedule for specific days.
+        - Each day in the schedule can have specific `start` and `end` times, allowing full control over when the component is unavailable.
+        - Start and end times must be provided in the format `T11:41:23Z`, where 'T' represents time and 'Z' represents UTC, or `11:41:23Z` without 'T'. Both formats, with and without 'T', are acceptable.     
+        - Timezone offsets are also accepted (e.g., `T11:41:23-05:00` or `11:41:23-05:00`), and can be used to define precise periods of unavailability within each day.
+      operationId: addUnavailabilityScheduleUsingPOST
+      requestBody:
+        description: The unavailability schedule data for one or more components
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RecurringSchedule'
+      responses:
+        201:
+          description: Successfully added the unavailability schedule(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request - Invalid schedule or overlapping schedules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to add the schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
+    get:
+      tags:
+      - Components
+      summary: Get the unavailability schedule for one or more components.
+      description: |
+        Retrieve the unavailability schedule for one or more components.
+        - Provide one or more `componentId` values as query parameters to filter the results.
+        - If no `componentId` is provided, schedules for all components will be retrieved.
+        - The response will return a separate unavailability schedule for each component.
+        - Each day within a component's unavailability schedule will be returned individually, whether it has a time period or not.
+        - If a day has no unavailability scheduled, it will be included with an empty `timePeriods` array.
+        - Start and end times must be in ISO 8601 format, either in UTC (`T11:41:23Z` or `11:41:23Z`) or with timezone offsets (`T11:41:23-05:00` or `11:41:23-05:00`). The 'T' is optional and may not appear in all periods, depending on the posted data.
+        - The order in which days and schedules are returned is not guaranteed and should not be relied upon.
+      operationId: getUnavailabilityScheduleUsingGET
+      parameters:
+      - in: query
+        name: componentIds
+        description: The UUID(s) of the component(s)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Successfully retrieved the unavailability schedule(s)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecurringSchedule'
+              examples:
+                singleComponent:
+                  summary: Example response for a single component
+                  value: 
+                    - componentId: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+                      schedules:
+                        - days: ["Monday"]
+                          periods:
+                            - start: "00:00:00Z"
+                              end: "T23:59:00Z"
+                        - days: ["Tuesday"]
+                          periods:
+                            - start: "T09:30:30Z"
+                              end: "17:00:00Z"
+                        - days: ["Thursday"]
+                          periods:
+                            - start: "T08:00:00+02:00"
+                              end: "16:00:00+02:00"
+                        - days: ["Friday"]
+                          periods:
+                            - start: "10:00:00-05:00"
+                              end: "T18:00:00-05:00"
+                        - days: ["Saturday"]
+                          periods:
+                            - start: "12:00:00Z"
+                              end: "T20:00:00Z"
+                        - days: ["Wednesday"]
+                          periods: []
+                        - days: ["Sunday"]
+                          periods: []
+        400:
+          description: Bad request - Invalid component ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read the unavailability schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found - No unavailability schedule found for the specified component ID(s).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+
+  /monitor/v1/component/schedule/unavailability/remove:
+    post:
+      tags:
+      - Components
+      summary: Remove unavailability schedules for one or more components.
+      description: |
+        Remove unavailability schedules for one or more components.
+        - If only the `componentId` is provided without any schedules, all days and all periods for that component will be deleted.
+        - If specific `days` are provided, the entire unavailability schedule for those days, including all periods, will be deleted for the specified component(s).
+        - If both `days` and `periods` are provided, only the specified periods for those days will be deleted.
+        - If `days`, `periods`, `start`, and `end` are provided, the request will delete specific time periods within those days, targeting the exact `start` and `end` times.
+        - Start and end times must be in ISO 8601 format, either in UTC (`T11:41:23Z` or `11:41:23Z`) or with timezone offsets (`T11:41:23-05:00` or `11:41:23-05:00`). The 'T' is optional and can be omitted in the time format.
+        - If no `componentId` is provided, the request will result in an error since `componentId` is required.
+        - To remove schedules for multiple components, provide each `componentId` with the corresponding `schedules`, `days`, and `Periods`.
+
+      operationId: removeUnavailabilityScheduleUsingPOST
+      requestBody:
+        description: The unavailability schedule data for removal
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RecurringSchedule'
+      responses:
+        200:
+          description: Successfully removed the unavailability schedule(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request - Invalid schedule or no schedule provided for removal.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to remove the schedule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found - No matching unavailability schedule found for the specified component ID(s).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
   /monitor/v1/fault:
     post:
       tags:
@@ -2139,7 +2377,84 @@ components:
           description: The success message provided back to the client
       required:
         - message
-    
+
+    RecurringSchedule:
+      type: object
+      required:
+        - componentId
+        - schedules
+      properties:
+        componentId:
+          type: string
+          format: uuid
+          description: |
+            The unique identifier for the component. 
+        schedules:
+          type: array
+          items:
+            type: object
+            required:
+              - days
+              - periods
+            properties:
+              days:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    - Sunday
+                    - All
+                description: |
+                  Specifies the days of the week that the periods apply to.
+                  - Users can list individual days (e.g., Monday, Tuesday, All) to specify scheduling data for those days.
+                  - If 'All' is selected, the component will be marked as unavailable for the entire week.
+              periods:
+                type: array
+                items:
+                  type: object
+                  description: |
+                    Defines specific periods for the schedule.
+                    - The `periods` array must be present, but individual `start` and `end` fields are optional.
+                    - If `periods` is provided as an empty array, the schedule will apply for the entire day (`T00:00:00Z` to `T23:59:59Z`).
+                    - If `start` and `end` are specified, they must be provided in ISO 8601 format. Start and end times can be in UTC (e.g., `T11:41:23Z` or `11:41:23Z`) or with a timezone offset (e.g., `T11:41:23-05:00` or `11:41:23-05:00`). The 'T' is optional and can be omitted in the time format.
+                  properties:
+                    start:
+                      type: string
+                      description: |
+                        Start time of the period, in ISO 8601 format.
+                        - The format is either THH:MM:SSZ, where 'T' represents time and 'Z' represents UTC, or HH:MM:SSZ. Timezone offsets are accepted (e.g., THH:MM:SS-05:00 or HH:MM:SS-05:00).
+                        - The 'T' is optional and both formats with and without the 'T' character are acceptable.
+                        Examples:
+                        - T00:00:00Z (Start of the day in UTC, with 'T')
+                        - 00:00:00Z (Start of the day in UTC, without 'T')
+                        - T11:41:23Z (UTC - Coordinated Universal Time, with 'T')
+                        - 11:41:23Z (UTC - Coordinated Universal Time, without 'T')
+                        - T11:41:23-05:00 (CST - Central Standard Time, with 'T')
+                        - 11:41:23-05:00 (CST - Central Standard Time, without 'T')
+                        - Seconds are optional and will be ignored by the server to avoid false precision. If not provided, the time defaults to the start of the minute (e.g., T23:59:00Z or 23:59:00Z).
+                        - If not specified, defaults to the start of the day (T00:00:00Z or 00:00:00Z).
+                    end:
+                      type: string
+                      description: |
+                        End time of the period, in ISO 8601 format.
+                        - The format is either THH:MM:SSZ, where 'T' represents time and 'Z' represents UTC, or HH:MM:SSZ. Timezone offsets are accepted (e.g., THH:MM:SS-05:00 or HH:MM:SS-05:00).
+                        - The 'T' is optional and both formats with and without the 'T' character are acceptable.
+                        Examples:
+                        - T23:59:59Z (End of the day in UTC, with 'T')
+                        - 23:59:59Z (End of the day in UTC, without 'T')
+                        - T11:41:23Z (UTC - Coordinated Universal Time, with 'T')
+                        - 11:41:23Z (UTC - Coordinated Universal Time, without 'T')
+                        - T11:41:23-05:00 (CST - Central Standard Time, with 'T')
+                        - 11:41:23-05:00 (CST - Central Standard Time, without 'T')
+                        - Seconds are optional and will be ignored by the server to avoid false precision. If not provided, the time defaults to the end of the minute (e.g., T11:41:59Z or 11:41:59Z), and the end time is set as an inclusive boundary.
+                        - If not specified, defaults to the end of the day (T23:59:59Z or 23:59:59Z).
+
     State:
       type: object
       properties:
@@ -2190,6 +2505,7 @@ components:
         configuration:
           type: string
           description: The version of the component's configuration, if applicable
+
 
   securitySchemes:
     OAuth2:
