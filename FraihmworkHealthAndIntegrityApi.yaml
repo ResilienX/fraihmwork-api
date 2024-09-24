@@ -2073,17 +2073,17 @@ components:
           format: date-time
           
         sessionRunningTimeSeconds:
-          description: If ONLINE, this is the amount of time (ms) passed between when the component started being ONLINE to the present. Otherwise 0. Function of (NOW - Component Startup)
+          description: If ONLINE, this is the amount of time in seconds that have passed between when the component started being ONLINE to the present. Otherwise 0.
           type: integer
           format: int64
         
         totalRunningTimeSeconds:
-          description: This is the amount of time that the component has been ONLINE since it has been registered with FRAIHMWORK. Could be seen as the sum of all SESSION RUNNING TIMEs since the TIME OF REGISTRATION. Used for tracking time used to measure MTBF 
+          description: This is the amount of time that the component has been ONLINE since it has been registered with FRAIHMWORK. Could be seen as the sum of all SESSION RUNNING TIMEs since the TIME OF REGISTRATION.
           type: integer
           format: int64
           
         registrationLifetimeSeconds:
-          description: Total time passed since TIME OF REGISTRATION. Total amount of time that the FRAIHMWORK CORE has been aware of this component. Function is (NOW - TIME OF REGISTRATION)
+          description: Total time passed since TIME OF REGISTRATION, not counting any time spent in UNAVAILABLE state.
           type: integer
           format: int64
 
@@ -2098,7 +2098,7 @@ components:
           format: int64
 
         performanceLifetimeSeconds:
-          description: Total time passed since TIME OF PERFORMANCE . Total amount of time that the FRAIHMWORK CORE has been aware of this component since a manual reset. Function is (NOW - TIME OF PERFORMANCE)
+          description: Total time passed since TIME OF PERFORMANCE, not counting any time spent in UNAVAILABLE state.
           type: integer
           format: int64
 
@@ -2113,7 +2113,7 @@ components:
           format: int64
 
         replacementLifetimeSeconds:
-          description: Total time in seconds that have passed since TIME OF REPLACEMENT. Total amount of time that FRAIHMWORK  has been aware of this component since a replacement. Function is (NOW - TIME OF REPLACEMENT)
+          description: Total time in seconds that have passed since TIME OF REPLACEMENT not counting any time spent in UNAVAILABLE state.
           type: integer
           format: int64
 
@@ -2462,10 +2462,10 @@ components:
           type: string
           description: "
           This is a high level description of the component or subsystem state. <br> <br>
-          UNAVAILABLE describes a component that cannot provide its normal services, but not due to a fault with the component. This could be because the service cannot access its host component, the component is being restarted, or any other similar reason  <br> <br>
-          STARTING_UP is for services being powered on - services may not be available yet but they will be soon  <br> <br>
-          ONLINE describes a component with services provided  <br> <br>
-          FAULTED describes a component that has a significant fault that is degrading service quality and/or is not meeting its performance specifications. In general, if this component is reporting faults, this state should be used in conjunction with any HIGH (and, situationally, MEDIUM) level faults "
+          UNAVAILABLE describes a component that is not expected to be providing services. It can represent a component that is configured within FRAIHMWORK but has not been connected to yet, a component that is not scheduled to be active for a period of time. Time statistics are not collected against a component in the UNAVAILABLE state, so being in UNAVAILABLE does not affect lifetime or uptime data. This state cannot be overridden by faults.  <br> <br>
+          STARTING_UP is for services being powered on - services may not be available yet but they should be soon. If a HIGH or UNKNOWN severity fault occurs, this component will instead report as FAULTED.  <br> <br>
+          ONLINE describes a component with services provided. If a HIGH or UNKNOWN severity fault occurs, this component will instead report as FAULTED.  <br> <br>
+          FAULTED describes a component that has a significant fault that is affecting its ability to provide services. This can be self-reported in conjunction with a fault report, or can be reached automatically if a HIGH or UNKNOWN fault is reported (see other state descriptions)"
           enum:
           - UNAVAILABLE
           - STARTING_UP
