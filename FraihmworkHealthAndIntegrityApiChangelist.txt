@@ -1,3 +1,8 @@
+Version 1.5.0
+- Added minimumTimeToLive field to Fault object, to allow for a specification of a minimum amount of time a fault is forced to exist in FRAIHMWORK
+- Added 202 return code to the fault delete operation, for when a delete is requested during a minimum time to live period. This will notify a client that the fault *will* be removed when the time period expires, but no action has been taken yet.
+- Added missing 400 return code for fault post operation. This is already performed by the FRAIHMWORK system, but was not documented in swagger spec.
+
 Version 1.4.0
 - Added POST /monitor/v1/component/schedule/unavailability: Add unavailability schedules for one or more components.
 - Added GET /monitor/v1/component/schedule/unavailability: Retrieve unavailability schedules.
