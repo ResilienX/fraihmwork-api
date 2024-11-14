@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.4.0
+  version: 1.5.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -1061,6 +1061,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request - something with the request is malformed or does not meet the specification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -1284,6 +1290,12 @@ paths:
       responses:
         200:
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        202:
+          description: Successfully accepted request. Actions like this may be deferred if the fault is currently in its minimum time to live, in which case this delete operation will take effect as soon as possible (provided it isn't overridden by an update or re-post of this fault)
           content:
             application/json:
               schema:
@@ -2177,7 +2189,13 @@ components:
           type: integer
           minimum: 1
           example: 100
-          description: Seconds within which a fault update is expected from the reporting client. If no update is received, the fault is assumed to be resolved.
+          description: Seconds within which a fault update is expected from the reporting client. If no update is received, the fault is assumed to be resolved. This should be greater than or equal to the minimumTimeToLive field, if specified. If not specified, this is set to a default value specified by the deployment's configuration.
+          
+        minimumTimeToLive: 
+          type: integer
+          minimum: 0
+          example: 5
+          description: The minimum amount of time, in seconds, the fault should exist in the system before it is allowed to be cleared. This should be less than or equal to the timeout field, if specified. If not specified, this is set to a default value specified by the deployment's configuration.
         
         reporter:
           type: string
