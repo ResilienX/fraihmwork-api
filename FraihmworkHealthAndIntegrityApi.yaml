@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.5.0
+  version: 1.6.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -25,6 +25,9 @@ tags:
 
 - name: Components
   description: All component related api endpoints
+  
+- name: Relationships
+  description: All endpoints related to relationship management 
   
 - name: Faults
   description: All fault related api endpoints
@@ -1027,6 +1030,355 @@ paths:
         500:
           description: Server error
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
+  /monitor/v1/relationship/definition:
+    get:
+      tags:
+      - Relationships
+      - Monitor
+      summary: Retrieve all of the relationship definitions active in FRAIHMWORK
+      operationId: findAllRelationshipDefinitions
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RelationshipDefinition'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read components
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+    post:
+      tags:
+      - Relationships
+      - Monitor
+      summary: Add a new relationship definition
+      description: Relationship definitions are usually defined in system configuration, but there are scenarios where a user or integrator will want to add new relationship definitions for a specific deployment. This endpoint facilitates that behavior.
+      operationId: postRelationshipDefinition
+      requestBody:
+        description: JSON description of the new relationship definition
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipDefinition'
+      responses:
+        201:
+          description: Successfully posted new component information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: "Bad request. The things that could cause a bad request include but are not limited to:<br>
+                        - Violation of the relationship definition schema <br>
+                        - Non unique name of the relationship definition <br>
+                        - Reference of a non-existing rule"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to create components
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  
+  /monitor/v1/relationship/definition/{name}:
+    delete:  
+      tags:
+      - Relationships
+      - Monitor
+      summary: Deletes a relationship definition from the deployment configuration
+      description: This operation removes a relationship definition from FRAIHMWORK, making it unusable for future relationship instances. This operation cannot be performed on definitions with active relationship instances - they must be deleted first. Note, requests with the fraihmwork.component.write permission may be limited for authorization reasons. See the descriptions in the securitySchemes.OAuth2.flows.clientCredentials.scopes for more details.  
+      operationId: deleteRelationshipDefinition
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          description: The name of the relationship definition to delete
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request - The relationship definition cannot be removed, likely because of existing relationships that are still using this definition.
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to delete this component
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Relationship definition with target name not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.admin]
+
+  /monitor/v1/relationship/instance:
+    get:
+      tags:
+      - Relationships
+      - Monitor
+      summary: Retrieve all of the relationship instances active in FRAIHMWORK, filtered by criteria
+      operationId: findRelationshipInstances
+      parameters:
+      - name: type
+        in: query
+        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition. Can leave null to not filter on this.
+        schema:
+          type: string
+      - name: source
+        in: query
+        description: Filter results to only return relationships with a source UUID equal to this value. Can leave null to not filter on this.
+        schema:
+          type: string
+          format: uuid
+      - name: target
+        in: query
+        description: Filter results to only return relationships with a target UUID equal to this value. Can leave null to not filter on this.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RelationshipInstance'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read components
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      deprecated: false
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+    post:
+      tags:
+      - Relationships
+      - Monitor
+      summary: Add a new relationship instance
+      description: Relationship instances connect two FRAIHMWORK resources together in a pattern established by existing relationship definitions to describe how they are related to an end user, as well as prescribe some automated actions. This endpoint allows for two resources have a relationship defined between them.
+      operationId: postRelationshipInstance
+      requestBody:
+        description: JSON description of the new relationship instance
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelationshipInstance'
+      responses:
+        201:
+          description: Successfully posted new component information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Already reported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: "Bad request. The things that could cause a bad request include but are not limited to:<br>
+                        - Violation of the relationship instance schema <br>
+                        - Reference to a non-existing relationship definition <br>
+                        - Providing a non-null, non-unique UUID for the relationship instance"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+          
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to create components
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: The referenced source or target UUID cannot be found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+  
+  /monitor/v1/relationship/instance/{uuid}:
+    delete:  
+      tags:
+      - Relationships
+      - Monitor
+      summary: Deletes a relationship instance
+      description: This operation breaks up two FRAIHMWORK resources that were previously in a relationship. Deleting a relationship from two resources requires that the caller has sufficient permissions to write on the two resources, or admin privileges. Note that relationships are automatically removed if any of the relevant resources are deleted.
+      operationId: deleteRelationshipInstance
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The name of the relationship instance to delete
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to delete this component
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Relationship instance with target UUID not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -2371,6 +2723,52 @@ components:
       required: 
         - name
         - state
+
+    RelationshipDefinition:
+      type: object
+      description: A 'kind' of relationship that can be held between two FRAIHMWORK resources
+      properties:
+        name:
+          type: string
+          description: The name of the relationship definition
+        description: 
+          type: string
+          description: A description of what the relationship is and means for the resources involved
+        visualization:
+          type: object
+          description: Currently, an open object definition for any kind of formatting rules to apply to displays representing this relationship
+        rules:
+          type: array
+          description: A list of rules that are automatically applied to relationships that match this definition. Relationship rules expect to have a source and destination resource defined, and these will be supplied by specific relationship instantiations of the RelationshipDefinition object
+          items:
+            type: string
+            description: The name of the rule to utilize
+      required:
+        - name
+
+    RelationshipInstance:
+      type: object
+      description: An instantiation of a RelationshipDefinition that explicitly identifies the UUIDs of the source and target resources involved
+      properties:
+        uuid: 
+          type: string
+          format: uuid
+          description: A unique identifier for the relationship, so that it can be referenced elsewhere. If not supplied on creation, this will be assigned by the server.
+        definition:
+          type: string
+          description: The name of the relationship definition being referenced for this instance. This shall correspond directly to an existing 'name' of a RelationshipDefinition object. Referencing an undefined relationship definition name will result in this object being invalid.
+        source:
+          type: string
+          format: uuid
+          description: The UUID of the 'source' resource of the relationship. Note that for relationships that are bidirectional, it doesn't matter which resource is the source and which is the target. Referencing an undefined resource UUID will result in this object being invalid.
+        target: 
+          type: string
+          format: uuid
+          description: The UUID of the 'target' resource of the relationship. Note that for relationships that are bidirectional, it doesn't matter which resource is the source and which is the target. Referencing an undefined resource UUID will result in this object being invalid.
+      required:
+        - definition
+        - source
+        - target
 
     Resolution:
       type: string
