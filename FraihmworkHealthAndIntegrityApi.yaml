@@ -1205,7 +1205,7 @@ paths:
       parameters:
       - name: type
         in: query
-        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition. Can leave null to not filter on this.
+        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition name. Can leave null to not filter on this.
         schema:
           type: string
       - name: source
@@ -1254,7 +1254,7 @@ paths:
       - Relationships
       - Monitor
       summary: Add a new relationship instance
-      description: Relationship instances connect two FRAIHMWORK resources together in a pattern established by existing relationship definitions to describe how they are related to an end user, as well as prescribe some automated actions. This endpoint allows for two resources have a relationship defined between them.
+      description: Relationship instances connect two FRAIHMWORK resources together in a pattern established by existing relationship definitions to describe how they are related to an end user, as well as prescribe some automated actions. This endpoint allows for two resources to have a relationship defined between them.
       operationId: postRelationshipInstance
       requestBody:
         description: JSON description of the new relationship instance
@@ -1293,7 +1293,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to create components
+          description: Forbidden - client is not authorized to create relationship instances
           content: 
             application/json:
               schema:
@@ -1355,7 +1355,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: Relationship instance with target UUID not found
+          description: Relationship instance with UUID not found
           content: 
             application/json:
               schema:
