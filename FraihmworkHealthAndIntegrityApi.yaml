@@ -455,7 +455,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ActiveComponent'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -478,7 +478,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
@@ -505,7 +504,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ActiveComponent'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -528,7 +527,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
@@ -1052,8 +1050,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelationshipDefinition'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -1064,19 +1068,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        404:
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
     post:
@@ -1095,7 +1086,7 @@ paths:
               $ref: '#/components/schemas/RelationshipDefinition'
       responses:
         201:
-          description: Successfully posted new component information
+          description: Successfully posted new relationship definition
           content:
             application/json:
               schema:
@@ -1245,7 +1236,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content:
             application/json:
               schema:
@@ -1256,7 +1247,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
     post:
@@ -1497,7 +1487,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ActiveFault'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content: 
             application/json:
               schema:
@@ -1514,7 +1504,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false
       security:
       - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 
@@ -1541,7 +1530,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ActiveFault'
         401:
-          description: Unauthorized
+          description: Not authenticated
           content: 
             application/json:
               schema:
@@ -1558,7 +1547,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
-      deprecated: false      
       security:
       - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 

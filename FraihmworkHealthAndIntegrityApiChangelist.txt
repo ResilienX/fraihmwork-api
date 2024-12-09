@@ -2,6 +2,9 @@ Version 1.6.0
 - Added RelationshipDefinition and RelationshipInstance data types
 - Added POST, GET, and DELETE endpoints for RelationshipDefinitions
 - Added POST, GET, and DELETE endpoints for RelationshipInstances
+- Removed useless deprecated: false declarations
+- All 401's are described as 'not authenticated' 
+
 
 Version 1.5.0
 - Added minimumTimeToLive field to Fault object, to allow for a specification of a minimum amount of time a fault is forced to exist in FRAIHMWORK
