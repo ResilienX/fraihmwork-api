@@ -359,6 +359,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         500:
           description: Server error
           content: 
@@ -478,6 +484,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
 
@@ -524,6 +542,18 @@ paths:
         404:
           description: Not Found
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -688,6 +718,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         500:
           description: Server error
           content: 
@@ -739,9 +775,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         500:
           description: Server error
-          content:
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -788,9 +830,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         500:
           description: Server error
-          content:
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -1068,6 +1116,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
     post:
@@ -1244,6 +1304,18 @@ paths:
         403:
           description: Forbidden - client is not authorized to read relationship instances
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -1504,6 +1576,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.fault.read, fraihmwork.fault.write, fraihmwork.fault.admin]
 
@@ -1543,6 +1627,18 @@ paths:
                 $ref: '#/components/schemas/Response'
         404:
           description: Not Found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
           content: 
             application/json:
               schema:

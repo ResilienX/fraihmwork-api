@@ -4,6 +4,7 @@ Version 1.6.0
 - Added POST, GET, and DELETE endpoints for RelationshipInstances
 - Removed useless deprecated: false declarations
 - All 401's are described as 'not authenticated' 
+- Scrubbed to ensure 406 and 500 codes applied universally
 
 
 Version 1.5.0
