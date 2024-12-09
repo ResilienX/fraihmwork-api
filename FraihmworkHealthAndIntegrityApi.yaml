@@ -1205,7 +1205,7 @@ paths:
       parameters:
       - name: type
         in: query
-        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition. Can leave null to not filter on this.
+        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition name. Can leave null to not filter on this.
         schema:
           type: string
       - name: source
