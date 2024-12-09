@@ -1242,7 +1242,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to read components
+          description: Forbidden - client is not authorized to read relationship instances
           content:
             application/json:
               schema:
