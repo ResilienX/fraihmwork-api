@@ -1098,12 +1098,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RelationshipDefinition'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -1195,6 +1189,59 @@ paths:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
   
   /monitor/v1/relationship/definition/{name}:
+    get:
+      tags:
+      - Relationships
+      - Monitor
+      summary: Retrieves a relationship definition by name
+      operationId: findRelationshipDefinitionByName
+      parameters:
+      - in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        description: The name of the relationship definition to retrieve
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelationshipDefinition'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read relationship definitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Relationship definition with target name not found
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+      
     delete:  
       tags:
       - Relationships
@@ -1229,7 +1276,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to delete this component
+          description: Forbidden - client is not authorized to delete this relationship definition
           content: 
             application/json:
               schema:
@@ -1290,7 +1337,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/RelationshipInstance'
         400:
-          description: Bad Request
+          description: Bad Request - one of the parameters is invalid
           content:
             application/json:
               schema:
@@ -1337,7 +1384,7 @@ paths:
               $ref: '#/components/schemas/RelationshipInstance'
       responses:
         201:
-          description: Successfully posted new component information
+          description: Successfully posted new relationship instance
           content:
             application/json:
               schema:
@@ -1421,7 +1468,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to delete this component
+          description: Forbidden - client is not authorized to delete this relationship instance
           content: 
             application/json:
               schema:
