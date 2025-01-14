@@ -201,16 +201,16 @@ paths:
     get:
       tags:
       - Rule Instances
-      summary: Retrieve all the rule instances active in this FRAIHMWORK deployment, filtered by any optional criteria provided.
+      summary: Retrieve a specific rule instance using its unique identifier (UUID)
       operationId: findRuleInstanceByUuid
       parameters:
       - in: path
         name: uuid
+        description: UUID of the rule to retrieve
         required: true
         schema:
           type: string
           format: uuid
-        description: UUID of the rule to retrieve
       responses:
         200:
           description: OK
@@ -231,7 +231,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         400:
-          description: Bad Request
+          description: Bad request, likely due to malformed UUID input
           content:
             application/json:
               schema:
@@ -324,9 +324,10 @@ components:
         itemId:
           type: string
           format: uuid
+          description: UUID of the relevant resource, if applicable
         message:
           type: string
-          description: The success message provided back to the client
+          description: The message provided back to the client
       required:
         - message
         
@@ -349,10 +350,11 @@ components:
           description: The Rule Template that this instance is based on
         ruleProperties:
           type: object
+          additionalProperties: true
           description: A free-form object that MUST match the Rule Template's JSON schema rules to be accepted
       required:
-        - template
         - name
+        - template
         - ruleProperties
 
     RuleTemplate:
@@ -370,18 +372,15 @@ components:
         amqpRoutingKey:
           type: string
           description: Rules generated from this template will be applied to messages that arrive from this routing key
-        instanceSchema:
-          type: string
-          description: The JSON schema that is used for the generation of any rule instatiations of this template, as a string
-        dmnFile:
-          type: string
-          description: The Decision Model Notation file that processes the inputs and outputs of the rule as a string
+        ruleInstanceSchema:
+          type: object
+          additionalProperties: true
+          description: The JSON schema that is used for the generation of any rule instatiations of this template, as a free form object, since JSON Schemas are JSON
       required:
         - name
         - amqpExchange
         - amqpRoutingKey
-        - instanceSchema
-        - dmnFile
+        - ruleInstanceSchema
         
   securitySchemes:
     OAuth2:
@@ -395,6 +394,7 @@ components:
           tokenUrl: https://well-known/oauth-authorization-server/token
           refreshUrl: https://well-known/oauth-authorization-server/refresh
           scopes:
+            # As per requirements, the component scopes are to be used for the rules manipulation until further notice
             fraihmwork.component.admin: Client may create, read, update, or delete any component regardless of creator.
             fraihmwork.component.write: Client may create new components, but can only update and delete components they create. Client may read all components regardless of creator.
             fraihmwork.component.read: Client may read any component that FRAIHMWORK can provide, regardless of creator.
