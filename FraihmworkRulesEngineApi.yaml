@@ -52,6 +52,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RuleTemplate'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -60,18 +66,6 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to read rule templates
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        400:
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        404:
-          description: Not Found
           content:
             application/json:
               schema:
@@ -112,6 +106,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RuleInstance'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -120,12 +120,6 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to read rule instances
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        400:
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -158,8 +152,20 @@ paths:
             schema:
               $ref: '#/components/schemas/RuleInstance'
       responses:
-        200:
-          description: OK
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        208:
+          description: Rule already created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request, incoming JSON malformed or not matching template
           content:
             application/json:
               schema:
@@ -172,12 +178,6 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to read rule instances
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        400:
-          description: Bad request, incoming JSON malformed or not matching template
           content:
             application/json:
               schema:
@@ -218,6 +218,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleInstance'
+        400:
+          description: Bad request, likely due to malformed UUID input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -226,12 +232,6 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to read rule instances
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        400:
-          description: Bad request, likely due to malformed UUID input
           content:
             application/json:
               schema:
@@ -277,6 +277,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -285,12 +291,6 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to read rule instances
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
-        400:
-          description: Bad Request
           content:
             application/json:
               schema:
