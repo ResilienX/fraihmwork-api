@@ -2,7 +2,7 @@
 openapi: 3.0.1
 info:
   title: FRAIHMWORK Rules Engine Service API
-  description: 'As data moves through FRAIHMWORK, there are many reactions the system must take in order to ensure correct behavior across the ecosystem. This API allows for instantiations of rules to be implemented into the target deployment that allows some of these actions to be automated. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
+  description: 'As data moves through FRAIHMWORK, there are many reactions the system must take in order to ensure correct behavior across the ecosystem. This API allows for instantiations of rules to be implemented into the target deployment that allows some of these actions to be automated. This API will be versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
   version: 0.1.0
@@ -35,12 +35,12 @@ paths:
           type: string         
       - name: exchange
         in: query
-        description: Filter results by the AMQP exchange that the messages that the rule(s) apply to come from. Can leave null to not filter
+        description: Filter results by the AMQP exchange that the messages that the rule(s) apply to come from. Can leave null to not filter on this parameter
         schema:
           type: string         
       - name: routingKey
         in: query
-        description: Filter results by the AMQP routing key that is used to select the messages that the rule(s) apply to. Can leave null to not filter
+        description: Filter results by the AMQP routing key that is used to select the messages that the rule(s) apply to. Can leave null to not filter on this parameter
         schema:
           type: string
       responses:
