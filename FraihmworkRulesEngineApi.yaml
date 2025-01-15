@@ -375,7 +375,7 @@ components:
         ruleInstanceSchema:
           type: object
           additionalProperties: true
-          description: The JSON schema that is used for the generation of any rule instantiations of this template, as a free form object, since JSON Schemas are JSON
+          description: The JSON schema that is used for the generation of any rule instantiations of this template. Since JSON schemas are JSON, this acts as the root node for a JSON schema declaration so that the API result is human readable, but still usable by consuming services
       required:
         - name
         - amqpExchange
