@@ -4,7 +4,7 @@ info:
   title: FRAIHMWORK Rules Engine Service API
   description: 'As data moves through FRAIHMWORK, there are many reactions the system must take in order to ensure correct behavior across the ecosystem. This API allows for instantiations of rules to be implemented into the target deployment that allows some of these actions to be automated. This API will be versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
-    email: g.dorchies@resilienx.com
+    email: support@resilienx.com
   version: 0.1.0
 externalDocs:
   description: Find out more about Swagger
@@ -375,7 +375,7 @@ components:
         ruleInstanceSchema:
           type: object
           additionalProperties: true
-          description: The JSON schema that is used for the generation of any rule instatiations of this template, as a free form object, since JSON Schemas are JSON
+          description: The JSON schema that is used for the generation of any rule instantiations of this template, as a free form object, since JSON Schemas are JSON
       required:
         - name
         - amqpExchange
