@@ -35,12 +35,12 @@ paths:
           type: string         
       - name: exchange
         in: query
-        description: Filter results by the AMQP exchange that the messages that the rule(s) apply to come from. Can leave null to not filter
+        description: Filter results by the AMQP exchange that the messages that the rule(s) apply to come from. Can leave null to not filter on this parameter
         schema:
           type: string         
       - name: routingKey
         in: query
-        description: Filter results by the AMQP routing key that is used to select the messages that the rule(s) apply to. Can leave null to not filter
+        description: Filter results by the AMQP routing key that is used to select the messages that the rule(s) apply to. Can leave null to not filter on this parameter
         schema:
           type: string
       responses:
