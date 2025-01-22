@@ -1,0 +1,274 @@
+---
+openapi: 3.0.1
+info:
+  title: Risk Assessment API
+  description: 'This API allows for generating risk assessment reports against flight operations. This API will be versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/).'
+  contact:
+    email: support@resilienx.com
+  version: 0.1.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+
+servers:
+- url: https://<site>.fraihmwork.resilienx.com/api
+
+tags:
+- name: Risk Assessment
+  description: Functions relating to risk assessment for flight operations
+
+paths:
+  /risk/v0/operation:
+    post:
+      tags:
+      - Risk Assessment
+      summary: Post a flight operation for risk assessment
+      operationId: postOperation
+      requestBody:
+        description: JSON description of the flight operation
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operation'
+      responses:
+        202:
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request, incoming JSON malformed or not matching template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to post flight operations
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
+
+  /risk/v0/assessment:
+    get:
+      tags:
+      - Risk Assessment
+      summary: Request risk assessment for a specific flight operation
+      operationId: getAssessment
+      parameters:
+      - name: operationUuid
+        in: query
+        description: The unique identifier of the flight operation for which to retrieve the risk assessment report
+        schema:
+          type: string
+          format: uuid
+        required: true
+      responses:
+        200:
+          description: Successful risk assessment
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Assessment'
+        202:
+          description: Accepted - Risk assessment in progress
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Response'
+        400:
+          description: Bad request, incoming JSON malformed or not matching template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to query risk assessment reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Flight operation with specified UUID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ['rotor', 'fixed wing', 'fixed wing with parachute']
+          description: The type of the vehicle
+        weightKilograms:
+          type: number
+          format: double
+          description: The weight of the vehicle in kilograms
+        dragCoefficient:
+          type: number
+          format: double
+          description: The drag coefficient of the vehicle
+        diameterMeters:
+          type: number
+          format: double
+          description: The diameter of the vehicle in meters
+        required:
+        - type
+        - weightKilograms
+        - dragCoefficient
+        - diameterMeters
+
+    Waypoint:
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the waypoint in decimal degrees
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the waypoint in decimal degrees
+        altitudeMetersWgs84:
+          type: number
+          format: double
+          description: The altitude of the waypoint in meters above the WGS84 ellipsoid
+        timeSecondsSinceStart:
+          type: number
+          format: double
+          description: The time of the waypoint in seconds since the start time
+        required:
+        - latitude
+        - longitude
+        - altitudeMetersWgs84
+        - timeSecondsSinceStart
+
+    Wind:
+      type: object
+      properties:
+        altitudeMetersWgs84:
+          type: number
+          format: double
+          description: The altitude where the wind is applicable in meters above the WGS84 ellipsoid
+        directionDegrees:
+          type: number
+          format: double
+          description: The direction of the wind in degrees
+        velocityMetersPerSecond:
+          type: number
+          format: double
+          description: The velocity of the wind in meters per second
+        required:
+        - altitudeMetersWgs84
+        - directionDegrees
+        - velocityMetersPerSecond
+
+    Operation:
+      type: object
+      properties:
+        operationUuid:
+          type: string
+          format: uuid
+          description: The unique identifier of the flight operation; Optionally assigned by the service
+        startTime:
+          type: string
+          format: date-time
+          description: The timestamp that the operation will start. Timestamp format is as specified by RFC 3339 section 5.6.
+        vehicle:
+          type: object
+          $ref: '#/components/schemas/Vehicle'
+          description: The list of all waypoints making up the flight operation
+        waypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Waypoint'
+          description: The list of all waypoints making up the flight operation
+        windProfile:
+          type: array
+          items:
+            $ref: '#/components/schemas/Wind'
+          description: The list of all wind values making up the wild profile
+      required:
+        - startTime
+        - vehicle
+        - waypoints
+
+    Assessment:
+      type: object
+      properties:
+        operation:
+          type: object
+          $ref: '#/components/schemas/Operation'
+          description: The flight operation for which the risk assessment report was generated
+        assessment:
+          type: object
+          additionalProperties: true
+          description: The freeform risk assessment report
+        required:
+        - operation
+        - assessment
+
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          # Note that multiple authorization servers can be specified to serve this API, and this description only provides details for the default
+          # internal security configuration. Each of the scopes below corresponds to a FRAIHMWORK permission, and can be configured to align to a
+          # different scope or role provided by a 3rd party authorization server, if required. However, at time of writing it is assumed that
+          # authentication activities are always happening over a client-credentials oauth2 flow.
+          tokenUrl: https://well-known/oauth-authorization-server/token
+          refreshUrl: https://well-known/oauth-authorization-server/refresh
+          scopes:
+            # Since no requirements regarding authorization scopes, the component scopes are being used for risk assessment until further notice
+            fraihmwork.component.admin: Client may create, read, update, or delete any component regardless of creator.
+            fraihmwork.component.write: Client may create new components, but can only update and delete components they create. Client may read all components regardless of creator.
+            fraihmwork.component.read: Client may read any component that FRAIHMWORK can provide, regardless of creator.
