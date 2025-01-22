@@ -52,19 +52,19 @@ paths:
                 $ref: '#/components/schemas/Response'
         403:
           description: Forbidden - client is not authorized to post flight operations
-          content: 
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
         406:
           description: Not acceptable - only responds in application/json format
-          content: 
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
         500:
           description: Server error
-          content: 
+          content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Response'
@@ -141,6 +141,19 @@ paths:
 
 components:
   schemas:
+    Response:
+      type: object
+      properties:
+        itemId:
+          type: string
+          format: uuid
+          description: UUID of the relevant resource, if applicable
+        message:
+          type: string
+          description: The message provided back to the client
+      required:
+      - message
+
     Vehicle:
       type: object
       properties:
@@ -160,11 +173,11 @@ components:
           type: number
           format: double
           description: The diameter of the vehicle in meters
-        required:
-        - type
-        - weightKilograms
-        - dragCoefficient
-        - diameterMeters
+      required:
+      - type
+      - weightKilograms
+      - dragCoefficient
+      - diameterMeters
 
     Waypoint:
       type: object
@@ -185,11 +198,11 @@ components:
           type: number
           format: double
           description: The time of the waypoint in seconds since the start time
-        required:
-        - latitude
-        - longitude
-        - altitudeMetersWgs84
-        - timeSecondsSinceStart
+      required:
+      - latitude
+      - longitude
+      - altitudeMetersWgs84
+      - timeSecondsSinceStart
 
     Wind:
       type: object
@@ -206,10 +219,10 @@ components:
           type: number
           format: double
           description: The velocity of the wind in meters per second
-        required:
-        - altitudeMetersWgs84
-        - directionDegrees
-        - velocityMetersPerSecond
+      required:
+      - altitudeMetersWgs84
+      - directionDegrees
+      - velocityMetersPerSecond
 
     Operation:
       type: object
@@ -237,9 +250,9 @@ components:
             $ref: '#/components/schemas/Wind'
           description: The list of all wind values making up the wild profile
       required:
-        - startTime
-        - vehicle
-        - waypoints
+      - startTime
+      - vehicle
+      - waypoints
 
     Assessment:
       type: object
@@ -252,9 +265,9 @@ components:
           type: object
           additionalProperties: true
           description: The freeform risk assessment report
-        required:
-        - operation
-        - assessment
+      required:
+      - operation
+      - assessment
 
   securitySchemes:
     OAuth2:
