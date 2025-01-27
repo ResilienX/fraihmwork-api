@@ -101,7 +101,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Response'
         400:
-          description: Bad request, incoming JSON malformed or not matching template
+          description: Bad request, incoming JSON malformed
           content:
             application/json:
               schema:
