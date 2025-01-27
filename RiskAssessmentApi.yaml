@@ -159,19 +159,25 @@ components:
       properties:
         type:
           type: string
-          enum: ['rotor', 'fixed wing', 'fixed wing with parachute']
+          enum: ['ROTOR', 'FIXED_WING', 'FIXED_WING_WITH_PARACHUTE']
           description: The type of the vehicle
         weightKilograms:
           type: number
           format: double
+          minimum: 0.2
+          maximum: 3000.0
           description: The weight of the vehicle in kilograms
         dragCoefficient:
           type: number
           format: double
+          minimum: 0.001
+          maximum: 2.0
           description: The drag coefficient of the vehicle
         diameterMeters:
           type: number
           format: double
+          minimum: 0.1
+          maximum: 6.0
           description: The diameter of the vehicle in meters
       required:
       - type
@@ -185,10 +191,14 @@ components:
         latitude:
           type: number
           format: double
+          minimum: -90.0
+          maximum: 90.0
           description: The latitude of the waypoint in decimal degrees
         longitude:
           type: number
           format: double
+          minimum: -180.0
+          maximum: 180.0
           description: The longitude of the waypoint in decimal degrees
         altitudeMetersWgs84:
           type: number
@@ -197,6 +207,7 @@ components:
         timeSecondsSinceStart:
           type: number
           format: double
+          minimum: 0.0
           description: The time of the waypoint in seconds since the start time
       required:
       - latitude
@@ -214,10 +225,13 @@ components:
         directionDegrees:
           type: number
           format: double
+          minimum: 0.0
+          exclusiveMaximum: 360.0
           description: The direction of the wind in degrees
         velocityMetersPerSecond:
           type: number
           format: double
+          minimum: 0.0
           description: The velocity of the wind in meters per second
       required:
       - altitudeMetersWgs84
