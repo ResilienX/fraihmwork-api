@@ -100,12 +100,6 @@ paths:
               schema:
                 items:
                   $ref: '#/components/schemas/Response'
-        400:
-          description: Bad request, incoming JSON malformed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Response'
         401:
           description: Not authenticated
           content:
@@ -226,7 +220,8 @@ components:
           type: number
           format: double
           minimum: 0.0
-          exclusiveMaximum: 360.0
+          maximum: 360.0
+          exclusiveMaximum: true
           description: The direction of the wind in degrees
         velocityMetersPerSecond:
           type: number
