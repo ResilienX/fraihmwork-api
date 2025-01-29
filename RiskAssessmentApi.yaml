@@ -236,7 +236,7 @@ components:
     FlightOperation:
       type: object
       properties:
-        operationUuid:
+        uuid:
           type: string
           format: uuid
           description: The unique identifier of the flight operation; Optionally assigned by the service
