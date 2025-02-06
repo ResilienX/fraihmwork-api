@@ -32,6 +32,11 @@ paths:
         in: query
         description: Filter results by the name of the rule. Can leave null to not filter on this parameter
         schema:
+          type: string  
+      - name: namespace
+        in: query
+        description: Filter results by the namespace of the rule. Can leave null to not filter on this parameter
+        schema:
           type: string         
       - name: exchange
         in: query
@@ -92,9 +97,14 @@ paths:
       summary: Retrieve all the rule instances active in this FRAIHMWORK deployment, filtered by any optional criteria provided.
       operationId: findAllRuleInstances
       parameters:
-      - name: template
+      - name: templateName
         in: query
         description: Filter results by the name of the Rule Template that the target rules are based on. Can leave null to not filter on this parameter
+        schema:
+          type: string   
+      - name: templateNamespace
+        in: query
+        description: Filter results by the namespace of the Rule Template that the target rules are based on. Can leave null to not filter on this parameter
         schema:
           type: string         
       responses:
@@ -346,8 +356,7 @@ components:
           type: string
           description: An optional description of the rule instance, to provide additional context
         template:
-          type: string
-          description: The Rule Template that this instance is based on
+          $ref: '#/components/schemas/RuleTemplateIdentifier'
         ruleProperties:
           type: object
           additionalProperties: true
@@ -357,12 +366,25 @@ components:
         - template
         - ruleProperties
 
-    RuleTemplate:
-      description: A template for a rule-based action that FRAIHMWORK can take in response to messages received from AMQP
+    RuleTemplateIdentifier:
+      type: object
+      description: Identifiers for locating a specific rule template
       properties:
         name:
           type: string
-          description: The name of the rule
+          description: The name of the rule template that is unique to its namespace
+        namespace:
+          type: string
+          description: The namespace of the rule. Rule templates can be organized into namespaces to help group them by function or primary triggering mechanisms
+      required: 
+        - name
+        - namespace
+
+    RuleTemplate:
+      description: A template for a rule-based action that FRAIHMWORK can take in response to messages received from AMQP
+      properties:
+        identifier:
+          $ref: '#/components/schemas/RuleTemplateIdentifier'
         description:
           type: string
           description: A description of the rule template
@@ -377,7 +399,7 @@ components:
           additionalProperties: true
           description: The JSON schema that is used for the generation of any rule instantiations of this template. Since JSON schemas are JSON, this acts as the root node for a JSON schema declaration so that the API result is human readable, but still usable by consuming services
       required:
-        - name
+        - identifier
         - amqpExchange
         - amqpRoutingKey
         - ruleInstanceSchema
