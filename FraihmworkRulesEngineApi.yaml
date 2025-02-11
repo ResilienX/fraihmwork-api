@@ -11,7 +11,7 @@ externalDocs:
   url: http://swagger.io
 
 servers:
-- url: https://<site>.fraihmwork.resilienx.com/api
+- url: https://dev.fraihmwork.resilienx.com/api
 
 tags:
 - name: Rule Instances
