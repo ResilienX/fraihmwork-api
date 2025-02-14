@@ -245,7 +245,8 @@ components:
           description: The timestamp that the operation will start. Timestamp format is as specified by RFC 3339 section 5.6.
         vehicle:
           type: object
-          $ref: '#/components/schemas/Vehicle'
+          items:
+             $ref: '#/components/schemas/Vehicle'
           description: The list of all waypoints making up the flight operation
         waypoints:
           type: array
@@ -267,7 +268,8 @@ components:
       properties:
         operation:
           type: object
-          $ref: '#/components/schemas/FlightOperation'
+          items:
+            $ref: '#/components/schemas/FlightOperation'
           description: The flight operation for which the risk assessment report was generated
         assessment:
           type: object
