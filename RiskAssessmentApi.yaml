@@ -262,6 +262,9 @@ components:
           items:
             $ref: '#/components/schemas/Waypoint'
           description: An ordered list of waypoints making up the flight operation
+        useWeatherService:
+          type: boolean
+          description: The toggle for using any available dynamic weather service data. If enabled, the wind profile is ignored
         windProfile:
           type: array
           items:
