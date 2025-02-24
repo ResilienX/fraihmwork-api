@@ -2867,7 +2867,6 @@ components:
           description: A description of what the relationship is and means for the resources involved
         visualization:
           type: object
-          additionalProperties: true
           description: Currently, an open object definition for any kind of formatting rules to apply to displays representing this relationship
         rules:
           type: array
