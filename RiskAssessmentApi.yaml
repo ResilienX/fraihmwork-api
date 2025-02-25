@@ -199,10 +199,10 @@ components:
           minimum: -180.0
           maximum: 180.0
           description: The longitude of the waypoint in decimal degrees
-        altitudeMetersWgs84:
+        altitudeMetersMsl:
           type: number
           format: double
-          description: The altitude of the waypoint in meters above the WGS84 ellipsoid
+          description: The altitude of the waypoint in meters above above mean sea level
         timeSecondsSinceStart:
           type: number
           format: double
@@ -216,16 +216,16 @@ components:
       required:
       - latitude
       - longitude
-      - altitudeMetersWgs84
+      - altitudeMetersMsl
 
     WindMeasurement:
       type: object
       description: A wind measurement at a specific altitude
       properties:
-        altitudeMetersWgs84:
+        altitudeMetersMsl:
           type: number
           format: double
-          description: The altitude where the wind is applicable in meters above the WGS84 ellipsoid
+          description: The altitude where the wind is applicable in meters above above mean sea level
         directionDegrees:
           type: number
           format: double
@@ -239,7 +239,7 @@ components:
           minimum: 0.0
           description: The speed of the wind in meters per second
       required:
-      - altitudeMetersWgs84
+      - altitudeMetersMsl
       - directionDegrees
       - speedMetersPerSecond
 
