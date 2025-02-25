@@ -261,6 +261,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Waypoint'
+          minItems: 2
           description: An ordered list of waypoints making up the flight operation
         weatherServiceEnabled:
           type: boolean
