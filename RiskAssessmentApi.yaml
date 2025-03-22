@@ -150,6 +150,10 @@ components:
       type: object
       description: An entity physically performing a flight operation
       properties:
+        uuid:
+          type: string
+          format: uuid
+          description: The unique identifier of the vehicle; Assigned by the caller
         type:
           type: string
           enum: ['ROTOR', 'FIXED_WING', 'FIXED_WING_WITH_PARACHUTE']
@@ -178,6 +182,7 @@ components:
           minimum: 0.0
           description: The default speed of the vehicle in meters per second. It may be overridden by a speed value for a waypoint
       required:
+      - uuid
       - type
       - weightKilograms
       - dragCoefficient
