@@ -5,7 +5,7 @@ info:
   description: 'This API allows for generating risk assessment reports against flight operations. This API will be versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/).'
   contact:
     email: support@resilienx.com
-  version: 0.1.0
+  version: 0.2.0
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -248,9 +248,147 @@ components:
       - directionDegrees
       - speedMetersPerSecond
 
+    ThreatRiskThresholds:
+      type: object
+      description: A collection of thresholds for setting threat risk level
+      properties:
+        distanceMeters:
+          type: number
+          format: double
+          minimum: 0.0
+          description: The threshold for the minimum distance to any threat in meters
+        buildingCount:
+          type: number
+          format: double
+          minimum: 0
+          description: The threshold for the number of building threats
+      required:
+      - distanceMeters
+      - buildingCount
+
+    GroundRiskThresholds:
+      type: object
+      description: A collection of thresholds for setting ground risk level
+      properties:
+        probabilityOfCasualty:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 1.0
+          description: The threshold for the probability of casualty for ground impact in decimal percentage [0.0, 1.0]
+      required:
+      - probabilityOfCasualty
+
+    NavigationRiskThresholds:
+      type: object
+      description: A collection of thresholds for setting navigation risk level
+      properties:
+        satelliteCount:
+          type: integer
+          format: int32
+          minimum: 0
+          description: The threshold for the number of visible satellites
+        positionDilutionOfPrecision:
+          type: number
+          format: double
+          minimum: 0.0
+          description: The threshold for the position dilution of precision (PDOP) indicating the strength of the satellite constellation for determining position
+      required:
+      - satelliteCount
+      - positionDilutionOfPrecision
+
+    RiskThresholds:
+      type: object
+      description: A collection of thresholds for determining various risk levels
+      properties:
+        threatRisk:
+          type: object
+          description: A collection of thresholds for determining threat risk level
+          properties:
+            mediumThresholds:
+              $ref: '#/components/schemas/ThreatRiskThresholds'
+              description: A collection of thresholds for setting threat risk level to MEDIUM
+            highThresholds:
+              $ref: '#/components/schemas/ThreatRiskThresholds'
+              description: A collection of thresholds for setting threat risk level to HIGH
+          required:
+          - mediumThresholds
+          - highThresholds
+        groundRisk:
+          type: object
+          description: A collection of thresholds for determining ground risk level
+          properties:
+            mediumThresholds:
+              $ref: '#/components/schemas/GroundRiskThresholds'
+              description: A collection of thresholds for setting ground risk level to MEDIUM
+            highThresholds:
+              $ref: '#/components/schemas/GroundRiskThresholds'
+              description: A collection of thresholds for setting ground risk level to HIGH
+          required:
+          - mediumThresholds
+          - highThresholds
+        navigationRisk:
+          type: object
+          description: A collection of thresholds for determining navigation risk level
+          properties:
+            mediumThresholds:
+              $ref: '#/components/schemas/NavigationRiskThresholds'
+              description: A collection of thresholds for setting navigation risk level to MEDIUM
+            highThresholds:
+              $ref: '#/components/schemas/NavigationRiskThresholds'
+              description: A collection of thresholds for setting navigation risk level to HIGH
+          required:
+          - mediumThresholds
+          - highThresholds
+        overallRisk:
+          type: object
+          description: A collection of thresholds for determining overall risk level
+          properties:
+            weights:
+              type: object
+              description: The weighting to apply to each risk level when determining the overall risk
+              properties:
+                threat:
+                  type: number
+                  format: double
+                  description: The weighting of threat risk when determining the overall risk
+                ground:
+                  type: number
+                  format: double
+                  description: The weighting of ground risk when determining the overall risk
+                navigation:
+                  type: number
+                  format: double
+                  description: The weighting of navigation risk when determining the overall risk
+              required:
+              - threat
+              - ground
+              - navigation
+            thresholds:
+              type: object
+              description: A collection of thresholds for determining overall risk level
+              properties:
+                medium:
+                  type: number
+                  format: double
+                  description: The threshold for setting overall risk level to MEDIUM
+                high:
+                  type: number
+                  format: double
+                  description: The threshold for setting overall risk level to HIGH
+              required:
+              - medium
+              - high
+            noGoHighRiskWaypointPercentage:
+              type: number
+              format: double
+              minimum: 0.0
+              maximum: 1.0
+              description: The threshold for the percentage of waypoints with an overall HIGH risk for setting go/no-go to NO-GO in decimal percentage [0.0, 1.0]
+
     FlightOperation:
       type: object
-      description: A collection of ordered waypoints to be flown by a vehicle, plus metadata to aid in risk assessment
+      description: A collection of ordered waypoints to be flown by a vehicle, plus metadata and thresholds to aid in risk assessment
       properties:
         uuid:
           type: string
@@ -276,21 +414,120 @@ components:
           items:
             $ref: '#/components/schemas/WindMeasurement'
           description: A list of wind measurements making up a wind profile
+        riskThresholds:
+          $ref: '#/components/schemas/RiskThresholds'
+          description: The thresholds provided to override pre-configured thresholds.
       required:
       - startTime
       - vehicle
       - waypoints
 
+    RiskResults:
+      type: object
+      description: The mapping of waypoint number to risk level
+      additionalProperties:
+        type: string
+        enum: ['LOW', 'MEDIUM', 'HIGH']
+        description: The level of the risk
+
     RiskAssessment:
       type: object
+      description:
       properties:
         operation:
           $ref: '#/components/schemas/FlightOperation'
           description: The flight operation for which the risk assessment report was generated
         assessment:
           type: object
+          properties:
+            flightGoAheadIndicator:
+              type: boolean
+              description: The GO (true) / NO-GO (false) indication for the flight operation based on the risk assessment
+            overallWeightedRisk:
+              type: number
+              format: double
+              description: The weighted overall risk level
+            riskLevels:
+              type: object
+              description: The various risk levels
+              properties:
+                overallRisk:
+                  type: number
+                  format: double
+                  description: The overall risk level
+                threatRisk:
+                  type: number
+                  format: double
+                  description: The threat risk level
+                groundRisk:
+                  type: number
+                  format: double
+                  description: The ground risk level
+                navigationRisk:
+                  type: number
+                  format: double
+                  description: The navigation risk level
+              additionalProperties: true
+            riskResults:
+              type: object
+              description: The risk assessment results used to determine the risk levels
+              properties:
+                overallRisk:
+                  $ref: '#/components/schemas/RiskResults'
+                  description: The mapping of waypoint number to overall risk level
+                threatRisk:
+                  $ref: '#/components/schemas/RiskResults'
+                  description: The mapping of waypoint number to threat risk level
+                groundRisk:
+                  $ref: '#/components/schemas/RiskResults'
+                  description: The mapping of waypoint number to ground risk level
+                navigationRisk:
+                  $ref: '#/components/schemas/RiskResults'
+                  description: The mapping of waypoint number to navigation risk level
+              additionalProperties: true
+            riskStatistics:
+              type: object
+              description: A collection of statistics for the risk assessment
+              properties:
+                totalWaypointCount:
+                  type: integer
+                  format: int32
+                  description: The total number of waypoints assessed for risk
+                highRiskWaypointCount:
+                  type: integer
+                  format: int32
+                  description: The number of waypoints receiving a HIGH risk score
+                mediumRiskWaypointCount:
+                  type: integer
+                  format: int32
+                  description: The number of waypoints receiving a MEDIUM risk score
+                lowRiskWaypointCount:
+                  type: integer
+                  format: int32
+                  description: The number of waypoints receiving a LOW risk score
+                threatRiskWaypointPercentage:
+                  type: number
+                  format: double
+                  minimum: 0.0
+                  maximum: 100.0
+                  description: The percentage of waypoints receiving a HIGH or MEDIUM threat risk score
+                groundRiskWaypointPercentage:
+                  type: number
+                  format: double
+                  minimum: 0.0
+                  maximum: 100.0
+                  description: The percentage of waypoints receiving a HIGH or MEDIUM ground risk score
+                navigationRiskWaypointPercentage:
+                  type: number
+                  format: double
+                  minimum: 0.0
+                  maximum: 100.0
+                  description: The percentage of waypoints receiving a HIGH or MEDIUM navigation risk score
+              additionalProperties: true
+            riskThresholds:
+              $ref: '#/components/schemas/RiskThresholds'
+              description: The thresholds used for this risk assessment.
           additionalProperties: true
-          description: The freeform risk assessment report
       required:
       - operation
       - assessment

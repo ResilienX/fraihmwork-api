@@ -1,2 +1,5 @@
+Version 0.2.0
+- Enhanced for go/no-go related capability
+
 Version 0.1.0
 - Inception of Risk Assessment API
