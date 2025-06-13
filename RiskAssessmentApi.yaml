@@ -281,7 +281,7 @@ components:
         uuid:
           type: string
           format: uuid
-          description: The unique identifier of the vehicle; Assigned by the caller
+          description: The unique identifier of the vehicle. Assigned by the caller
         type:
           type: string
           enum: ['ROTOR', 'FIXED_WING', 'FIXED_WING_WITH_PARACHUTE']
@@ -309,6 +309,7 @@ components:
           format: double
           minimum: 0.0
           description: The default speed of the vehicle in meters per second. It may be overridden by a speed value for a waypoint
+      additionalProperties: true
       required:
       - uuid
       - type
@@ -346,6 +347,7 @@ components:
           format: double
           minimum: 0.0
           description: The speed of the vehicle as it travels from this waypoint to the next waypoint in meters per second. If not provided, the default speed of the vehicle may be used
+      additionalProperties: true
       required:
       - latitude
       - longitude
@@ -371,6 +373,7 @@ components:
           format: double
           minimum: 0.0
           description: The speed of the wind in meters per second
+      additionalProperties: true
       required:
       - altitudeMetersMsl
       - directionDegrees
@@ -390,6 +393,7 @@ components:
           format: double
           minimum: 0
           description: The threshold for the number of obstacles within the minimum distance
+      additionalProperties: true
       required:
       - minimumDistanceMeters
       - obstacleCount
@@ -404,6 +408,7 @@ components:
           minimum: 0.0
           maximum: 1.0
           description: The threshold for the probability of casualty for ground impact impact
+      additionalProperties: true
       required:
       - probabilityOfCasualty
 
@@ -427,6 +432,7 @@ components:
           minimum: 0.0
           maximum: 1.0
           description: The threshold for the weighted risk which incorporates satellite count, PDOP, and map tile availability
+      additionalProperties: true
       required:
       - satelliteCount
       - pdop
@@ -446,6 +452,7 @@ components:
             highThresholds:
               $ref: '#/components/schemas/ObstacleProximityRiskThresholds'
               description: A collection of thresholds for setting obstacle proximity risk level to HIGH
+          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -459,6 +466,7 @@ components:
             highThresholds:
               $ref: '#/components/schemas/GroundImpactRiskThresholds'
               description: A collection of thresholds for setting ground impact risk level to HIGH
+          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -494,6 +502,7 @@ components:
                   minimum: 0.0
                   maximum: 1.0
                   description: The weighting of map tile availability risk
+              additionalProperties: true
               required:
               - satelliteCount
               - pdop
@@ -501,6 +510,7 @@ components:
             forceHighRiskIfMapTileUnavailable:
               type: boolean
               description: The toggle for forcing navigation reliability risk level to HIGH if map tile is unavailable
+          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -532,6 +542,7 @@ components:
                   minimum: 0.0
                   maximum: 1.0
                   description: The weighting of navigation reliability risk
+              additionalProperties: true
               required:
               - obstacleProximity
               - groundImpact
@@ -561,6 +572,7 @@ components:
               minimum: 0.0
               maximum: 1.0
               description: The threshold for the percentage of waypoints with an overall HIGH risk for setting Flight Go-Ahead Indicator to FALSE
+      additionalProperties: true
 
     FlightOperation:
       type: object
@@ -569,7 +581,7 @@ components:
         uuid:
           type: string
           format: uuid
-          description: The unique identifier of the flight operation; Optionally assigned by the service
+          description: The unique identifier of the flight operation. Optionally assigned by the service
         startTime:
           type: string
           format: date-time
@@ -578,38 +590,64 @@ components:
           $ref: '#/components/schemas/Vehicle'
         waypoints:
           type: array
+          description: An ordered list of waypoints making up the flight operation
+          minItems: 2
           items:
             $ref: '#/components/schemas/Waypoint'
-          minItems: 2
-          description: An ordered list of waypoints making up the flight operation
         weatherServiceEnabled:
           type: boolean
           description: The toggle for enabling use of any available dynamic weather service data. If enabled, the wind profile is ignored
         windProfile:
           type: array
+          description: A list of wind measurements making up a wind profile
           items:
             $ref: '#/components/schemas/WindMeasurement'
-          description: A list of wind measurements making up a wind profile
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
           description: The risk thresholds provided to override pre-configured thresholds.
+      additionalProperties: true
       required:
       - startTime
       - vehicle
       - waypoints
 
+    RiskLevel:
+      type: string
+      enum: ['LOW', 'MEDIUM', 'HIGH']
+      description: The levels of risk
+
     RiskResults:
       type: object
-      description: The mapping of waypoint number to risk level
-      additionalProperties:
-        type: string
-        enum: ['LOW', 'MEDIUM', 'HIGH']
-        description: The level of the risk
+      description: The pairing of a waypoint from the flight operation and associated risk levels
+      properties:
+        waypoint:
+          $ref: '#/components/schemas/Waypoint'
+          description: A waypoint from the flight operation
+        overallRiskLevel:
+          $ref: '#/components/schemas/RiskLevel'
+          description: The overall risk level for the given waypoints
+        obstacleProximityRiskLevel:
+          $ref: '#/components/schemas/RiskLevel'
+          description: The obstacle proximity risk level for the given waypoints
+        groundImpactRiskLevel:
+          $ref: '#/components/schemas/RiskLevel'
+          description: The ground impact risk level for the given waypoints
+        navigationReliabilityRiskLevel:
+          $ref: '#/components/schemas/RiskLevel'
+          description: The navigation reliability risk level for the given waypoints
+      additionalProperties: true
+      required:
+      - waypoint
+      - overallRiskLevel
 
     RiskAssessment:
       type: object
       description: A risk assessment report including a Flight Go-Ahead Indicator, plus supporting artifacts
       properties:
+        flightOperationUuid:
+          type: string
+          format: uuid
+          description: The unique identifier of the flight operation for which the risk assessment report was generated
         flightGoAheadIndicator:
           type: boolean
           description: The go-ahead indication for the flight operation based on the risk assessment with TRUE meaning go-ahead and FALSE meaning do not go-ahead
@@ -637,68 +675,46 @@ components:
               type: integer
               format: int32
               description: The number of waypoints receiving a LOW risk
-            obstacleProximityRiskWaypointPercentage:
+            obstacleProximityRiskyWaypointPercentage:
               type: number
               format: double
               minimum: 0.0
               maximum: 100.0
               description: The percentage of waypoints receiving a HIGH or MEDIUM obstacle proximity risk
-            groundImpactRiskWaypointPercentage:
+            groundImpactRiskyWaypointPercentage:
               type: number
               format: double
               minimum: 0.0
               maximum: 100.0
               description: The percentage of waypoints receiving a HIGH or MEDIUM ground impact risk
-            navigationReliabilityRiskWaypointPercentage:
+            navigationReliabilityRiskyWaypointPercentage:
               type: number
               format: double
               minimum: 0.0
               maximum: 100.0
               description: The percentage of waypoints receiving a HIGH or MEDIUM navigation reliability risk
           additionalProperties: true
+          required:
+          - overallWeightedRisk
+          - totalWaypointCount
+          - highRiskWaypointCount
+          - mediumRiskWaypointCount
+          - lowRiskWaypointCount
         riskResults:
-          type: object
-          description: The risk assessment results used to determine the risk levels
-          properties:
-            overallRisk:
-              $ref: '#/components/schemas/RiskResults'
-              description: The mapping of waypoint number to overall risk level
-            obstacleProximityRisk:
-              $ref: '#/components/schemas/RiskResults'
-              description: The mapping of waypoint number to obstacle proximity risk level
-            groundImpactRisk:
-              $ref: '#/components/schemas/RiskResults'
-              description: The mapping of waypoint number to ground impact risk level
-            navigationReliabilityRisk:
-              $ref: '#/components/schemas/RiskResults'
-              description: The mapping of waypoint number to navigation reliability risk level
-          additionalProperties: true
+          type: array
+          description: An ordered list of waypoints making up the flight operation and their associated risk levels
+          items:
+            $ref: '#/components/schemas/RiskResults'
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
           description: The thresholds used for this risk assessment.
-        flightOperationSummary:
-          type: object
-          description: The flight operation unique identifier and waypoints for which the risk assessment report was generated. For the full flight operation, perform a GET on the /risk/v0/operation/{uuid} endpoint
-          properties:
-            uuid:
-              type: string
-              format: uuid
-              description: The unique identifier of the flight operation
-            waypoints:
-              type: object
-              additionalProperties:
-                $ref: '#/components/schemas/Waypoint'
-              description: The mapping of waypoint number to waypoint definition 
-          required:
-          - uuid
-          - waypoints
       additionalProperties: true
       required:
+      - flightOperationUuid
       - flightGoAheadIndicator
       - riskStatistics
       - riskResults
       - riskThresholds
-      - flightOperation
 
   securitySchemes:
     OAuth2:
