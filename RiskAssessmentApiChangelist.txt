@@ -1,5 +1,7 @@
 Version 0.2.0
-- Enhanced for go/no-go related capability
+- Enhanced for risk assessment endpoint for Flight Go-Ahead Indicator, plus supporting artifacts
+- Added endpoint for retrieving flight operation by UUID
+- Added endpoint for retrieving raw risk results
 
 Version 0.1.0
 - Inception of Risk Assessment API
