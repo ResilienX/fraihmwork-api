@@ -117,7 +117,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: Not Found - flight operation with specified unique identifier not found
+          description: Not Found - flight operation with specified unique identifier does not exist
           content:
             application/json:
               schema:
@@ -177,7 +177,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: Not Found - flight operation with specified unique identifier not found
+          description: Not Found - flight operation with specified unique identifier does not exist
           content:
             application/json:
               schema:
@@ -239,7 +239,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         404:
-          description: Not Found - flight operation with specified unique identifier not found
+          description: Not Found - flight operation with specified unique identifier does not exist
           content:
             application/json:
               schema:
