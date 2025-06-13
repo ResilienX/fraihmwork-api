@@ -392,7 +392,7 @@ components:
           description: The threshold for the number of obstacles within the minimum distance
       required:
       - minimumDistanceMeters
-      - buildingCount
+      - obstacleCount
 
     GroundImpactRiskThresholds:
       type: object
@@ -429,7 +429,7 @@ components:
           description: The threshold for the weighted risk which incorporates satellite count, PDOP, and map tile availability
       required:
       - satelliteCount
-      - positionDilutionOfPrecision
+      - pdop
       - weightedRisk
 
     RiskThresholds:
@@ -535,7 +535,7 @@ components:
               required:
               - obstacleProximity
               - groundImpact
-              - navigation
+              - navigationReliability
             thresholds:
               type: object
               description: A collection of thresholds for determining overall risk level
@@ -608,7 +608,7 @@ components:
 
     RiskAssessment:
       type: object
-      description:
+      description: A risk assessment report including a Flight Go-Ahead Indicator, plus supporting artifacts
       properties:
         flightGoAheadIndicator:
           type: boolean
@@ -676,9 +676,9 @@ components:
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
           description: The thresholds used for this risk assessment.
-        flightOperation:
+        flightOperationSummary:
           type: object
-          description: The flight operation unique identifier and waypoints for which the risk assessment report was generated
+          description: The flight operation unique identifier and waypoints for which the risk assessment report was generated. For the full flight operation, perform a GET on the /risk/v0/operation/{uuid} endpoint
           properties:
             uuid:
               type: string
