@@ -63,7 +63,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         409:
-          description: Conflict - flight operation with specified unique identifier already exists
+          description: Conflict - flight operation with specified unique identifier exists
           content:
             application/json:
               schema:
