@@ -676,7 +676,7 @@ components:
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
           description: The thresholds used for this risk assessment.
-        operation:
+        flightOperation:
           type: object
           description: The flight operation unique identifier and waypoints for which the risk assessment report was generated
           properties:
@@ -698,7 +698,7 @@ components:
       - riskStatistics
       - riskResults
       - riskThresholds
-      - operation
+      - flightOperation
 
   securitySchemes:
     OAuth2:
