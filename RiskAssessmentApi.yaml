@@ -111,7 +111,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to post flight operations
+          description: Forbidden - client is not authorized to query flight operations
           content:
             application/json:
               schema:
@@ -196,7 +196,7 @@ paths:
                 $ref: '#/components/schemas/Response'
       security:
       - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
-        
+
   /risk/v0/assessment/rawResults:
     get:
       tags:
@@ -217,9 +217,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
-                description: The freeform risk assessment raw results
+                $ref: '#/components/schemas/RawResults'
         202:
           description: Accepted - risk assessment in progress
           content:
@@ -233,7 +231,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Response'
         403:
-          description: Forbidden - client is not authorized to query risk assessment reports
+          description: Forbidden - client is not authorized to query risk assessment raw results
           content:
             application/json:
               schema:
@@ -585,7 +583,7 @@ components:
         startTime:
           type: string
           format: date-time
-          description: The timestamp when the flight operation will start. Timestamp format is as specified by RFC 3339 section 5.6.
+          description: The timestamp when the flight operation will start. Timestamp format is as specified by RFC 3339 section 5.6
         vehicle:
           $ref: '#/components/schemas/Vehicle'
         waypoints:
@@ -604,12 +602,61 @@ components:
             $ref: '#/components/schemas/WindMeasurement'
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
-          description: The risk thresholds provided to override pre-configured thresholds.
-      additionalProperties: true
+          description: The risk thresholds provided to override pre-configured thresholds
       required:
       - startTime
       - vehicle
       - waypoints
+
+    RiskStatistics:
+      type: object
+      description: A collection of statistics for the risk assessment
+      properties:
+        overallWeightedRisk:
+          type: number
+          format: double
+          description: The weighted overall risk level
+        totalWaypointCount:
+          type: integer
+          format: int32
+          description: The total number of waypoints assessed for risk
+        highRiskWaypointCount:
+          type: integer
+          format: int32
+          description: The number of waypoints receiving a HIGH risk
+        mediumRiskWaypointCount:
+          type: integer
+          format: int32
+          description: The number of waypoints receiving a MEDIUM risk
+        lowRiskWaypointCount:
+          type: integer
+          format: int32
+          description: The number of waypoints receiving a LOW risk
+        obstacleProximityRiskyWaypointPercentage:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          description: The percentage of waypoints receiving a HIGH or MEDIUM obstacle proximity risk
+        groundImpactRiskyWaypointPercentage:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          description: The percentage of waypoints receiving a HIGH or MEDIUM ground impact risk
+        navigationReliabilityRiskyWaypointPercentage:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          description: The percentage of waypoints receiving a HIGH or MEDIUM navigation reliability risk
+      additionalProperties: true
+      required:
+      - overallWeightedRisk
+      - totalWaypointCount
+      - highRiskWaypointCount
+      - mediumRiskWaypointCount
+      - lowRiskWaypointCount
 
     RiskLevel:
       type: string
@@ -652,54 +699,8 @@ components:
           type: boolean
           description: The go-ahead indication for the flight operation based on the risk assessment with TRUE meaning go-ahead and FALSE meaning do not go-ahead
         riskStatistics:
-          type: object
-          description: A collection of statistics for the risk assessment
-          properties:
-            overallWeightedRisk:
-              type: number
-              format: double
-              description: The weighted overall risk level
-            totalWaypointCount:
-              type: integer
-              format: int32
-              description: The total number of waypoints assessed for risk
-            highRiskWaypointCount:
-              type: integer
-              format: int32
-              description: The number of waypoints receiving a HIGH risk
-            mediumRiskWaypointCount:
-              type: integer
-              format: int32
-              description: The number of waypoints receiving a MEDIUM risk
-            lowRiskWaypointCount:
-              type: integer
-              format: int32
-              description: The number of waypoints receiving a LOW risk
-            obstacleProximityRiskyWaypointPercentage:
-              type: number
-              format: double
-              minimum: 0.0
-              maximum: 100.0
-              description: The percentage of waypoints receiving a HIGH or MEDIUM obstacle proximity risk
-            groundImpactRiskyWaypointPercentage:
-              type: number
-              format: double
-              minimum: 0.0
-              maximum: 100.0
-              description: The percentage of waypoints receiving a HIGH or MEDIUM ground impact risk
-            navigationReliabilityRiskyWaypointPercentage:
-              type: number
-              format: double
-              minimum: 0.0
-              maximum: 100.0
-              description: The percentage of waypoints receiving a HIGH or MEDIUM navigation reliability risk
-          additionalProperties: true
-          required:
-          - overallWeightedRisk
-          - totalWaypointCount
-          - highRiskWaypointCount
-          - mediumRiskWaypointCount
-          - lowRiskWaypointCount
+          $ref: '#/components/schemas/RiskStatistics'
+          description: The statistics for this risk assessment
         riskResults:
           type: array
           description: An ordered list of waypoints making up the flight operation and their associated risk levels
@@ -707,7 +708,7 @@ components:
             $ref: '#/components/schemas/RiskResults'
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
-          description: The thresholds used for this risk assessment.
+          description: The thresholds used for this risk assessment
       additionalProperties: true
       required:
       - flightOperationUuid
@@ -715,6 +716,11 @@ components:
       - riskStatistics
       - riskResults
       - riskThresholds
+
+    RawResults:
+      type: object
+      description: A freeform object for risk assessment raw results
+      additionalProperties: true
 
   securitySchemes:
     OAuth2:
