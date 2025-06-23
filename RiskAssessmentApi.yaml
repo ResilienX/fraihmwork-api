@@ -84,7 +84,7 @@ paths:
       operationId: getFlightOperationByUuid
       parameters:
       - name: uuid
-        in: path
+        in: query
         description: The unique identifier of the flight operation
         schema:
           type: string
