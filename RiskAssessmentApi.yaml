@@ -710,7 +710,13 @@ components:
           type: string
           format: uuid
           description: The unique identifier of the flight operation for which the raw results were generated
-      additionalProperties: true
+        rawResults:
+          type: object
+          additionalProperties: true
+          description: The freeform risk assessment raw results
+      required:
+      - flightOperationUuid
+      - rawResults
 
   securitySchemes:
     OAuth2:
