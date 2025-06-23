@@ -77,7 +77,6 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /risk/v0/operation/{uuid}:
     get:
       tags:
       - Risk Assessment
