@@ -83,7 +83,7 @@ paths:
       summary: Retrieve a flight operation for risk assessment
       operationId: getFlightOperationByUuid
       parameters:
-      - name: uuid
+      - name: operationUuid
         in: query
         description: The unique identifier of the flight operation
         schema:
