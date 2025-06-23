@@ -388,7 +388,6 @@ components:
           format: double
           minimum: 0
           description: The threshold for the number of obstacles within the minimum distance
-      additionalProperties: true
       required:
       - minimumDistanceMeters
       - obstacleCount
@@ -403,7 +402,6 @@ components:
           minimum: 0.0
           maximum: 1.0
           description: The threshold for the probability of casualty for ground impact impact
-      additionalProperties: true
       required:
       - probabilityOfCasualty
 
@@ -427,7 +425,6 @@ components:
           minimum: 0.0
           maximum: 1.0
           description: The threshold for the weighted risk which incorporates satellite count, PDOP, and map tile availability
-      additionalProperties: true
       required:
       - satelliteCount
       - pdop
@@ -447,7 +444,6 @@ components:
             highThresholds:
               $ref: '#/components/schemas/ObstacleProximityRiskThresholds'
               description: A collection of thresholds for setting obstacle proximity risk level to HIGH
-          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -461,7 +457,6 @@ components:
             highThresholds:
               $ref: '#/components/schemas/GroundImpactRiskThresholds'
               description: A collection of thresholds for setting ground impact risk level to HIGH
-          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -497,7 +492,6 @@ components:
                   minimum: 0.0
                   maximum: 1.0
                   description: The weighting of map tile availability risk
-              additionalProperties: true
               required:
               - satelliteCount
               - pdop
@@ -505,7 +499,6 @@ components:
             forceHighRiskIfMapTileUnavailable:
               type: boolean
               description: The toggle for forcing navigation reliability risk level to HIGH if map tile is unavailable
-          additionalProperties: true
           required:
           - mediumThresholds
           - highThresholds
@@ -537,7 +530,6 @@ components:
                   minimum: 0.0
                   maximum: 1.0
                   description: The weighting of navigation reliability risk
-              additionalProperties: true
               required:
               - obstacleProximity
               - groundImpact
@@ -567,7 +559,6 @@ components:
               minimum: 0.0
               maximum: 1.0
               description: The threshold for the percentage of waypoints with an overall HIGH risk for setting Flight Go-Ahead Indicator to FALSE
-      additionalProperties: true
 
     FlightOperation:
       type: object
@@ -647,7 +638,6 @@ components:
           minimum: 0.0
           maximum: 100.0
           description: The percentage of waypoints receiving a HIGH or MEDIUM navigation reliability risk
-      additionalProperties: true
       required:
       - overallWeightedRisk
       - totalWaypointCount
@@ -679,7 +669,6 @@ components:
         navigationReliabilityRiskLevel:
           $ref: '#/components/schemas/RiskLevel'
           description: The navigation reliability risk level for the given waypoints
-      additionalProperties: true
       required:
       - waypoint
       - overallRiskLevel
@@ -706,7 +695,6 @@ components:
         riskThresholds:
           $ref: '#/components/schemas/RiskThresholds'
           description: The thresholds used for this risk assessment
-      additionalProperties: true
       required:
       - flightOperationUuid
       - flightGoAheadIndicator
