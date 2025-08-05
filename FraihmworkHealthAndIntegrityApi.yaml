@@ -5,7 +5,7 @@ info:
   description: 'FRAIHMWORK allows for multiple implementations of basic health and integrity monitoring services for other systems in a given network. This set of APIs are for systems that elect to do HTTP POST calls to push their state and fault information to the FRAIHMWORK platform, rather than hosting their own server endpoint or TCP/UDP streams. This API will versioned according to SemVer 2.0.0 rules (as described here: https://semver.org/)'
   contact:
     email: g.dorchies@resilienx.com
-  version: 1.5.0
+  version: 1.5.1
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -1981,6 +1981,8 @@ components:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
       allOf:
         - $ref: '#/components/schemas/Fault'
+        - type: object
+          properties: {}
 
     Blocklist:
       type: object
@@ -2366,6 +2368,7 @@ components:
         extensions:
           description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
           type: object
+          nullable: true
           additionalProperties: true
 
       required: 
