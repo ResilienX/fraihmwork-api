@@ -6,6 +6,8 @@ Version 1.6.0
 - All 401's are described as 'not authenticated' 
 - Scrubbed to ensure 406 and 500 codes applied universally
 
+Version 1.5.1
+- Added empty object and nullable attributes in a handful of places to support openapitools-generator code generation
 
 Version 1.5.0
 - Added minimumTimeToLive field to Fault object, to allow for a specification of a minimum amount of time a fault is forced to exist in FRAIHMWORK

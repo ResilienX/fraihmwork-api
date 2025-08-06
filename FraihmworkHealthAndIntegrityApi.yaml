@@ -2464,6 +2464,8 @@ components:
       description: The final 'fault' that is used for external consumption by displays and other services. Currently, this is the same data type as the Fault object, but leaves room for future expansion
       allOf:
         - $ref: '#/components/schemas/Fault'
+        - type: object
+          properties: {}
 
     Blocklist:
       type: object
@@ -2849,6 +2851,7 @@ components:
         extensions:
           description: The addition for any component extensions that are optionally included to provide stereotyped information for a particular component. 
           type: object
+          nullable: true
           additionalProperties: true
 
       required: 
