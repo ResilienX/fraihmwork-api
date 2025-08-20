@@ -1082,7 +1082,7 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
-  /monitor/v1/component/{uuid}/relationship:
+  /monitor/v1/component/{uuid}/queryRelationship:
     get:
       tags:
       - Monitor
@@ -1100,7 +1100,7 @@ paths:
           format: uuid
       - name: type
         in: query
-        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition name.
+        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition name or null to not filter
         schema:
           type: string
       - name: role
