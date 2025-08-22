@@ -1082,6 +1082,85 @@ paths:
       security:
       - OAuth2: [fraihmwork.component.write, fraihmwork.component.admin]
 
+  /monitor/v1/component/{uuid}/queryRelationship:
+    get:
+      tags:
+      - Monitor
+      - Components
+      summary: Retrieve all components that have a relationship with the given component
+      description: Returns all components that have a relationship with the given component, can optionally filter by specific relation types and if the related component is a source or target.
+      operationId: getComponentsByRelationship
+      parameters:
+      - name: uuid
+        in: path
+        description: The UUID of the component to get related components for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: query
+        description: Filter results by the type of relationship. The string should match an existing RelationshipDefinition name or null to not filter
+        schema:
+          type: string
+      - name: role
+        in: query
+        description: Filter by the role of the component in the relationship
+        schema:
+          type: string
+          enum:
+          - source
+          - target
+          - any
+          default: any
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActiveComponent'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        401:
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        403:
+          description: Forbidden - client is not authorized to read this component
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        404:
+          description: Component not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        406:
+          description: Not acceptable - only responds in application/json format
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        500:
+          description: Server error
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+      security:
+      - OAuth2: [fraihmwork.component.read, fraihmwork.component.write, fraihmwork.component.admin]
+
   /monitor/v1/relationship/definition:
     get:
       tags:

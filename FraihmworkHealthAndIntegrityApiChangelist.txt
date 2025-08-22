@@ -1,3 +1,6 @@
+Version 1.6.1
+- Added GET /monitor/v1/component/{uuid}/queryRelationship: to allow querying associated components to a given one by its relationships
+
 Version 1.6.0
 - Added RelationshipDefinition and RelationshipInstance data types
 - Added POST, GET, and DELETE endpoints for RelationshipDefinitions
